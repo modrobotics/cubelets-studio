@@ -1,0 +1,199 @@
+<html>
+<head>
+	<title>Cubelets Studio</title>
+
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/d3.js"></script>
+
+	<style type="text/css">
+
+body {
+	background: #111;
+	color: #fff;
+	margin: 0;
+	padding: 0;
+	font-family: 'Andale Mono', 'Courier New', monospace;
+}
+
+#studio {
+
+}
+
+#studio .titlebar {
+	background: #333;
+	height: 44px;
+}
+
+#studio .titlebar-title {
+	line-height: 44px;
+	margin: auto;
+	text-align: center;
+	width: 400px;
+	font-size: 1em;
+	font-weight: bold;
+	padding: 0;
+}
+
+#studio .titlebar-title-document-name,
+#studio .titlebar-title-separator,
+#studio .titlebar-title-device-name {
+	display: inline-block;
+}
+
+#studio .titlebar-connection-status {
+	display: inline-block;
+	color: #fff;
+	background: #444;
+	border-top: 1px solid #555;
+	border-right: 1px solid #222;
+	border-bottom: 1px solid #222;
+	border-left: 1px solid #555;
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 24px;
+	margin: 9px;
+}
+
+#studio .titlebar-connection-status-icon {
+	background: url(img/connection-disconnected.png);
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	margin: 3px;
+	float: left;
+}
+
+#studio .titlebar-connection-status-label {
+	display: inline-block;
+	float: left;
+	line-height: 20px;
+	margin: 3px 6px;
+	font-size: 0.8em;
+}
+
+#studio .workspace {
+	position: absolute;
+	width: 100%;
+	top: 44px;
+	bottom: 0px;
+}
+
+#studio .workspace-programs {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	bottom: 100px;
+	width: 300px;
+	border-right: 2px solid #333;
+	overflow-x: auto;
+	overflow-y: scroll;
+}
+
+#studio .workspace-programs-title {
+	font-size: 0.9em;
+	font-weight: bold;
+	margin: 6px;
+	padding: 0;
+	text-align: left;
+}
+
+#studio .workspace-code {
+	position: absolute;
+	top: 0px;
+	left: 300px;
+	right: 300px;
+	bottom: 100px;
+}
+
+#studio .workspace-construction {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	bottom: 100px;
+	width: 300px;
+	border-left: 2px solid #333;
+}
+
+#studio .workspace-construction-graph {
+	width: 300px;
+	height: 300px;
+	border-bottom: 1px solid #333;
+}
+
+#studio .console {
+	position: absolute;
+	height: 100px;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	background: #111;
+	border-top: 2px solid #333;
+}
+
+	</style>
+</head>
+<body>
+
+	<div id="studio">
+		<div class="titlebar">
+			<h1 class="titlebar-title">
+				<div class="titlebar-title-document-name">Untitled</div>
+				<div class="titlebar-title-separator">&mdash;</div>
+				<div class="titlebar-title-device-name">Cubelet-D41A</div>
+			</h1>
+			<a href="#" class="titlebar-connection-status">
+				<div class="titlebar-connection-status-icon"></div>
+				<div class="titlebar-connection-status-label">Disconnected</div>
+			</a>
+		</div>
+		<div class="workspace">
+			<div class="workspace-programs">
+				<h2 class="workspace-programs-title">Programs</h2>
+			</div>
+			<div class="workspace-code">
+				<div class="workspace-code-tabs"></div>
+				<div class="workspace-code-editor"></div>
+			</div>
+			<div class="workspace-construction">
+				<div class="workspace-construction-graph"></div>
+			</div>
+		</div>
+		<div class="console">
+			<div class="console-toolbar"></div>
+			<div class="console-messages"></div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+
+var Studio = function(selector) {
+
+	var cubelet = undefined;
+	var documents = [];
+	var studio = this;
+
+};
+
+var cubelets = require('cubelets');
+var studio = new Studio('#studio');
+
+cubelets.list(function(error, devices) {
+	if (error) {
+		handleError(error);
+		return;
+	}
+
+	d3.select('#cubelets-list ul')
+		.selectAll('li')
+		.data(devices)
+		.enter()
+			.append('li')
+			.text(function (d) {
+				return d.comName;
+			});
+});
+
+	</script>
+</body>
+</html>

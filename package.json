@@ -1,0 +1,11 @@
+{
+    "name": "cubelets-studio",
+    "main": "index.html",
+    "window": {
+        "title": "Cubelets Studio",
+		"toolbar": true,
+		"resizable": true,
+		"width": 660,
+		"height": 500
+    }
+}
