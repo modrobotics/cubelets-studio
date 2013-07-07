@@ -88,7 +88,7 @@ body {
 	left: 0px;
 	bottom: 100px;
 	width: 300px;
-	border-right: 2px solid #333;
+	border-right: 4px solid #333;
 	overflow-x: auto;
 	overflow-y: scroll;
 }
@@ -134,9 +134,43 @@ body {
 
 #studio .workspace-code-editor {
 	position: absolute;
-	width: 100%;
-	height: 100%;
+	left: 4px;
+	right: 0px;
+	top: 32px;
+	bottom: 4px;
 }
+
+#studio .workspace-code-tabs {
+	position: absolute;
+	top: 0px;
+	left: 6px;
+	right: 0px;
+	height: 32px;
+}
+
+#studio .workspace-code-tab {
+	display: block;
+	float: left;
+	width: 100px;
+	height: 28px;
+	line-height: 30px;
+	font-size: 0.7em;
+	margin: 3px 2px 0px 0px;
+	padding: 0px 9px;
+	text-align: left;
+	background: #333;
+	border-top: 1px solid #555;
+	border-left: 1px solid #555;
+	border-radius: 6px 6px 0px 0px;
+}
+
+#studio .workspace-code-tab-active {
+	background: rgba(85,97,255,0.5);
+	border-top: 1px solid rgba(85,97,255,1);
+	border-left: 1px solid rgba(85,97,255,1);
+}
+
+#studio .workspace-code-tab-active {}
 
 #studio .workspace-construction {
 	position: absolute;
@@ -144,7 +178,7 @@ body {
 	right: 0px;
 	bottom: 100px;
 	width: 300px;
-	border-left: 2px solid #333;
+	border-left: 4px solid #333;
 }
 
 #studio .workspace-construction-graph {
@@ -160,7 +194,7 @@ body {
 	left: 0px;
 	right: 0px;
 	background: #111;
-	border-top: 2px solid #333;
+	border-top: 4px solid #333;
 }
 
 #studio .dialog {
@@ -281,9 +315,7 @@ var ui = {
 		d3.select('#studio .workspace-programs-list')
 			.insert('li', ':first-child')
 			.append('a').attr('href', '#')
-			.text(function() {
-				return program.name;
-			})
+			.text(program.name)
 			.on('click', function() {
 				studio.openProgram(program);
 			});
@@ -297,14 +329,29 @@ var ui = {
 		editor.setFontSize(14);
 		ui.editor = editor;
 	},
+	addWorkspaceCodeTab: function(tab) {
+		ui.tabs.push(tab);
+		tab.element = d3.select('#studio .workspace-code-tabs')
+			.append('a')
+			.attr('class', 'workspace-code-tab')
+			.text(tab.title)[0][0];
+		ui.setWorkspaceCodeTabActive(tab);
+	},
+	setWorkspaceCodeTabActive: function(tab) {
+		d3.selectAll('#studio .workspace-code-tab')
+			.classed('workspace-code-tab-active', false);
+		d3.select(tab.element)
+			.classed('workspace-code-tab-active', true);
+	},
 	openProgramInEditorTab: function(program) {
 		if (ui.tabs.length === 0) {
 			// First tab
 			var session = ui.editor.getSession();
 			session.getDocument().setValue(program.code);
 			ui.setWorkspaceTitleDocumentName(program.name);
-			ui.tabs.push({
+			ui.addWorkspaceCodeTab({
 				type: 'program',
+				title: program.name,
 				ref: {
 					program: program,
 					session: session
@@ -319,6 +366,7 @@ var ui = {
 			// Tab already exists
 			ui.editor.setSession(tab.ref.session);
 			ui.setWorkspaceTitleDocumentName(program.name);
+			ui.setWorkspaceCodeTabActive(tab);
 		}
 		else {
 			// Create a new tab
@@ -326,8 +374,9 @@ var ui = {
 			var session = new ace.EditSession(program.code, mode);
 			ui.editor.setSession(session);
 			ui.setWorkspaceTitleDocumentName(program.name);
-			ui.tabs.push({
+			ui.addWorkspaceCodeTab({
 				type: 'program',
+				title: program.name,
 				ref: {
 					program: program,
 					session: session
