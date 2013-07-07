@@ -2,8 +2,11 @@
 <head>
 	<title>Cubelets Studio</title>
 
-	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/d3.js"></script>
+	<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/d3.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/underscore.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="css/ace.css" />
 
 	<style type="text/css">
 
@@ -29,7 +32,7 @@ body {
 	margin: auto;
 	text-align: center;
 	width: 400px;
-	font-size: 1em;
+	font-size: 1.2em;
 	font-weight: bold;
 	padding: 0;
 }
@@ -91,11 +94,34 @@ body {
 }
 
 #studio .workspace-programs-title {
-	font-size: 0.9em;
+	font-size: 1.1em;
 	font-weight: bold;
-	margin: 6px;
-	padding: 0;
+	margin: 0px;
+	padding: 6px;
 	text-align: left;
+	background-color: rgba(85,97,255,0.5);
+}
+
+#studio .workspace-programs-list {
+	list-style: inside square;
+	padding: 0px;
+	margin: 0px;
+}
+
+#studio .workspace-programs-list li {
+	font-size: 0.9em;
+	margin: 6px;
+}
+
+#studio .workspace-programs-list li a {
+	color: #fff;
+	text-decoration: none;
+	font-weight: none;
+}
+
+#studio .workspace-programs-list li a:hover {
+	color: #fff;
+	background: rgba(85,97,255,1.0);
 }
 
 #studio .workspace-code {
@@ -104,6 +130,12 @@ body {
 	left: 300px;
 	right: 300px;
 	bottom: 100px;
+}
+
+#studio .workspace-code-editor {
+	position: absolute;
+	width: 100%;
+	height: 100%;
 }
 
 #studio .workspace-construction {
@@ -131,6 +163,11 @@ body {
 	border-top: 2px solid #333;
 }
 
+#studio .dialog {
+	display: none;
+	background: rgb(1,1,1,0.5);
+}
+
 	</style>
 </head>
 <body>
@@ -138,9 +175,9 @@ body {
 	<div id="studio">
 		<div class="titlebar">
 			<h1 class="titlebar-title">
-				<div class="titlebar-title-document-name">Untitled</div>
+				<div class="titlebar-title-document-name">Untitled.c</div>
 				<div class="titlebar-title-separator">&mdash;</div>
-				<div class="titlebar-title-device-name">Cubelet-D41A</div>
+				<div class="titlebar-title-device-name">Cubelet</div>
 			</h1>
 			<a href="#" class="titlebar-connection-status">
 				<div class="titlebar-connection-status-icon"></div>
@@ -150,6 +187,7 @@ body {
 		<div class="workspace">
 			<div class="workspace-programs">
 				<h2 class="workspace-programs-title">Programs</h2>
+				<ul class="workspace-programs-list"></ul>
 			</div>
 			<div class="workspace-code">
 				<div class="workspace-code-tabs"></div>
@@ -163,36 +201,155 @@ body {
 			<div class="console-toolbar"></div>
 			<div class="console-messages"></div>
 		</div>
+		<div class="dialog">
+			<div class="dialog-error">
+				<h3 class="dialog-error-title"></h3>
+				<div class="dialog-error-message"></div>
+			</div>
+			<div class="dialog-connection">
+				<h3 class="dialog-connection-title"></h3>
+				<ul class="dialog-connection-device-list"></ul>
+			</div>
+		</div>
 	</div>
 
 	<script type="text/javascript">
 
-var Studio = function(selector) {
+var cubelets = require('cubelets');
+var studio = new (require('./studio'))();
 
-	var cubelet = undefined;
-	var documents = [];
-	var studio = this;
+studio.on('load', function() {
+	ui.loadProgramList(studio.programs);
+});
 
+studio.on('newProgram', function(program) {
+	ui.addProgramListItem(program);
+	ui.openProgramInEditorTab(program);
+});
+
+studio.on('openProgram', function(program) {
+	ui.openProgramInEditorTab(program);
+});
+
+var ui = {
+	tabs: [],
+
+	initialize: function() {
+		ui.initializeEditor();
+	},
+	showErrorDialog: function(title, message) {
+		console.error(title + ':', message);
+	},
+	setWorkspaceTitle: function(documentName, deviceName) {
+		ui.setWorkspaceTitleDocumentName(documentName);
+		ui.setWorkspaceTitleDeviceName(deviceName);
+		d3.select('#studio .titlebar-title-separator').html((documentName && deviceName) ? '&mdash;' : '');
+	},
+	setWorkspaceTitleDocumentName: function(documentName) {
+		d3.select('#studio .titlebar-title-document-name').text(documentName);
+	},
+	setWorkspaceTitleDeviceName: function(deviceName) {
+		d3.select('#studio .titlebar-title-device-name').text(deviceName);
+	},
+	showConnectionDialog: function(devices) {
+		d3.select('#studio .dialog-connection-device-list')
+			.selectAll('li')
+			.data(devices)
+			.enter()
+				.append('li')
+				.text(function(device) {
+					return device.comName;
+				});
+	},
+	loadProgramList: function(programs) {
+		d3.select('#studio .workspace-programs-list')
+			.selectAll('li')
+			.data(studio.programs)
+			.enter()
+				.append('li')
+				.append('a').attr('href', '#')
+				.text(function(d) {
+					return d.name;
+				});
+		d3.selectAll('#studio .workspace-programs-list li').each(function(d, i) {
+			d3.select(this).on('click', function() {
+				studio.openProgram(d);
+			});
+		});
+	},
+	addProgramListItem: function(program) {
+		d3.select('#studio .workspace-programs-list')
+			.insert('li', ':first-child')
+			.append('a').attr('href', '#')
+			.text(function() {
+				return program.name;
+			})
+			.on('click', function() {
+				studio.openProgram(program);
+			});
+	},
+	initializeEditor: function() {
+		var container = d3.select('#studio .workspace-code-editor')[0][0];
+		var editor = ace.edit(container);
+		editor.setTheme('ace/theme/twilight');
+		editor.getSession().setMode('ace/mode/c_cpp');
+		editor.setShowPrintMargin(false);
+		editor.setFontSize(14);
+		ui.editor = editor;
+	},
+	openProgramInEditorTab: function(program) {
+		if (ui.tabs.length === 0) {
+			// First tab
+			var session = ui.editor.getSession();
+			session.getDocument().setValue(program.code);
+			ui.setWorkspaceTitleDocumentName(program.name);
+			ui.tabs.push({
+				type: 'program',
+				ref: {
+					program: program,
+					session: session
+				}
+			});
+			return;
+		}
+		var tab = _(ui.tabs).find(function(tab) {
+			return tab.type === 'program' && tab.ref.program === program;
+		});
+		if (tab) {
+			// Tab already exists
+			ui.editor.setSession(tab.ref.session);
+			ui.setWorkspaceTitleDocumentName(program.name);
+		}
+		else {
+			// Create a new tab
+			var mode = ui.editor.getSession().getMode();
+			var session = new ace.EditSession(program.code, mode);
+			ui.editor.setSession(session);
+			ui.setWorkspaceTitleDocumentName(program.name);
+			ui.tabs.push({
+				type: 'program',
+				ref: {
+					program: program,
+					session: session
+				}
+			});
+		}
+	}
 };
 
-var cubelets = require('cubelets');
-var studio = new Studio('#studio');
-
-cubelets.list(function(error, devices) {
-	if (error) {
-		handleError(error);
-		return;
-	}
-
-	d3.select('#cubelets-list ul')
-		.selectAll('li')
-		.data(devices)
-		.enter()
-			.append('li')
-			.text(function (d) {
-				return d.comName;
-			});
+d3.select('.titlebar-connection-status').on('click', function(e) {
+	cubelets.list(function(error, devices) {
+		if (error) {
+			ui.showErrorDialog('Connection Error', 'Could not list connected cubelets.');
+			return;
+		}
+		ui.showConnectionDialog(devices);
+	});
 });
+
+ui.initialize();
+studio.load();
+studio.createNewProgram('Untitled.c');
 
 	</script>
 </body>
