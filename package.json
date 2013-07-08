@@ -5,7 +5,9 @@
         "title": "Cubelets Studio",
 		"toolbar": true,
 		"resizable": true,
-		"width": 660,
-		"height": 500
+		"width": 1200,
+		"height": 675,
+		"min_width": 800,
+		"min_height": 450
     }
 }

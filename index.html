@@ -91,6 +91,7 @@ body {
 	border-right: 4px solid #333;
 	overflow-x: auto;
 	overflow-y: scroll;
+	background: #111;
 }
 
 #studio .workspace-programs-title {
@@ -136,7 +137,7 @@ body {
 	position: absolute;
 	left: 4px;
 	right: 0px;
-	top: 32px;
+	top: 33px;
 	bottom: 4px;
 }
 
@@ -146,6 +147,7 @@ body {
 	left: 6px;
 	right: 0px;
 	height: 32px;
+	border-bottom: 1px solid #333;
 }
 
 #studio .workspace-code-tab {
@@ -154,7 +156,6 @@ body {
 	width: 100px;
 	height: 28px;
 	line-height: 30px;
-	font-size: 0.7em;
 	margin: 3px 2px 0px 0px;
 	padding: 0px 9px;
 	text-align: left;
@@ -162,6 +163,9 @@ body {
 	border-top: 1px solid #555;
 	border-left: 1px solid #555;
 	border-radius: 6px 6px 0px 0px;
+	font-size: 0.7em;
+	color: #fff;
+	text-decoration: none;
 }
 
 #studio .workspace-code-tab-active {
@@ -170,8 +174,6 @@ body {
 	border-left: 1px solid rgba(85,97,255,1);
 }
 
-#studio .workspace-code-tab-active {}
-
 #studio .workspace-construction {
 	position: absolute;
 	top: 0px;
@@ -179,6 +181,7 @@ body {
 	bottom: 100px;
 	width: 300px;
 	border-left: 4px solid #333;
+	background: #111;
 }
 
 #studio .workspace-construction-graph {
@@ -269,7 +272,23 @@ var ui = {
 	tabs: [],
 
 	initialize: function() {
+		ui.initializeMenu();
 		ui.initializeEditor();
+	},
+	initializeMenu: function() {
+		var g = require('nw.gui');
+		var mainMenu = g.Window.get().menu = new g.Menu({ type: 'menubar' });
+		var fileMenuItem = new g.MenuItem({ label: 'File' });
+		var fileMenu = fileMenuItem.submenu = new g.Menu();
+		fileMenu.append(new g.MenuItem({ label: 'New Program' }));
+		fileMenu.append(new g.MenuItem({ label: 'Open' }));
+		fileMenu.append(new g.MenuItem({ label: 'Save' }));
+		fileMenu.append(new g.MenuItem({ label: 'Save As...' }));
+		fileMenu.append(new g.MenuItem({ label: 'Save All' }));
+		fileMenu.append(new g.MenuItem({ type: 'separator' }));
+		fileMenu.append(new g.MenuItem({ label: 'Close Program' }));
+		fileMenu.append(new g.MenuItem({ label: 'Close All Programs' }));
+		mainMenu.insert(fileMenuItem, 1);
 	},
 	showErrorDialog: function(title, message) {
 		console.error(title + ':', message);
@@ -331,10 +350,16 @@ var ui = {
 	},
 	addWorkspaceCodeTab: function(tab) {
 		ui.tabs.push(tab);
-		tab.element = d3.select('#studio .workspace-code-tabs')
+		var element = d3.select('#studio .workspace-code-tabs')
 			.append('a')
+			.attr('href', '#')
 			.attr('class', 'workspace-code-tab')
-			.text(tab.title)[0][0];
+			.text(tab.title)
+			.on('click', function() {
+				var program = tab.ref.program;
+				ui.openProgramInEditorTab(program);
+			});
+		tab.element = element[0][0];
 		ui.setWorkspaceCodeTabActive(tab);
 	},
 	setWorkspaceCodeTabActive: function(tab) {
@@ -342,6 +367,9 @@ var ui = {
 			.classed('workspace-code-tab-active', false);
 		d3.select(tab.element)
 			.classed('workspace-code-tab-active', true);
+	},
+	closeWorkspaceCodeTab: function(tab) {
+
 	},
 	openProgramInEditorTab: function(program) {
 		if (ui.tabs.length === 0) {
