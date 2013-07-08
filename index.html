@@ -52,8 +52,8 @@ body {
 	border-bottom: 1px solid #222;
 	border-left: 1px solid #555;
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: 0px;
+	right: 0px;
 	height: 24px;
 	margin: 9px;
 }
@@ -190,6 +190,13 @@ body {
 	border-bottom: 1px solid #333;
 }
 
+#studio .workspace-construction-graph-canvas {
+	width: 300px;
+	height: 300px;
+	margin: 0px;
+	padding: 0px;
+}
+
 #studio .console {
 	position: absolute;
 	height: 100px;
@@ -232,6 +239,7 @@ body {
 			</div>
 			<div class="workspace-construction">
 				<div class="workspace-construction-graph"></div>
+				<div class="workspace-construction-details"></div>
 			</div>
 		</div>
 		<div class="console">
@@ -261,19 +269,28 @@ studio.on('load', function() {
 
 studio.on('newProgram', function(program) {
 	ui.addProgramListItem(program);
-	ui.openProgramInEditorTab(program);
+	ui.openProgram(program);
 });
 
 studio.on('openProgram', function(program) {
-	ui.openProgramInEditorTab(program);
+	ui.openProgram(program);
+});
+
+studio.on('constructionChanged', function() {
+	ui.drawWorkspaceConstructionGraph(studio.construction);
 });
 
 var ui = {
+	// UI Properties
 	tabs: [],
+	editor: undefined,
+	graph: undefined,
 
+	// Initialization
 	initialize: function() {
 		ui.initializeMenu();
-		ui.initializeEditor();
+		ui.initializeWorkspaceCodeEditor();
+		ui.initializeWorkspaceConstructionGraph();
 	},
 	initializeMenu: function() {
 		var g = require('nw.gui');
@@ -290,19 +307,28 @@ var ui = {
 		fileMenu.append(new g.MenuItem({ label: 'Close All Programs' }));
 		mainMenu.insert(fileMenuItem, 1);
 	},
+	initializeWorkspaceCodeEditor: function() {
+		var container = d3.select('#studio .workspace-code-editor')[0][0];
+		var editor = ace.edit(container);
+		editor.setTheme('ace/theme/twilight');
+		editor.getSession().setMode('ace/mode/c_cpp');
+		editor.setShowPrintMargin(false);
+		editor.setFontSize(14);
+		ui.editor = editor;
+	},
+	initializeWorkspaceConstructionGraph: function() {
+		var width = 300;
+		var height = 300;
+		ui.graph = d3.select('#studio .workspace-construction-graph')
+			.append('svg:svg')
+			.attr('class', 'workspace-construction-graph-canvas')
+			.attr('width', width)
+			.attr('height', height);
+	},
+
+	// Dialogs
 	showErrorDialog: function(title, message) {
 		console.error(title + ':', message);
-	},
-	setWorkspaceTitle: function(documentName, deviceName) {
-		ui.setWorkspaceTitleDocumentName(documentName);
-		ui.setWorkspaceTitleDeviceName(deviceName);
-		d3.select('#studio .titlebar-title-separator').html((documentName && deviceName) ? '&mdash;' : '');
-	},
-	setWorkspaceTitleDocumentName: function(documentName) {
-		d3.select('#studio .titlebar-title-document-name').text(documentName);
-	},
-	setWorkspaceTitleDeviceName: function(deviceName) {
-		d3.select('#studio .titlebar-title-device-name').text(deviceName);
 	},
 	showConnectionDialog: function(devices) {
 		d3.select('#studio .dialog-connection-device-list')
@@ -314,6 +340,46 @@ var ui = {
 					return device.comName;
 				});
 	},
+
+	// Workspace Title Formatting
+	setWorkspaceTitle: function(documentName, deviceName) {
+		ui.setWorkspaceTitleDocumentName(documentName);
+		ui.setWorkspaceTitleDeviceName(deviceName);
+		d3.select('#studio .titlebar-title-separator').html((documentName && deviceName) ? '&mdash;' : '');
+	},
+	setWorkspaceTitleDocumentName: function(documentName) {
+		d3.select('#studio .titlebar-title-document-name').text(documentName);
+	},
+	setWorkspaceTitleDeviceName: function(deviceName) {
+		d3.select('#studio .titlebar-title-device-name').text(deviceName);
+	},
+
+	// Workspace Code Tabs
+	addWorkspaceCodeTab: function(tab) {
+		ui.tabs.push(tab);
+		var element = d3.select('#studio .workspace-code-tabs')
+			.append('a')
+			.attr('href', '#')
+			.attr('class', 'workspace-code-tab')
+			.text(tab.title)
+			.on('click', function() {
+				var program = tab.ref.program;
+				ui.openProgram(program);
+			});
+		tab.element = element[0][0];
+		ui.setWorkspaceCodeTabActive(tab);
+	},
+	setWorkspaceCodeTabActive: function(tab) {
+		d3.selectAll('#studio .workspace-code-tab')
+			.classed('workspace-code-tab-active', false);
+		d3.select(tab.element)
+			.classed('workspace-code-tab-active', true);
+	},
+	closeWorkspaceCodeTab: function(tab) {
+
+	},
+
+	// Program List/Display
 	loadProgramList: function(programs) {
 		d3.select('#studio .workspace-programs-list')
 			.selectAll('li')
@@ -339,41 +405,9 @@ var ui = {
 				studio.openProgram(program);
 			});
 	},
-	initializeEditor: function() {
-		var container = d3.select('#studio .workspace-code-editor')[0][0];
-		var editor = ace.edit(container);
-		editor.setTheme('ace/theme/twilight');
-		editor.getSession().setMode('ace/mode/c_cpp');
-		editor.setShowPrintMargin(false);
-		editor.setFontSize(14);
-		ui.editor = editor;
-	},
-	addWorkspaceCodeTab: function(tab) {
-		ui.tabs.push(tab);
-		var element = d3.select('#studio .workspace-code-tabs')
-			.append('a')
-			.attr('href', '#')
-			.attr('class', 'workspace-code-tab')
-			.text(tab.title)
-			.on('click', function() {
-				var program = tab.ref.program;
-				ui.openProgramInEditorTab(program);
-			});
-		tab.element = element[0][0];
-		ui.setWorkspaceCodeTabActive(tab);
-	},
-	setWorkspaceCodeTabActive: function(tab) {
-		d3.selectAll('#studio .workspace-code-tab')
-			.classed('workspace-code-tab-active', false);
-		d3.select(tab.element)
-			.classed('workspace-code-tab-active', true);
-	},
-	closeWorkspaceCodeTab: function(tab) {
-
-	},
-	openProgramInEditorTab: function(program) {
+	openProgram: function(program) {
 		if (ui.tabs.length === 0) {
-			// First tab
+			// Initial tab
 			var session = ui.editor.getSession();
 			session.getDocument().setValue(program.code);
 			ui.setWorkspaceTitleDocumentName(program.name);
@@ -411,6 +445,39 @@ var ui = {
 				}
 			});
 		}
+	},
+
+	// Construction Graph
+	imageForWorkspaceConstructionNode: function(node) {
+		var Types = cubelets.Types;
+		switch (node.type) {
+			case Types.BLUETOOTH:
+				return 'img/cubelet-bluetooth.png';
+			default:
+				return 'img/cubelet-unknown.png';
+		}
+	},
+	drawWorkspaceConstructionGraph: function(construction) {
+		var w = 300;
+		var h = 300;
+		var iw = 45;
+		var ih = 45;
+		var cx = w / 2;
+		var cy = h / 2;
+		var t = 'translate(' + -iw / 2 + ',' + -ih / 2 + ')';
+		ui.graph.selectAll().remove();
+		ui.graph
+			.selectAll('image.workspace-construction-graph-node')
+			.data([construction.origin])
+			.enter()
+				.append('image')
+				.attr('class', 'workspace-construction-graph-node')
+				.attr('xlink:href', ui.imageForWorkspaceConstructionNode)
+				.attr('x', cx)
+				.attr('y', cy)
+				.attr('width', iw)
+				.attr('height', ih)
+				.attr('transform', t);
 	}
 };
 
@@ -427,6 +494,7 @@ d3.select('.titlebar-connection-status').on('click', function(e) {
 ui.initialize();
 studio.load();
 studio.createNewProgram('Untitled.c');
+studio.mockConstruction();
 
 	</script>
 </body>

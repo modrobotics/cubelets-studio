@@ -1,12 +1,13 @@
 var _ = require('underscore');
 var util = require('util');
 var events = require('events');
+var cubelets = require('cubelets');
 
 var Studio = function() {
 	events.EventEmitter.call(this);
 
 	this.connection = undefined;
-	this.graph = undefined;
+	this.construction = undefined;
 	this.programs = [];
 
 	this.load = function() {
@@ -36,6 +37,11 @@ var Studio = function() {
 	this.openProgram = function(program) {
 		this.emit('openProgram', program);
 	};
+
+	this.mockConstruction = function() {
+		this.construction = new cubelets.Construction();
+		this.emit('constructionChanged');
+	}
 
 };
 
