@@ -367,17 +367,20 @@ var ui = {
 		d3.select('#studio .titlebar-title-device-name').text(deviceName);
 	},
 
-	// Workspace Code Tabs
+	// Workspace Code Tabs/Editor
 	addWorkspaceCodeTab: function(tab) {
 		ui.tabs.push(tab);
+		var program = tab.ref.program;
 		var element = d3.select('#studio .workspace-code-tabs')
 			.append('a')
 			.attr('href', '#')
 			.classed('workspace-code-tab', true)
 			.text(tab.title)
 			.on('click', function() {
-				var program = tab.ref.program;
 				ui.openProgram(program);
+			})
+			.on('contextmenu', function() {
+				ui.closeProgram(program);
 			});
 		tab.element = element[0][0];
 		ui.setWorkspaceCodeTabActive(tab);
@@ -388,8 +391,20 @@ var ui = {
 		d3.select(tab.element)
 			.classed('workspace-code-tab-active', true);
 	},
-	closeWorkspaceCodeTab: function(tab) {
-
+	removeWorkspaceCodeTab: function(tab) {
+		var index = ui.tabs.indexOf(tab);
+		if (index >= 0) {
+			ui.tabs.splice(index, 1);
+			d3.select(tab.element).remove();
+		}
+		return index;
+	},
+	hideWorkspaceEditor: function() {
+		ui.editor.getSession().setValue('');
+		d3.select('#studio .workspace-code-editor').style('visibility', 'hidden');
+	},
+	showWorkspaceEditor: function() {
+		d3.select('#studio .workspace-code-editor').style('visibility', 'visible');
 	},
 
 	// Program List/Display
@@ -419,6 +434,7 @@ var ui = {
 			});
 	},
 	openProgram: function(program) {
+		ui.showWorkspaceEditor();
 		if (ui.tabs.length === 0) {
 			// Initial tab
 			var session = ui.editor.getSession();
@@ -457,6 +473,24 @@ var ui = {
 					session: session
 				}
 			});
+		}
+	},
+	closeProgram: function(program) {
+		var tab = _(ui.tabs).find(function(tab) {
+			return tab.type === 'program' && tab.ref.program === program;
+		});
+		if (tab) {
+			var index = ui.removeWorkspaceCodeTab(tab);
+			var length = ui.tabs.length;
+			if (length > 0) {
+				var nextTab = ui.tabs[Math.max(0, Math.min(index - 1, length - 1))];
+				if (nextTab) {
+					ui.openProgram(nextTab.ref.program);
+					return;
+				}
+			}
+			// Hide editor if no next tab
+			ui.hideWorkspaceEditor();
 		}
 	},
 
