@@ -8,6 +8,7 @@ var Studio = function() {
 
 	this.connection = undefined;
 	this.construction = undefined;
+	this.cubelet = undefined;
 	this.programs = [];
 
 	this.load = function() {
@@ -40,6 +41,7 @@ var Studio = function() {
 
 	this.mockConstruction = function() {
 		this.construction = new cubelets.Construction();
+		this.cubelet = this.construction.origin;
 		this.emit('constructionChanged');
 	}
 

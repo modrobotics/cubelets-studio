@@ -136,7 +136,7 @@ body {
 #studio .workspace-code-editor {
 	position: absolute;
 	left: 4px;
-	right: 0px;
+	right: 4px;
 	top: 33px;
 	bottom: 4px;
 }
@@ -144,7 +144,7 @@ body {
 #studio .workspace-code-tabs {
 	position: absolute;
 	top: 0px;
-	left: 6px;
+	left: 4px;
 	right: 0px;
 	height: 32px;
 	border-bottom: 1px solid #333;
@@ -156,7 +156,7 @@ body {
 	width: 100px;
 	height: 28px;
 	line-height: 30px;
-	margin: 3px 2px 0px 0px;
+	margin: 3px 0px 0px 2px;
 	padding: 0px 9px;
 	text-align: left;
 	background: #333;
@@ -185,6 +185,7 @@ body {
 }
 
 #studio .workspace-construction-graph {
+	position: absolute;
 	width: 300px;
 	height: 300px;
 	border-bottom: 1px solid #333;
@@ -208,6 +209,51 @@ body {
 
 #studio .workspace-construction-graph-node-active {
 	opacity: 1.0;
+}
+
+#studio .workspace-construction-detail {
+	padding: 9px;
+	position: absolute;
+	top: 301px;
+	bottom: 4px;
+	left: 0px;
+	right: 0px;
+	overflow-x: auto;
+	overflow-y: scroll;
+}
+
+#studio .workspace-construction-detail-icon {
+	width: 90px;
+	height: 90px;
+	background: url(img/cubelet-unknown@2x.png);
+	margin: auto;
+}
+
+#studio .workspace-construction-detail-label {
+	font-size: 1.1em;
+	text-align: center;
+	margin: 9px auto;
+}
+
+#studio .workspace-construction-detail-info {
+	font-size: 0.7em;
+	border-collapse: collapse;
+	margin: 27px auto;
+}
+
+#studio .workspace-construction-detail-info tr td {
+	text-align: left;
+	width: 50%;
+	color: #ccc;
+	border: 1px solid #222;
+	padding: 4px 9px;
+	font-weight: normal;
+}
+
+#studio .workspace-construction-detail-info tr td:first-child {
+	text-align: right;
+	color: #fff;
+	font-weight: bold;
 }
 
 #studio .console {
@@ -252,7 +298,14 @@ body {
 			</div>
 			<div class="workspace-construction">
 				<div class="workspace-construction-graph"></div>
-				<div class="workspace-construction-details"></div>
+				<div class="workspace-construction-detail">
+					<div class="workspace-construction-detail-icon"></div>
+					<div class="workspace-construction-detail-label">12345</div>
+					<table class="workspace-construction-detail-info">
+						<tr><td>Type</td><td>Unknown</td></tr>
+						<tr><td>Category</td><td>None</td></tr>
+					</table>
+				</div>
 			</div>
 		</div>
 		<div class="console">
@@ -290,7 +343,7 @@ studio.on('openProgram', function(program) {
 });
 
 studio.on('constructionChanged', function() {
-	ui.drawWorkspaceConstructionGraph(studio.construction);
+	ui.drawWorkspaceConstructionGraph();
 });
 
 var ui = {
@@ -494,9 +547,13 @@ var ui = {
 		}
 	},
 
-	// Construction Graph
-	getImageForWorkspaceConstructionNode: function(node) {
+	// Construction Graph/Info
+	getImageForWorkspaceConstructionGraphNode: function(node) {
 		return 'img/cubelet-' + node.type.name + '.png';
+	},
+	selectWorkspaceConstructionCubelet: function(node) {
+		ui.setWorkspaceConstructionGraphNodeActive(node);
+		ui.setWorkspaceConstructionDetail(node);
 	},
 	setWorkspaceConstructionGraphNodeActive: function(node) {
 		d3.selectAll('#studio .workspace-construction-graph-node')
@@ -504,7 +561,18 @@ var ui = {
 		d3.select(node.element)
 			.classed('workspace-construction-graph-node-active', true);
 	},
-	drawWorkspaceConstructionGraph: function(construction) {
+	drawWorkspaceConstructionGraph: function() {
+		// Clear graph
+		ui.graph.selectAll().remove();
+
+		if (!studio.construction) {
+			// Nothing to draw
+			return;
+		}
+
+		// Draw construction
+		var construction = studio.construction;
+		var cubelet = studio.cubelet;
 		var w = 300;
 		var h = 300;
 		var s = 32;
@@ -514,7 +582,7 @@ var ui = {
 		var t = 'translate(' + -s / 2 + ',' + -s / 2 + ')';
 		function applyNode() {
 			this
-				.attr('xlink:href', ui.getImageForWorkspaceConstructionNode)
+				.attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode)
 				.attr('width', s)
 				.attr('height', s)
 				.attr('transform', t)
@@ -535,7 +603,6 @@ var ui = {
 				return cy + radius * Math.sin(2 * (i / spokes) * Math.PI + Math.PI / 2);
 			}
 		}
-		ui.graph.selectAll().remove();
 		if (construction.far.length > 0) {
 			ui.graph
 				.append('circle')
@@ -573,6 +640,11 @@ var ui = {
 				.attr('x', plotX(2 * p, construction.far.length))
 				.attr('y', plotY(2 * p, construction.far.length))
 				.call(applyNode);
+		// Select cubelet
+		ui.selectWorkspaceConstructionCubelet(studio.cubelet);
+	},
+	setWorkspaceConstructionDetail: function(node) {
+
 	}
 };
 
