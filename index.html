@@ -188,13 +188,26 @@ body {
 	width: 300px;
 	height: 300px;
 	border-bottom: 1px solid #333;
+	background: #000;
 }
 
-#studio .workspace-construction-graph-canvas {
-	width: 300px;
-	height: 300px;
-	margin: 0px;
-	padding: 0px;
+#studio .workspace-construction-graph-circle-near {
+	stroke: rgba(85,255,97,0.5);
+	stroke-width: 2px;
+}
+
+#studio .workspace-construction-graph-circle-far {
+	stroke: rgba(51,51,51,1);
+	stroke-width: 2px;
+	stroke-dasharray: 10px, 5px;
+}
+
+#studio .workspace-construction-graph-node {
+	opacity: 0.5;
+}
+
+#studio .workspace-construction-graph-node-active {
+	opacity: 1.0;
 }
 
 #studio .console {
@@ -321,7 +334,7 @@ var ui = {
 		var height = 300;
 		ui.graph = d3.select('#studio .workspace-construction-graph')
 			.append('svg:svg')
-			.attr('class', 'workspace-construction-graph-canvas')
+			.classed('workspace-construction-graph-svg', true)
 			.attr('width', width)
 			.attr('height', height);
 	},
@@ -360,7 +373,7 @@ var ui = {
 		var element = d3.select('#studio .workspace-code-tabs')
 			.append('a')
 			.attr('href', '#')
-			.attr('class', 'workspace-code-tab')
+			.classed('workspace-code-tab', true)
 			.text(tab.title)
 			.on('click', function() {
 				var program = tab.ref.program;
@@ -448,36 +461,84 @@ var ui = {
 	},
 
 	// Construction Graph
-	imageForWorkspaceConstructionNode: function(node) {
-		var Types = cubelets.Types;
-		switch (node.type) {
-			case Types.BLUETOOTH:
-				return 'img/cubelet-bluetooth.png';
-			default:
-				return 'img/cubelet-unknown.png';
-		}
+	getImageForWorkspaceConstructionNode: function(node) {
+		return 'img/cubelet-' + node.type.name + '.png';
+	},
+	setWorkspaceConstructionGraphNodeActive: function(node) {
+		d3.selectAll('#studio .workspace-construction-graph-node')
+			.classed('workspace-construction-graph-node-active', false);
+		d3.select(node.element)
+			.classed('workspace-construction-graph-node-active', true);
 	},
 	drawWorkspaceConstructionGraph: function(construction) {
 		var w = 300;
 		var h = 300;
-		var iw = 45;
-		var ih = 45;
+		var s = 32;
+		var p = (w - s * 5) / 10 + s;
 		var cx = w / 2;
 		var cy = h / 2;
-		var t = 'translate(' + -iw / 2 + ',' + -ih / 2 + ')';
+		var t = 'translate(' + -s / 2 + ',' + -s / 2 + ')';
+		function applyNode() {
+			this
+				.attr('xlink:href', ui.getImageForWorkspaceConstructionNode)
+				.attr('width', s)
+				.attr('height', s)
+				.attr('transform', t)
+				.each(function(node) {
+					node.element = this;
+				})
+				.on('click', function(node) {
+					ui.setWorkspaceConstructionGraphNodeActive(node);
+				});
+		}
+		function plotX(radius, spokes) {
+			return function(node, i) {
+				return cx + radius * Math.cos(2 * (i / spokes) * Math.PI + Math.PI / 2);
+			}
+		}
+		function plotY(radius, spokes) {
+			return function(node, i) {
+				return cy + radius * Math.sin(2 * (i / spokes) * Math.PI + Math.PI / 2);
+			}
+		}
 		ui.graph.selectAll().remove();
+		if (construction.far.length > 0) {
+			ui.graph
+				.append('circle')
+				.classed('workspace-construction-graph-circle-far', true)
+				.attr({ 'r': 2.5 * p, 'cx': cx, 'cy': cy });
+		}
 		ui.graph
-			.selectAll('image.workspace-construction-graph-node')
+			.append('circle')
+			.classed('workspace-construction-graph-circle-near', true)
+			.attr({ 'r': 1.5 * p, 'cx': cx, 'cy': cy });
+		ui.graph.selectAll('image.workspace-construction-graph-node-origin')
 			.data([construction.origin])
 			.enter()
 				.append('image')
-				.attr('class', 'workspace-construction-graph-node')
-				.attr('xlink:href', ui.imageForWorkspaceConstructionNode)
+				.classed('workspace-construction-graph-node', true)
+				.classed('workspace-construction-graph-node-origin', true)
 				.attr('x', cx)
 				.attr('y', cy)
-				.attr('width', iw)
-				.attr('height', ih)
-				.attr('transform', t);
+				.call(applyNode);
+		ui.graph.selectAll('image.workspace-construction-graph-node-near')
+			.data(construction.near)
+			.enter()
+				.append('image')
+				.classed('workspace-construction-graph-node', true)
+				.classed('workspace-construction-graph-node-near', true)
+				.attr('x', plotX(p, construction.near.length))
+				.attr('y', plotY(p, construction.near.length))
+				.call(applyNode);
+		ui.graph.selectAll('image.workspace-construction-graph-node-far')
+			.data(construction.far)
+			.enter()
+				.append('image')
+				.classed('workspace-construction-graph-node', true)
+				.classed('workspace-construction-graph-node-far', true)
+				.attr('x', plotX(2 * p, construction.far.length))
+				.attr('y', plotY(2 * p, construction.far.length))
+				.call(applyNode);
 	}
 };
 
