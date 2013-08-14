@@ -485,6 +485,7 @@ var studio = new (require('./studio'))();
 
 studio.on('load', function() {
 	ui.loadProgramList(studio.programs);
+	ui.drawWorkspaceConstructionGraph();
 });
 
 studio.on('newProgram', function(program) {
@@ -498,6 +499,10 @@ studio.on('openProgram', function(program) {
 
 studio.on('constructionChanged', function() {
 	ui.drawWorkspaceConstructionGraph();
+});
+
+studio.on('cubeletChanged', function(cubelet) {
+	ui.updateWorkspaceConstructionGraphNode(cubelet);
 });
 
 studio.on('connected', function() {
@@ -866,6 +871,10 @@ var ui = {
 	getWorkspaceConstructionGraphNodeActive: function() {
 		return d3.select('#studio .workspace-construction-graph-node-active').datum();
 	},
+	updateWorkspaceConstructionGraphNode: function(node) {
+		d3.select(node.element)
+			.attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode);
+	},
 	drawWorkspaceConstructionGraph: function() {
 		// Clear graph
 		ui.graph.selectAll('*').remove();
@@ -877,7 +886,6 @@ var ui = {
 
 		// Draw construction
 		var construction = studio.construction;
-		var cubelet = studio.cubelet;
 		var w = 300;
 		var h = 300;
 		var s = 32;
@@ -920,35 +928,46 @@ var ui = {
 			.append('circle')
 			.classed('workspace-construction-graph-circle-near', true)
 			.attr({ 'r': 1.5 * p, 'cx': cx, 'cy': cy });
-		ui.graph.selectAll('image.workspace-construction-graph-node-origin')
-			.data([construction.origin])
-			.enter()
-				.append('image')
-				.classed('workspace-construction-graph-node', true)
-				.classed('workspace-construction-graph-node-origin', true)
-				.attr('x', cx)
-				.attr('y', cy)
-				.call(applyNode);
-		ui.graph.selectAll('image.workspace-construction-graph-node-near')
-			.data(construction.near)
-			.enter()
-				.append('image')
-				.classed('workspace-construction-graph-node', true)
-				.classed('workspace-construction-graph-node-near', true)
-				.attr('x', plotX(p, construction.near.length))
-				.attr('y', plotY(p, construction.near.length))
-				.call(applyNode);
-		ui.graph.selectAll('image.workspace-construction-graph-node-far')
-			.data(construction.far)
-			.enter()
-				.append('image')
-				.classed('workspace-construction-graph-node', true)
-				.classed('workspace-construction-graph-node-far', true)
-				.attr('x', plotX(2 * p, construction.far.length))
-				.attr('y', plotY(2 * p, construction.far.length))
-				.call(applyNode);
+		// Draw origin
+		if (construction.origin) {
+			ui.graph.selectAll('image.workspace-construction-graph-node-origin')
+				.data([construction.origin])
+				.enter()
+					.append('image')
+					.classed('workspace-construction-graph-node', true)
+					.classed('workspace-construction-graph-node-origin', true)
+					.attr('x', cx)
+					.attr('y', cy)
+					.call(applyNode);
+		}
+		// Draw inner ring of cubelets
+		if (construction.near.length > 0) {
+			ui.graph.selectAll('image.workspace-construction-graph-node-near')
+				.data(construction.near)
+				.enter()
+					.append('image')
+					.classed('workspace-construction-graph-node', true)
+					.classed('workspace-construction-graph-node-near', true)
+					.attr('x', plotX(p, construction.near.length))
+					.attr('y', plotY(p, construction.near.length))
+					.call(applyNode);
+		}
+		// Draw outer ring of cubelets
+		if (construction.far.length > 0) {
+			ui.graph.selectAll('image.workspace-construction-graph-node-far')
+				.data(construction.far)
+				.enter()
+					.append('image')
+					.classed('workspace-construction-graph-node', true)
+					.classed('workspace-construction-graph-node-far', true)
+					.attr('x', plotX(2 * p, construction.far.length))
+					.attr('y', plotY(2 * p, construction.far.length))
+					.call(applyNode);
+		}
 		// Select cubelet
-		ui.selectWorkspaceConstructionCubelet(studio.cubelet);
+		if (studio.cubelet) {
+			ui.selectWorkspaceConstructionCubelet(studio.cubelet);
+		}
 	},
 	setWorkspaceConstructionDetail: function(node) {
 		d3.select('#studio .workspace-construction-detail-label')

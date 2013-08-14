@@ -13,6 +13,7 @@ var Studio = function() {
 
 	var studio = this;
 	var buildService = new cubelets.BuildService();
+	var infoService = new cubelets.InfoService();
 
 	this.load = function() {
 		this.programs = _(require('./programs')).reduce(function(result, value, key) {
@@ -42,32 +43,9 @@ var Studio = function() {
 		this.emit('openProgram', program);
 	};
 
-	this.mockConstruction = function() {
-		var Types = cubelets.Types;
-		var Node = function(id, type) {
-			this.id = id;
-			this.type = type;
-		};
-		this.construction.mock(new Node('12345', Types.BLUETOOTH), [
-			new Node('82334', Types.DRIVE),
-			new Node('83823', Types.INVERSE),
-			new Node('39021', Types.KNOB),
-			new Node('38281', Types.MAXIMUM),
-			new Node('93849', Types.SPEAKER),
-			new Node('38492', Types.ROTATE)
-		],[
-			new Node('34141', Types.PASSIVE),
-			new Node('67362', Types.DRIVE),
-			new Node('77381', Types.MINIMUM),
-			new Node('11091', Types.FLASHLIGHT)
-		]);
-		this.cubelet = this.construction.origin;
-		this.emit('constructionChanged');
-	}
-
 	this.discoverConstruction = function() {
 		this.construction.discover();
-	}
+	};
 
 	this.setConnection = function(connection) {
 		this.connection = connection;
@@ -79,13 +57,18 @@ var Studio = function() {
 		buildService.requestBuild(program, cubelet);
 	}
 
-	this.construction.on('discover', function() {
+	this.construction.on('change', function() {
 		studio.emit('constructionChanged');
+		fetchCubeletInfo();
 	});
 
 	buildService.on('error', function(error) {
 		console.log(error);
 	});
+
+	function fetchCubeletInfo() {
+		
+	}
 
 };
 
