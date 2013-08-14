@@ -293,6 +293,20 @@ body {
 	text-decoration: none;
 }
 
+#studio .console-toolbar-button-enabled {
+	cursor: hand;
+}
+
+#studio .console-toolbar-button-disabled {
+	background: #333;
+	border-top: 1px solid #222;
+	border-right: 1px solid #111;
+	border-bottom: 1px solid #111;
+	border-left: 1px solid #222;
+	color: #555;
+	cursor: default;
+}
+
 #studio .console-messages {
 	height: 76px;
 	font-size: 0.75em;
@@ -509,12 +523,29 @@ studio.on('connected', function() {
 	ui.setConnectionStatusConnected();
 });
 
-studio.on('buildProgress', function(build, status) {
-	ui.updateBuildProgress(build, status);
+studio.on('buildComplete', function(build) {
+	ui.showBuildComplete(build);
+	ui.enableFlashButton();
 });
 
-studio.on('buildComplete', function(build) {
-	ui.setBuildComplete(build);
+studio.on('buildError', function(error) {
+	ui.showBuildError(build, error);
+});
+
+studio.on('buildProgress', function(build, progress) {
+	ui.showBuildProgress(build, progress);
+});
+
+studio.on('flashComplete', function() {
+	ui.showFlashComplete();
+});
+
+studio.on('flashError', function(error) {
+	ui.showFlashError(error);
+});
+
+studio.on('flashProgress', function(progress) {
+	ui.showFlashProgress(progress);
 });
 
 var log = new (function() {
@@ -580,20 +611,46 @@ var ui = {
 	initializeBuildButton: function() {
 		d3.select('#studio .console-toolbar-button-build')
 			.on('click', function() {
-				var cubelet = ui.getWorkspaceConstructionGraphNodeActive();
+				log.info('Building...');
 				var tab = ui.getWorkspaceCodeTabActive();
 				var program = tab.ref.program;
-				studio.requestBuild(program, cubelet);
+				studio.buildProgram(program);
 			});
+		ui.enableFlashButton();
 	},
 	initializeFlashButton: function() {
 		d3.select('#studio .console-toolbar-button-flash')
 			.on('click', function() {
-				alert('Flash');
+				studio.flashCubelet();
 			});
+		ui.disableFlashButton();
 	},
 
-	// Dialog
+	// Buttons
+	enableConsoleToolbarButton: function(selector) {
+		d3.select(selector)
+			.classed('console-toolbar-button-disabled', false)
+			.classed('console-toolbar-button-enabled', true);
+	},
+	disableConsoleToolbarButton: function(selector) {
+		d3.select(selector)
+			.classed('console-toolbar-button-enabled', false)
+			.classed('console-toolbar-button-disabled', true);
+	},
+	enableBuildButton: function() {
+		ui.enableConsoleToolbarButton('#studio .console-toolbar-button-build');
+	},
+	disableBuildButton: function() {
+		ui.disableConsoleToolbarButton('#studio .console-toolbar-button-build');
+	},
+	enableFlashButton: function() {
+		ui.enableConsoleToolbarButton('#studio .console-toolbar-button-flash');
+	},
+	disableFlashButton: function() {
+		ui.disableConsoleToolbarButton('#studio .console-toolbar-button-flash');
+	},
+
+	// Dialogs
 	showDialog: function(title, contents, buttons) {
 		d3.select('#studio .dialog-container').style('display', 'block');
 		d3.select('#studio .dialog-buttons').selectAll('.dialog-button')
@@ -848,15 +905,6 @@ var ui = {
 	getLargeImageForWorkspaceConstructionGraphNode: function(node) {
 		return 'img/cubelet-' + node.type.name + '@2x.png';
 	},
-	getTypeLabelForWorkspaceConstructionGraphNode: function(node) {
-		return node.type.name
-			.replace(/^(.)/, function(s) { return s.toUpperCase() })
-			.replace(/bargraph/i, 'Bar Graph');
-	},
-	getCategoryLabelForWorkspaceConstructionGraphNode: function(node) {
-		return node.type.category
-			.replace(/^(.)/, function(s) { return s.toUpperCase() });
-	},
 	selectWorkspaceConstructionCubelet: function(node) {
 		studio.cubelet = node;
 		ui.setWorkspaceConstructionGraphNodeActive(node);
@@ -874,6 +922,9 @@ var ui = {
 	updateWorkspaceConstructionGraphNode: function(node) {
 		d3.select(node.element)
 			.attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode);
+		if (node == studio.cubelet) {
+			ui.setWorkspaceConstructionDetail(node);
+		}
 	},
 	drawWorkspaceConstructionGraph: function() {
 		// Clear graph
@@ -974,10 +1025,32 @@ var ui = {
 			.text(node.id);
 		d3.select('#studio .workspace-construction-detail-icon')
 			.style('background-image', 'url(' + ui.getLargeImageForWorkspaceConstructionGraphNode(node) + ')');
-		var info = [
-			{ key: 'Type', value: ui.getTypeLabelForWorkspaceConstructionGraphNode(node) },
-			{ key: 'Category', value: ui.getCategoryLabelForWorkspaceConstructionGraphNode(node) }
-		];
+
+		var info = [];
+
+		if (node.type) {
+			info.push({
+				key: 'Type',
+				value: ui.formatCubeletTypeLabel(node.type.name)
+			})
+			info.push({
+				key: 'Category',
+				value: ui.formatCubeletCategoryLabel(node.type.category)
+			})
+		}
+		if (node.mcu) {
+			info.push({
+				key: 'MCU',
+				value: node.mcu.toUpperCase()
+			})
+		}
+		if (node.currentFirmwareVersion) {
+			info.push({
+				key: 'Version',
+				value: node.currentFirmwareVersion
+			})
+		}
+
 		d3.selectAll('#studio .workspace-construction-detail-info tr').remove();
 		d3.select('#studio .workspace-construction-detail-info').selectAll('tr')
 			.data(info)
@@ -989,18 +1062,52 @@ var ui = {
 				});
 	},
 
+	// Connection status
 	setConnectionStatusConnected: function() {
 		d3.select('#studio .titlebar-connection-status-label')
 			.text('Connected');
 		d3.select('#studio .titlebar-connection-status-icon')
 			.style('background-image', 'url(img/connection-connected.png)');
 	},
-
 	setConnectionStatusDisconnected: function() {
 		d3.select('#studio .titlebar-connection-status-label')
 			.text('Disconnected');
 		d3.select('#studio .titlebar-connection-status-icon')
 			.style('background-image', 'url(img/connection-disconnected.png)');
+	},
+
+	// Building
+	showBuildComplete: function(build) {
+		log.info('Build complete.');
+	},
+	showBuildError: function(build, error) {
+		log.error(error);
+	},
+	showBuildProgress: function(build, progress) {
+		log.info('Build', progress + '%');
+	},
+
+	// Flashing
+	showFlashComplete: function() {
+		log.info('Flash complete.');
+	},
+	showFlashError: function(error) {
+		log.error(error);
+	},
+	showFlashProgress: function(progress) {
+		console.log('Progress', progress);
+		log.info('Flash', 'Action: ' + progress.action, progress.percentage + '%');
+	},
+
+	// Formatting
+	formatCubeletTypeLabel: function(type) {
+		return type
+			.replace(/^(.)/, function(s) { return s.toUpperCase() })
+			.replace(/bargraph/i, 'Bar Graph');
+	},
+	formatCubeletCategoryLabel: function(category) {
+		return category
+			.replace(/^(.)/, function(s) { return s.toUpperCase() });
 	}
 };
 
@@ -1017,6 +1124,11 @@ d3.select('.titlebar-connection-status').on('click', function(e) {
 ui.initialize();
 studio.load();
 studio.createNewProgram('Untitled.c');
+studio.cubelet = new cubelets.Cubelet(23825);
+
+studio.fetchCubeletInfo([
+	new cubelets.Cubelet(23825)
+]);
 
 	</script>
 </body>
