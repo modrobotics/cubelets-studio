@@ -556,6 +556,7 @@ var log = new (function() {
 				.append('div')
 				.classed('console-message-' + type, true)
 				.text(Array.prototype.join.call(arguments, ' '));
+			ui.scrollConsoleToBottom();
 		}
 	});
 });
@@ -1096,7 +1097,7 @@ var ui = {
 	},
 	showFlashProgress: function(progress) {
 		console.log('Progress', progress);
-		log.info('Flash', 'Action: ' + progress.action, progress.percentage + '%');
+		log.info('Flash', progress.action, progress.percent + '%');
 	},
 
 	// Formatting
@@ -1108,6 +1109,12 @@ var ui = {
 	formatCubeletCategoryLabel: function(category) {
 		return category
 			.replace(/^(.)/, function(s) { return s.toUpperCase() });
+	},
+
+	// Console
+	scrollConsoleToBottom: function() {
+		var console = d3.select('#studio .console-messages');
+		console.scrollTop = console.scrollHeight;
 	}
 };
 
@@ -1124,11 +1131,6 @@ d3.select('.titlebar-connection-status').on('click', function(e) {
 ui.initialize();
 studio.load();
 studio.createNewProgram('Untitled.c');
-studio.cubelet = new cubelets.Cubelet(23825);
-
-studio.fetchCubeletInfo([
-	new cubelets.Cubelet(23825)
-]);
 
 	</script>
 </body>

@@ -86,7 +86,7 @@ var Studio = function() {
 			console.error('Flash program is invalid.');
 			return;
 		}
-		var loader = new cubelets.FlashLoader(studio.connection);
+		var loader = new cubelets.FlashLoader(studio.connection.serial());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',
