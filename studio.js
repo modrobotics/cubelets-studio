@@ -24,7 +24,10 @@ var Studio = function() {
 		this.emit('load');
 	};
 
+	var autoProgramName = 1;
+
 	this.createNewProgram = function(programName) {
+		programName = programName || ((autoProgramName++) + '.c');
 		var program = {
 			name: programName,
 			code: [

@@ -474,7 +474,7 @@ body {
 			<h1 class="titlebar-title">
 				<div class="titlebar-title-document-name">Untitled.c</div>
 				<div class="titlebar-title-separator">&mdash;</div>
-				<div class="titlebar-title-device-name">Cubelet</div>
+				<div class="titlebar-title-device-name"></div>
 			</h1>
 			<a href="#" class="titlebar-connection-status">
 				<div class="titlebar-connection-status-icon"></div>
@@ -625,7 +625,9 @@ var ui = {
 		var mainMenu = g.Window.get().menu = new g.Menu({ type: 'menubar' });
 		var fileMenuItem = new g.MenuItem({ label: 'File' });
 		var fileMenu = fileMenuItem.submenu = new g.Menu();
-		fileMenu.append(new g.MenuItem({ label: 'New Program' }));
+		fileMenu.append(new g.MenuItem({ label: 'New Program', click: function() {
+			studio.createNewProgram();
+		}}));
 		fileMenu.append(new g.MenuItem({ label: 'Open' }));
 		fileMenu.append(new g.MenuItem({ label: 'Save' }));
 		fileMenu.append(new g.MenuItem({ label: 'Save As...' }));
@@ -659,6 +661,8 @@ var ui = {
 				log.info('Building...');
 				var tab = ui.getWorkspaceCodeTabActive();
 				var program = tab.ref.program;
+				program.code = tab.ref.session.getValue();
+				console.log(program.code);
 				studio.buildProgram(program);
 				ui.disableBuildButton();
 				ui.showBuildProgressIndicator();
