@@ -20,6 +20,7 @@ var Studio = function() {
 		this.programs = __(require('./programs')).reduce(function(result, value, key) {
 			return result.concat({ name: key, code: value });
 		}, []);
+		this.openProgram(this.programs[0]);
 		this.emit('load');
 	};
 
@@ -44,6 +45,10 @@ var Studio = function() {
 		this.emit('openProgram', program);
 	};
 
+	this.closeProgram = function(program) {
+		this.emit('closeProgram', program);
+	};
+
 	this.discoverConstruction = function() {
 		this.construction.discover();
 	};
@@ -56,8 +61,8 @@ var Studio = function() {
 	this.setConnection = function(connection) {
 		this.connection = connection;
 		this.construction.setConnection(connection);
-		this.emit('connected');
-	}
+		this.emit('connected', connection.device);
+	};
 
 	this.buildProgram = function(program) {
 		console.log('Building...');
@@ -67,7 +72,15 @@ var Studio = function() {
 			return;
 		}
 		buildService.requestBuild(program, cubelet);
-	}
+	};
+
+	this.selectCubelet = function(cubelet) {
+		if (!cubelet) {
+			return;
+		}
+		this.cubelet = cubelet;
+		this.emit('cubeletSelected', cubelet);
+	};
 
 	this.flashCubelet = function() {
 		console.log('Flashing...');
@@ -84,9 +97,15 @@ var Studio = function() {
 		var program = new cubelets.FlashProgram(build.hex);
 		if (!program.valid) {
 			console.error('Flash program is invalid.');
+			console.log(build.hex);
 			return;
 		}
-		var loader = new cubelets.FlashLoader(studio.connection.serial());
+		var connection = studio.connection;
+		if (!connection) {
+			console.error('Flash program is invalid.');
+			return;
+		}
+		var loader = new cubelets.FlashLoader(connection.serial());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',
@@ -107,7 +126,7 @@ var Studio = function() {
 			studio.emit('flashError', error);
 		});
 		loader.load(program, cubelet.id, cubelet.mcu);
-	}
+	};
 
 	buildService.on('complete', function(build) {
 		studio.build = build;
@@ -133,6 +152,20 @@ var Studio = function() {
 		cubelet.latestFirmwareVersion = parseFloat(info.latestFirmwareVersion);
 		studio.emit('cubeletChanged', cubelet);
 	});
+
+	this.mockConstruction = function() {
+		var Types = cubelets.Types;
+		var Cubelet = cubelets.Cubelet;
+		this.construction.origin = new Cubelet(32028, Types.BLUETOOTH);
+		this.construction.near = [
+			new Cubelet(26012, Types.BARGRAPH),
+			new Cubelet(23825, Types.PASSIVE),
+			new Cubelet(24003, Types.BRIGHTNESS),
+			new Cubelet(21685, Types.BATTERY),
+			new Cubelet(20214, Types.DISTANCE)
+		];
+		this.emit('constructionChanged');
+	};
 
 };
 

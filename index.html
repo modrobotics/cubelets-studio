@@ -36,6 +36,8 @@ body {
 	font-size: 1.2em;
 	font-weight: bold;
 	padding: 0;
+	white-space: nowrap;
+	overflow: visible;
 }
 
 #studio .titlebar-title-document-name,
@@ -278,7 +280,7 @@ body {
 	display: block;
 	float: right;
 	color: #fff;
-	background: #444;
+	background-color: #444;
 	border-top: 1px solid #555;
 	border-right: 1px solid #222;
 	border-bottom: 1px solid #222;
@@ -298,13 +300,34 @@ body {
 }
 
 #studio .console-toolbar-button-disabled {
-	background: #333;
+	background-color: #333;
+	background-image: none;
+	background-repeat: no-repeat;
+	background-position: right center;
 	border-top: 1px solid #222;
 	border-right: 1px solid #111;
 	border-bottom: 1px solid #111;
 	border-left: 1px solid #222;
 	color: #555;
 	cursor: default;
+}
+
+#studio .console-toolbar-progress-indicator-enabled {
+	color: rgb(85,255,97) !important;
+	background-image: url(img/progress-indicator.gif) !important;
+	border-top: 1px solid rgb(85,255,97) !important;
+	border-right: 1px solid rgb(85,255,97) !important;
+	border-bottom: 1px solid rgb(85,255,97) !important;
+	border-left: 1px solid rgb(85,255,97) !important;
+}
+
+#studio .console-toolbar-progress-bar-enabled {
+	color: rgb(85,255,97) !important;
+	background-image: url(img/progress-bar.png) !important;
+	border-top: 1px solid rgb(85,255,97) !important;
+	border-right: 1px solid rgb(85,255,97) !important;
+	border-bottom: 1px solid rgb(85,255,97) !important;
+	border-left: 1px solid rgb(85,255,97) !important;
 }
 
 #studio .console-messages {
@@ -509,6 +532,16 @@ studio.on('newProgram', function(program) {
 
 studio.on('openProgram', function(program) {
 	ui.openProgram(program);
+	if (studio.cubelet) {
+		ui.enableBuildButton();
+	}
+});
+
+studio.on('closeProgram', function(program) {
+	if (!ui.hasAnyProgramOpen()) {
+		ui.disableBuildButton();
+		ui.disableFlashButton();
+	}
 });
 
 studio.on('constructionChanged', function() {
@@ -519,33 +552,44 @@ studio.on('cubeletChanged', function(cubelet) {
 	ui.updateWorkspaceConstructionGraphNode(cubelet);
 });
 
-studio.on('connected', function() {
+studio.on('cubeletSelected', function(cubelet) {
+	if (ui.hasAnyProgramOpen()) {
+		ui.enableBuildButton();
+	}
+});
+
+studio.on('connected', function(device) {
 	ui.setConnectionStatusConnected();
+	ui.setWorkspaceTitleDeviceName(device);
 });
 
 studio.on('buildComplete', function(build) {
-	ui.showBuildComplete(build);
+	ui.hideBuildProgressIndicator();
+	ui.enableBuildButton();
 	ui.enableFlashButton();
+	log.info('Build complete.');
 });
 
 studio.on('buildError', function(error) {
+	ui.hideBuildProgressIndicator();
+	ui.enableBuildButton();
 	ui.showBuildError(build, error);
 });
 
-studio.on('buildProgress', function(build, progress) {
-	ui.showBuildProgress(build, progress);
+studio.on('flashProgress', function(progress) {
+	ui.showFlashProgressBar(progress);
 });
 
 studio.on('flashComplete', function() {
-	ui.showFlashComplete();
+	ui.hideFlashProgressBar();
+	ui.enableFlashButton();
+	log.info('Flash complete.');
 });
 
 studio.on('flashError', function(error) {
+	ui.hideFlashProgressIndicator();
+	ui.enableFlashButton();
 	ui.showFlashError(error);
-});
-
-studio.on('flashProgress', function(progress) {
-	ui.showFlashProgress(progress);
 });
 
 var log = new (function() {
@@ -616,13 +660,17 @@ var ui = {
 				var tab = ui.getWorkspaceCodeTabActive();
 				var program = tab.ref.program;
 				studio.buildProgram(program);
+				ui.disableBuildButton();
+				ui.showBuildProgressIndicator();
 			});
-		ui.enableFlashButton();
+		ui.disableBuildButton();
 	},
 	initializeFlashButton: function() {
 		d3.select('#studio .console-toolbar-button-flash')
 			.on('click', function() {
 				studio.flashCubelet();
+				ui.disableFlashButton();
+				ui.showFlashProgressBar(0);
 			});
 		ui.disableFlashButton();
 	},
@@ -886,6 +934,7 @@ var ui = {
 		});
 		if (tab) {
 			var index = ui.removeWorkspaceCodeTab(tab);
+			studio.closeProgram(tab.ref.program);
 			var length = ui.tabs.length;
 			if (length > 0) {
 				var nextTab = ui.tabs[Math.max(0, Math.min(index - 1, length - 1))];
@@ -898,18 +947,21 @@ var ui = {
 			ui.hideWorkspaceEditor();
 		}
 	},
+	hasAnyProgramOpen: function() {
+		return ui.tabs.length > 0;
+	},
 
 	// Construction Graph/Info
+	selectWorkspaceConstructionCubelet: function(cubelet) {
+		studio.selectCubelet(cubelet);
+		ui.setWorkspaceConstructionGraphNodeActive(cubelet);
+		ui.setWorkspaceConstructionDetail(cubelet);
+	},
 	getImageForWorkspaceConstructionGraphNode: function(node) {
 		return 'img/cubelet-' + node.type.name + '.png';
 	},
 	getLargeImageForWorkspaceConstructionGraphNode: function(node) {
 		return 'img/cubelet-' + node.type.name + '@2x.png';
-	},
-	selectWorkspaceConstructionCubelet: function(node) {
-		studio.cubelet = node;
-		ui.setWorkspaceConstructionGraphNodeActive(node);
-		ui.setWorkspaceConstructionDetail(node);
 	},
 	setWorkspaceConstructionGraphNodeActive: function(node) {
 		d3.selectAll('#studio .workspace-construction-graph-node')
@@ -938,14 +990,14 @@ var ui = {
 
 		// Draw construction
 		var construction = studio.construction;
-		var w = 300;
-		var h = 300;
-		var s = 32;
-		var p = (w - s * 5) / 10 + s;
-		var cx = w / 2;
-		var cy = h / 2;
+		var w = 300; // Width
+		var h = 300; // Height
+		var s = 32; // Size
+		var p = (w - s * 5) / 10 + s; // Padding
+		var cx = w / 2; // Center x
+		var cy = h / 2; // Center y
 		var t = 'translate(' + -s / 2 + ',' + -s / 2 + ')';
-		function applyNode() {
+		function draw() {
 			this
 				.attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode)
 				.attr('width', s)
@@ -990,7 +1042,7 @@ var ui = {
 					.classed('workspace-construction-graph-node-origin', true)
 					.attr('x', cx)
 					.attr('y', cy)
-					.call(applyNode);
+					.call(draw);
 		}
 		// Draw inner ring of cubelets
 		if (construction.near.length > 0) {
@@ -1002,7 +1054,7 @@ var ui = {
 					.classed('workspace-construction-graph-node-near', true)
 					.attr('x', plotX(p, construction.near.length))
 					.attr('y', plotY(p, construction.near.length))
-					.call(applyNode);
+					.call(draw);
 		}
 		// Draw outer ring of cubelets
 		if (construction.far.length > 0) {
@@ -1014,7 +1066,7 @@ var ui = {
 					.classed('workspace-construction-graph-node-far', true)
 					.attr('x', plotX(2 * p, construction.far.length))
 					.attr('y', plotY(2 * p, construction.far.length))
-					.call(applyNode);
+					.call(draw);
 		}
 		// Select cubelet
 		if (studio.cubelet) {
@@ -1078,26 +1130,32 @@ var ui = {
 	},
 
 	// Building
-	showBuildComplete: function(build) {
-		log.info('Build complete.');
+	showBuildProgressIndicator: function() {
+		d3.select('#studio .console-toolbar-button-build')
+			.classed('console-toolbar-progress-indicator-enabled', true);
+	},
+	hideBuildProgressIndicator: function() {
+		d3.select('#studio .console-toolbar-button-build')
+			.classed('console-toolbar-progress-indicator-enabled', false);
 	},
 	showBuildError: function(build, error) {
 		log.error(error);
 	},
-	showBuildProgress: function(build, progress) {
-		log.info('Build', progress + '%');
-	},
 
 	// Flashing
-	showFlashComplete: function() {
-		log.info('Flash complete.');
+	showFlashProgressBar: function(percent) {
+		var button = d3.select('#studio .console-toolbar-button-flash');
+		var w = 132; // TODO: Get width from button dynamically
+		var x = w * (percent || 0.0) / 100.0;
+		button.style('background-position', [x - w, 0].join(' '));
+		button.classed('console-toolbar-progress-bar-enabled', true);
+	},
+	hideFlashProgressBar: function() {
+		d3.select('#studio .console-toolbar-button-flash')
+			.classed('console-toolbar-progress-bar-enabled', true);
 	},
 	showFlashError: function(error) {
 		log.error(error);
-	},
-	showFlashProgress: function(progress) {
-		console.log('Progress', progress);
-		log.info('Hex', progress.action, progress.percent + '%');
 	},
 
 	// Formatting
@@ -1130,7 +1188,7 @@ d3.select('.titlebar-connection-status').on('click', function(e) {
 
 ui.initialize();
 studio.load();
-studio.createNewProgram('Untitled.c');
+studio.mockConstruction();
 
 	</script>
 </body>
