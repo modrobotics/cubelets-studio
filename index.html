@@ -577,7 +577,7 @@ studio.on('buildError', function(error) {
 });
 
 studio.on('flashProgress', function(progress) {
-	ui.showFlashProgressBar(progress);
+	ui.showFlashProgressBar(progress.percent);
 });
 
 studio.on('flashComplete', function() {
@@ -587,7 +587,7 @@ studio.on('flashComplete', function() {
 });
 
 studio.on('flashError', function(error) {
-	ui.hideFlashProgressIndicator();
+	ui.hideFlashProgressBar();
 	ui.enableFlashButton();
 	ui.showFlashError(error);
 });
@@ -1152,7 +1152,7 @@ var ui = {
 	},
 	hideFlashProgressBar: function() {
 		d3.select('#studio .console-toolbar-button-flash')
-			.classed('console-toolbar-progress-bar-enabled', true);
+			.classed('console-toolbar-progress-bar-enabled', false);
 	},
 	showFlashError: function(error) {
 		log.error(error);
@@ -1188,7 +1188,6 @@ d3.select('.titlebar-connection-status').on('click', function(e) {
 
 ui.initialize();
 studio.load();
-studio.mockConstruction();
 
 	</script>
 </body>

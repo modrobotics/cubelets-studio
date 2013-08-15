@@ -17,8 +17,8 @@ var Studio = function() {
 	var infoService = new cubelets.InfoService();
 
 	this.load = function() {
-		this.programs = __(require('./programs')).reduce(function(result, value, key) {
-			return result.concat({ name: key, code: value });
+		this.programs = __(require('./programs')).reduce(function(list, value, key) {
+			return list.concat({ name: key, code: value });
 		}, []);
 		this.openProgram(this.programs[0]);
 		this.emit('load');
@@ -102,7 +102,7 @@ var Studio = function() {
 		}
 		var connection = studio.connection;
 		if (!connection) {
-			console.error('Flash program is invalid.');
+			console.error('No connection available.');
 			return;
 		}
 		var loader = new cubelets.FlashLoader(connection.serial());
