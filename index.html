@@ -516,6 +516,7 @@ body {
 				<div class="dialog-buttons"></div>
 			</div>
 		</div>
+		<div style="display:none" class="file-browser" />
 	</div>
 
 	<script type="text/javascript">
@@ -616,6 +617,7 @@ var ui = {
 	tabs: [],
 	editor: undefined,
 	graph: undefined,
+	menu: undefined,
 
 	// Initialization
 	initialize: function() {
@@ -628,20 +630,25 @@ var ui = {
 	},
 	initializeMenu: function() {
 		var g = require('nw.gui');
-		var mainMenu = g.Window.get().menu = new g.Menu({ type: 'menubar' });
+		var menu = g.Window.get().menu = new g.Menu({ type: 'menubar' });
 		var fileMenuItem = new g.MenuItem({ label: 'File' });
 		var fileMenu = fileMenuItem.submenu = new g.Menu();
 		fileMenu.append(new g.MenuItem({ label: 'New Program', click: function() {
 			studio.createNewProgram();
 		}}));
-		fileMenu.append(new g.MenuItem({ label: 'Open' }));
+		fileMenu.append(new g.MenuItem({ label: 'Open', click: function() {
+			ui.openFileBrowser(function(file) {
+				studio.openProgramFile(file);
+			});
+		}}));
 		fileMenu.append(new g.MenuItem({ label: 'Save' }));
 		fileMenu.append(new g.MenuItem({ label: 'Save As...' }));
 		fileMenu.append(new g.MenuItem({ label: 'Save All' }));
 		fileMenu.append(new g.MenuItem({ type: 'separator' }));
 		fileMenu.append(new g.MenuItem({ label: 'Close Program' }));
 		fileMenu.append(new g.MenuItem({ label: 'Close All Programs' }));
-		mainMenu.insert(fileMenuItem, 1);
+		menu.insert(fileMenuItem, 1);
+		ui.menu = menu;
 	},
 	initializeWorkspaceCodeEditor: function() {
 		var container = d3.select('#studio .workspace-code-editor')[0][0];
@@ -693,6 +700,22 @@ var ui = {
 					studio.flashCubelet();
 				}
 			});
+	},
+
+	// File Browser
+	openFileBrowser: function(callback) {
+		var browser = d3.select('#studio .file-browser')
+			.append('input')
+			.attr('type', 'file');
+		browser.on('change', function() {
+			var file = this.value;
+			if (file) {
+				callback(file);
+			}
+		});
+		var e = document.createEvent('UIEvents');
+		e.initUIEvent('click', true, true);
+		browser.node().dispatchEvent(e);
 	},
 
 	// UI Elements

@@ -1,4 +1,6 @@
 var util = require('util');
+var fs = require('fs');
+var path = require('path');
 var events = require('events');
 var cubelets = require('cubelets');
 var __ = require('underscore');
@@ -29,23 +31,33 @@ var Studio = function() {
 
 	this.getPrograms = function() {
 		return programs;
-	}
+	};
 
-	this.createNewProgram = function(programName) {
+	this.openProgramFile = function(file) {
+		if (fs.existsSync(file)) {
+			var code = fs.readFileSync(file, 'utf8');
+			if (code) {
+				var programName = path.basename(file);
+				studio.createNewProgram(programName, code);
+			}
+		}
+	};
+
+	this.createNewProgram = function(programName, code) {
 		programName = programName || ((autoProgramName++) + '.c');
-		var program = {
+		code = code || [
+			'void setup()',
+			'{',
+			'}',
+			'',
+			'void loop()',
+			'{',
+			'}'
+		].join('\n');
+		studio.emit('newProgram', {
 			name: programName,
-			code: [
-				'void setup()',
-				'{',
-				'}',
-				'',
-				'void loop()',
-				'{',
-				'}'
-			].join('\n')
-		};
-		studio.emit('newProgram', program);
+			code: code
+		});
 	};
 
 	this.openProgram = function(program) {
