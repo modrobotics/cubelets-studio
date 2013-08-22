@@ -71,16 +71,20 @@ var Studio = function() {
 
 	this.saveProgram = function(program, session) {
 		if (program.dirty) {
+			program.saving = true;
 			program.code = session.getValue();
 			if (!program.filepath) {
 				studio.emit('error', new Error('No filepath specified for program.'));
 				return;
 			}
+			program.dirty = false;
 			studio.emit('programSaved', program);
+			program.saving = false;
 		}
 	};
 
 	this.closeProgram = function(program) {
+		program.dirty = false;
 		studio.emit('programClosed', program);
 	};
 

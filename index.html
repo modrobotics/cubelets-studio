@@ -835,9 +835,8 @@ var ui = {
 				});
 		d3.select('#studio .dialog-title').text(title);
 		d3.select('#studio .dialog-contents').call(function(selection) {
-			if (_(contents).isFunction()) {
-				contents(selection, buttons);
-			}
+			if (_(contents).isFunction()) contents(selection, buttons);
+			if (_(contents).isString()) selection.text(contents);
 		});
 		d3.select('#studio .dialog').style('display', 'block');
 	},
@@ -910,10 +909,10 @@ var ui = {
 	showYesNoDialog: function(title, message, callback) {
 		ui.showDialog(title, message, [{
 			label: 'Yes',
-			click: function() { callback(true) }
+			click: function() { callback(true); ui.hideDialog() }
 		},{
 			label: 'No',
-			click: function() { callback(false) }
+			click: function() { callback(false); ui.hideDialog() }
 		}]);
 	},
 
@@ -943,31 +942,37 @@ var ui = {
 			.on('click', function() {
 				ui.showProgramTab(program);
 			})
-			.on('contextmenu', function() {
-				studio.closeProgram(program);
+		element.append('a')
+			.attr('href', '#')
+			.classed('workspace-code-tab-control', true)
+			.on('click', function(tab) {
+				d3.event.preventDefault();
+				d3.event.stopPropagation();
+				// No changes to save. Close.
+				if (!program.dirty) {
+					studio.closeProgram(program);
+					return;
+				}
+				// Unsaved changes. Ask to save.
+				ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program?', function(yes) {
+					if (yes) studio.saveProgram(program, session);
+					studio.closeProgram(program);
+				});
 			});
-		// element.append('a')
-		// 	.attr('href', '#')
-		// 	.classed('workspace-code-tab-control', true)
-		// 	.on('click', function() {
-		// 		if (!program.dirty) {
-		// 			studio.closeProgram(program);
-		// 			return;
-		// 		}
-		// 		ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program?', function(answer) {
-		// 			if (answer) {
-		// 				program.saveProgram(program, session);
-		// 				program.closeProgram(program);
-		// 			}
-		// 			else {
-		// 				program.closeProgram(program);							
-		// 			}
-		// 		});
-		// 	});
 		tab.element = element[0][0];
 		ui.setWorkspaceCodeTabActive(tab);
 		if (program.dirty) ui.setWorkspaceCodeTabDirty(tab);
 		else ui.setWorkspaceCodeTabClean(tab);
+		tab.ref.change = function() {
+			// Ignore changes while saving
+			if (program.saving) {
+				console.log('Program is saving.');
+				return;
+			}
+			program.dirty = true;
+			ui.setWorkspaceCodeTabDirty(tab);
+		};
+		session.on('change', tab.ref.change);
 	},
 	setWorkspaceCodeTabActive: function(tab) {
 		d3.selectAll('#studio .workspace-code-tab')
@@ -976,15 +981,13 @@ var ui = {
 			.classed('workspace-code-tab-active', true);
 	},
 	setWorkspaceCodeTabClean: function(tab) {
-		d3.selectAll('#studio .workspace-code-tab')
-			.classed('workspace-code-tab-dirty', false);
 		d3.select(tab.element)
+			.classed('workspace-code-tab-dirty', false)
 			.classed('workspace-code-tab-clean', true);
 	},
 	setWorkspaceCodeTabDirty: function(tab) {
-		d3.selectAll('#studio .workspace-code-tab')
-			.classed('workspace-code-tab-clean', false);
 		d3.select(tab.element)
+			.classed('workspace-code-tab-clean', false)
 			.classed('workspace-code-tab-dirty', true);
 	},
 	getWorkspaceCodeTabActive: function() {
@@ -993,6 +996,9 @@ var ui = {
 	removeWorkspaceCodeTab: function(tab) {
 		var index = ui.tabs.indexOf(tab);
 		if (index >= 0) {
+			var session = tab.ref.session;
+			var change = tab.ref.change;
+			session.off('change', change);
 			ui.tabs.splice(index, 1);
 			d3.select(tab.element).remove();
 		}
@@ -1075,9 +1081,7 @@ var ui = {
 		}
 	},
 	closeProgramTab: function(program) {
-		var tab = _(ui.tabs).find(function(tab) {
-			return tab.type === 'program' && tab.ref.program === program;
-		});
+		var tab = ui.getTabForProgram(program);
 		if (tab) {
 			var index = ui.removeWorkspaceCodeTab(tab);
 			var length = ui.tabs.length;
@@ -1091,6 +1095,11 @@ var ui = {
 			// Hide editor if no next tab
 			ui.hideWorkspaceEditor();
 		}
+	},
+	getTabForProgram: function(program) {
+		return _(ui.tabs).find(function(tab) {
+			return tab.type === 'program' && tab.ref.program === program;
+		});
 	},
 	hasAnyProgramOpen: function() {
 		return ui.tabs.length > 0;
