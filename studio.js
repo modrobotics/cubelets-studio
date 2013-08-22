@@ -69,7 +69,6 @@ var Studio = function() {
 	};
 
 	this.discoverConstruction = function() {
-		console.log('Discover construction...')
 		construction.discover();
 	};
 

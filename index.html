@@ -16,6 +16,7 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: 'Andale Mono', 'Courier New', monospace;
+	overflow: hidden;
 }
 
 #studio {
@@ -658,7 +659,10 @@ var ui = {
 			.append('svg:svg')
 			.classed('workspace-construction-graph-svg', true)
 			.attr('width', width)
-			.attr('height', height);
+			.attr('height', height)
+			.on('contextmenu', function() {
+				studio.discoverConstruction();
+			});
 	},
 	initializeBuildButton: function() {
 		ui.flashButton = this
@@ -685,8 +689,8 @@ var ui = {
 				click: function(button) {
 					log.info('Flashing...');
 					button.disable();
-					studio.flashCubelet();
 					ui.showFlashProgressBar(0);
+					studio.flashCubelet();
 				}
 			});
 	},
@@ -730,9 +734,11 @@ var ui = {
 		d3.select('#studio .console-toolbar-button-flash').datum().enable();
 	},
 	disableFlashButton: function() {
-		d3.select('#studio .console-toolbar-button-flash').datum().enable();
+		d3.select('#studio .console-toolbar-button-flash').datum().disable();
 	},
 	updateBuildAndFlashButtons: function() {
+		ui.hideFlashProgressBar();
+		ui.hideBuildProgressIndicator();
 		var connection = studio.getConnection();
 		if (!connection || !connection.connected) {
 			ui.disableFlashButton();
@@ -1259,6 +1265,7 @@ studio.on('serviceError', function(error) {
 });
 
 studio.load();
+studio.mockConstruction();
 
 	</script>
 </body>
