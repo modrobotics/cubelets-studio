@@ -12,18 +12,37 @@ var Studio = function() {
 	var cubelet = null;
 	var construction = new cubelets.Construction();
 	var programs = [];
-	var program = null;
 	var build = null;
 
 	var studio = this;
 	var buildService = new cubelets.BuildService();
 	var infoService = new cubelets.InfoService();
 
-	this.load = function() {
-		programs = __(require('./programs')).reduce(function(list, value, key) {
-			return list.concat({ name: key, code: value });
-		}, []);
-		studio.openProgram(programs[0]);
+	this.load = function(p) {
+		if (!p) {
+			var glob = require('glob');
+			var found = [];
+			glob("programs/*.c", {
+				sync: true
+			}, function(error, files) {
+				if (!error) __(files).each(function(file) {
+					var code = fs.readFileSync(file, 'utf8');
+					if (code) {
+						found.push({
+							name: path.basename(file),
+							code: code,
+							file: file
+						});
+					}
+				});
+				studio.load(found);
+			});
+			return;
+		}
+		programs = p || [];
+		if (programs && programs.length > 0) {
+			studio.openProgram(programs[0]);
+		}
 		studio.emit('load');
 	};
 
@@ -31,19 +50,19 @@ var Studio = function() {
 		return programs;
 	};
 
-	this.openProgramFile = function(filepath) {
-		if (fs.existsSync(filepath)) {
-			var code = fs.readFileSync(filepath, 'utf8');
+	this.openProgramFile = function(file) {
+		if (fs.existsSync(file)) {
+			var code = fs.readFileSync(file, 'utf8');
 			if (code) {
-				var programName = path.basename(filepath);
-				studio.createNewProgram(programName, code, filepath);
+				var programName = path.basename(file);
+				studio.createNewProgram(programName, code, file);
 			}
 		}
 	};
 
 	var autoProgramName = 1;
 
-	this.createNewProgram = function(programName, code, filepath) {
+	this.createNewProgram = function(programName, code, file) {
 		programName = (programName) || ('Program' + (autoProgramName++) + '.c');
 		code = code || [
 			'void setup()',
@@ -57,8 +76,8 @@ var Studio = function() {
 		studio.emit('programCreated', {
 			name: programName,
 			code: code,
-			filepath: filepath,
-			dirty: (filepath === null)
+			file: file,
+			dirty: (file === null)
 		});
 	};
 
@@ -69,18 +88,17 @@ var Studio = function() {
 		studio.emit('programOpened', program);
 	};
 
-	this.saveProgram = function(program, session) {
-		if (program.dirty) {
-			program.saving = true;
-			program.code = session.getValue();
-			if (!program.filepath) {
-				studio.emit('error', new Error('No filepath specified for program.'));
-				return;
-			}
-			program.dirty = false;
-			studio.emit('programSaved', program);
-			program.saving = false;
+	this.saveProgram = function(program, session, callback) {
+		if (!program.file) {
+			studio.emit('programHasNoFile', program, session, callback);
+			return;
 		}
+		program.code = session.getValue();
+		fs.writeFileSync(program.file, program.code);
+		program.dirty = false;
+		program.name = path.basename(program.file);
+		studio.emit('programSaved', program);
+		if (callback) callback(program);
 	};
 
 	this.closeProgram = function(program) {

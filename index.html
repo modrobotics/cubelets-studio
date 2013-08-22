@@ -170,9 +170,12 @@ body {
 	border-top: 1px solid #555;
 	border-left: 1px solid #555;
 	border-radius: 6px 6px 0px 0px;
+	text-decoration: none;
+}
+
+#studio .workspace-code-tab-title {
 	font-size: 0.7em;
 	color: #fff;
-	text-decoration: none;
 }
 
 #studio .workspace-code-tab-active {
@@ -532,7 +535,10 @@ body {
 				<div class="dialog-buttons"></div>
 			</div>
 		</div>
-		<div style="display:none" class="file-browser" />
+		<div style="display:none" class="file-browser">
+			<input type="file" class="file-browser-open" />
+			<input type="file" class="file-browser-save-as" nwsaveas />
+		</div>
 	</div>
 
 	<script type="text/javascript">
@@ -541,7 +547,7 @@ var cubelets = require('cubelets');
 var studio = new (require('./studio'))();
 
 studio.on('load', function() {
-	ui.loadProgramList(studio.getPrograms());
+	ui.loadProgramList();
 	ui.drawWorkspaceConstructionGraph();
 });
 
@@ -556,7 +562,19 @@ studio.on('programOpened', function(program) {
 });
 
 studio.on('programSaved', function(program) {
+	ui.updateProgramList();
+	var tab = ui.getTabForProgram(program);
+	if (tab) {
+		ui.setWorkspaceCodeTabClean(tab);
+		ui.updateWorkspaceCodeTab(tab);
+	}
+});
 
+studio.on('programHasNoFile', function(program, session, callback) {
+	ui.showSaveAsFileBrowser(function(file) {
+		program.file = file;
+		studio.saveProgram(program, session, callback);
+	});
 });
 
 studio.on('programClosed', function(program) {
@@ -643,12 +661,22 @@ var ui = {
 
 	// Initialization
 	initialize: function() {
+		ui.initializeWindow();
 		ui.initializeMenu();
 		ui.initializeWorkspaceCodeEditor();
 		ui.initializeWorkspaceConstructionGraph();
 		ui.initializeBuildButton();
 		ui.initializeFlashButton();
 		ui.setConnectionStatusDisconnected();
+	},
+	initializeWindow: function() {
+		var g = require('nw.gui');
+		g.Window.get().on('close', function() {
+			this.hide();
+			ui.saveAll();
+			ui.saveProgramList();
+			this.close(true);
+		});
 	},
 	initializeMenu: function() {
 		var g = require('nw.gui');
@@ -659,16 +687,24 @@ var ui = {
 			studio.createNewProgram();
 		}}));
 		fileMenu.append(new g.MenuItem({ label: 'Open', click: function() {
-			ui.openFileBrowser(function(file) {
-				studio.openProgramFile(file);
-			});
+			ui.open();
 		}}));
-		fileMenu.append(new g.MenuItem({ label: 'Save' }));
-		fileMenu.append(new g.MenuItem({ label: 'Save As...' }));
-		fileMenu.append(new g.MenuItem({ label: 'Save All' }));
+		fileMenu.append(new g.MenuItem({ label: 'Save', click: function() {
+			ui.save();
+		}}));
+		fileMenu.append(new g.MenuItem({ label: 'Save As...', click: function() {
+			ui.saveAs();
+		}}));
+		fileMenu.append(new g.MenuItem({ label: 'Save All', click: function() {
+			ui.saveAll();
+		}}));
 		fileMenu.append(new g.MenuItem({ type: 'separator' }));
-		fileMenu.append(new g.MenuItem({ label: 'Close Program' }));
-		fileMenu.append(new g.MenuItem({ label: 'Close All Programs' }));
+		fileMenu.append(new g.MenuItem({ label: 'Close Program', click: function() {
+			ui.close();
+		}}));
+		fileMenu.append(new g.MenuItem({ label: 'Close All Programs', click: function() {
+			ui.closeAll();
+		}}));
 		menu.insert(fileMenuItem, 1);
 		ui.menu = menu;
 	},
@@ -725,19 +761,21 @@ var ui = {
 	},
 
 	// File Browser
-	openFileBrowser: function(callback) {
-		var browser = d3.select('#studio .file-browser')
-			.append('input')
-			.attr('type', 'file');
+	showFileBrowser: function(selector, callback) {
+		var browser = d3.select(selector);
 		browser.on('change', function() {
 			var file = this.value;
-			if (file) {
-				callback(file);
-			}
-		});
+			if (file) callback(file);
+		})
 		var e = document.createEvent('UIEvents');
 		e.initUIEvent('click', true, true);
 		browser.node().dispatchEvent(e);
+	},
+	showOpenFileBrowser: function(callback) {
+		ui.showFileBrowser('#studio .file-browser-open', callback);
+	},
+	showSaveAsFileBrowser: function(callback) {
+		ui.showFileBrowser('#studio .file-browser-save-as', callback);
 	},
 
 	// UI Elements
@@ -938,26 +976,19 @@ var ui = {
 			.append('div')
 			.classed('workspace-code-tab', true)
 			.datum(tab)
-			.text(tab.title)
 			.on('click', function() {
 				ui.showProgramTab(program);
-			})
+			});
+		element.append('span')
+			.classed('workspace-code-tab-title', true)
+			.text(tab.title);
 		element.append('a')
 			.attr('href', '#')
 			.classed('workspace-code-tab-control', true)
 			.on('click', function(tab) {
 				d3.event.preventDefault();
 				d3.event.stopPropagation();
-				// No changes to save. Close.
-				if (!program.dirty) {
-					studio.closeProgram(program);
-					return;
-				}
-				// Unsaved changes. Ask to save.
-				ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program?', function(yes) {
-					if (yes) studio.saveProgram(program, session);
-					studio.closeProgram(program);
-				});
+				ui.close(tab);
 			});
 		tab.element = element[0][0];
 		ui.setWorkspaceCodeTabActive(tab);
@@ -973,6 +1004,12 @@ var ui = {
 			ui.setWorkspaceCodeTabDirty(tab);
 		};
 		session.on('change', tab.ref.change);
+	},
+	updateWorkspaceCodeTab: function(tab) {
+		var program = tab.ref.program;
+		tab.title = program.name;
+		d3.select(tab.element).select('.workspace-code-tab-title')
+			.text(tab.title);
 	},
 	setWorkspaceCodeTabActive: function(tab) {
 		d3.selectAll('#studio .workspace-code-tab')
@@ -1013,31 +1050,47 @@ var ui = {
 	},
 
 	// Program List/Display
-	loadProgramList: function(programs) {
+	loadProgramList: function() {
 		d3.select('#studio .workspace-programs-list')
 			.selectAll('li')
 			.data(studio.getPrograms())
 			.enter()
 				.append('li')
 				.append('a').attr('href', '#')
-				.text(function(d) {
-					return d.name;
-				});
+				.attr('title', function(d) { return d.file })
+				.text(function(d) { return d.name });
 		d3.selectAll('#studio .workspace-programs-list li').each(function(d, i) {
 			d3.select(this).on('click', function() {
 				studio.openProgram(d);
 			});
 		});
 	},
+	updateProgramList: function() {
+		d3.select('#studio .workspace-programs-list')
+			.selectAll('li a')
+			.attr('title', function(d) { return d.file })
+			.text(function(d) { return d.name });
+	},
 	addProgramListItem: function(program) {
 		d3.select('#studio .workspace-programs-list')
 			.insert('li', ':first-child')
 			.append('a').attr('href', '#')
+			.datum(program)
+			.attr('title', program.file)
 			.text(program.name)
 			.on('click', function() {
 				studio.openProgram(program);
 			});
 	},
+	saveProgramList: function() {
+		var programs = studio.getPrograms();
+		var storage = JSON.stringify(programs);
+		if (storage) {
+			localStorage['programList'] = storage;
+		}
+	},
+
+	// Program Tabs
 	showProgramTab: function(program) {
 		ui.showWorkspaceEditor();
 		if (ui.tabs.length === 0) {
@@ -1330,6 +1383,64 @@ var ui = {
 	scrollConsoleToBottom: function() {
 		var c = d3.select('#studio .console-messages')[0][0];
 		c.scrollTop = c.scrollHeight;
+	},
+
+	// Saving
+	save: function(tab) {
+		tab = tab || ui.getWorkspaceCodeTabActive();
+		if (tab) {
+			var program = tab.ref.program;
+			var session = tab.ref.session;
+			studio.saveProgram(program, session);
+		}
+	},
+	saveAs: function(tab) {
+		tab = tab || ui.getWorkspaceCodeTabActive();
+		if (tab) {
+			ui.showSaveAsFileBrowser(function(file) {
+				var program = tab.ref.program;
+				var session = tab.ref.session;
+				program.file = file;
+				studio.saveProgram(program, session);
+			});
+		}
+	},
+	saveAll: function() {
+		_(ui.tabs).each(function(tab) {
+			ui.save(tab);
+		});
+	},
+	open: function() {
+		ui.showOpenFileBrowser(function(file) {
+			studio.openProgramFile(file);
+		});
+	},
+	close: function(tab) {
+		tab = tab || ui.getWorkspaceCodeTabActive();
+		if (tab) {
+			var program = tab.ref.program;
+			var session = tab.ref.session;
+			// No changes to save. Close.
+			if (!program.dirty) {
+				studio.closeProgram(program);
+				return;
+			}
+			// Unsaved changes. Ask to save.
+			ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program before closing?', function(yes) {
+				if (!yes) {
+					studio.closeProgram(program);
+					return;
+				}
+				studio.saveProgram(program, session, function() {
+					studio.closeProgram(program);
+				});
+			});
+		}
+	},
+	closeAll: function() {
+		_(ui.tabs).each(function(tab) {
+			ui.close(tab);
+		});
 	}
 };
 
@@ -1358,7 +1469,17 @@ studio.on('serviceError', function(error) {
 	log.error('Service Error. Please try again, and report a bug if the problem persists.', error);
 });
 
-studio.load();
+(function() {
+	var storage = localStorage['programList'];
+	if (storage) {
+		var programs = JSON.parse(storage);
+		if (programs) {
+			studio.load(programs);
+			return;
+		}
+	}
+	studio.load();
+})();
 
 	</script>
 </body>
