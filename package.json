@@ -1,9 +1,9 @@
 {
-    "name": "cubelets-studio",
+    "name": "Cubelets Studio",
     "main": "index.html",
     "window": {
         "title": "Cubelets Studio",
-		"toolbar": false,
+		"toolbar": true,
 		"resizable": true,
 		"width": 1200,
 		"height": 725,

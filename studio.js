@@ -6,25 +6,30 @@ var __ = require('underscore');
 var Studio = function() {
 	events.EventEmitter.call(this);
 
-	this.connection = undefined;
-	this.cubelet = undefined;
-	this.construction = new cubelets.Construction();
-	this.programs = [];
-	this.build = undefined;
+	var connection = null;
+	var cubelet = null;
+	var construction = new cubelets.Construction();
+	var programs = [];
+	var program = null;
+	var build = null;
 
 	var studio = this;
 	var buildService = new cubelets.BuildService();
 	var infoService = new cubelets.InfoService();
 
 	this.load = function() {
-		this.programs = __(require('./programs')).reduce(function(list, value, key) {
+		programs = __(require('./programs')).reduce(function(list, value, key) {
 			return list.concat({ name: key, code: value });
 		}, []);
-		this.openProgram(this.programs[0]);
-		this.emit('load');
+		studio.openProgram(programs[0]);
+		studio.emit('load');
 	};
 
 	var autoProgramName = 1;
+
+	this.getPrograms = function() {
+		return programs;
+	}
 
 	this.createNewProgram = function(programName) {
 		programName = programName || ((autoProgramName++) + '.c');
@@ -40,72 +45,91 @@ var Studio = function() {
 				'}'
 			].join('\n')
 		};
-		this.programs.push(program);
-		this.emit('newProgram', program);
+		studio.emit('newProgram', program);
 	};
 
 	this.openProgram = function(program) {
-		this.emit('openProgram', program);
+		if (!__(programs).contains(program)) {
+			programs.push(program);
+		}
+		studio.emit('openProgram', program);
 	};
 
 	this.closeProgram = function(program) {
-		this.emit('closeProgram', program);
+		studio.emit('closeProgram', program);
+	};
+
+	this.getConstruction = function() {
+		return construction;
 	};
 
 	this.discoverConstruction = function() {
-		this.construction.discover();
+		construction.discover();
 	};
 
-	this.construction.on('change', function() {
-		studio.emit('constructionChanged');
-		studio.fetchCubeletInfo(studio.construction.all());
+	construction.on('change', function() {
+		studio.emit('constructionChanged', construction);
+		studio.fetchCubeletInfo(construction.all());
 	});
 
-	this.setConnection = function(connection) {
-		this.connection = connection;
-		this.construction.setConnection(connection);
-		this.emit('connected', connection.device);
+	this.setConnection = function(c) {
+		connection = c;
+		construction.setConnection(c);
+		c.on('close', function() {
+			studio.emit('deviceDisconnected');
+		});
+		studio.emit('deviceConnected', c.device);
+	};
+
+	this.getConnection = function() {
+		return connection;
 	};
 
 	this.buildProgram = function(program) {
-		console.log('Building...');
-		var cubelet = studio.cubelet;
 		if (!cubelet) {
-			console.error('No cubelet selected to build.');
+			studio.emit('error', new Error('No cubelet selected to build.'));
 			return;
 		}
 		buildService.requestBuild(program, cubelet);
 	};
 
-	this.selectCubelet = function(cubelet) {
-		if (!cubelet) {
+	this.hasBuild = function() {
+		return (build !== null);
+	};
+
+	this.getCubelet = function() {
+		return cubelet;
+	};
+
+	this.selectCubelet = function(c) {
+		if (!c) {
 			return;
 		}
-		this.cubelet = cubelet;
-		this.emit('cubeletSelected', cubelet);
+		cubelet = c;
+		studio.emit('cubeletSelected', c);
 	};
 
 	this.flashCubelet = function() {
-		console.log('Flashing...');
-		var cubelet = studio.cubelet;
 		if (!cubelet) {
-			console.error('No cubelet selected to flash.');
+			studio.emit('error', new Error('No cubelet selected to flash.'));
 			return;
 		}
-		var build = studio.build;
 		if (!build) {
-			console.error('No program compiled to build.');
+			studio.emit('error', new Error('No program compiled to build.'));
+			return;
+		}
+		if (!build.hex) {
+			studio.emit('error', new Error('Build has not completed.'));
 			return;
 		}
 		var program = new cubelets.FlashProgram(build.hex);
 		if (!program.valid) {
-			console.error('Flash program is invalid.');
-			console.log(build.hex);
+			console.error(build.hex);
+			studio.emit('error', new Error('Flash program is invalid.'));
 			return;
 		}
-		var connection = studio.connection;
 		if (!connection) {
-			console.error('No connection available.');
+			studio.emit('error', new Error('No Cubelet connection available.'));
 			return;
 		}
 		var loader = new cubelets.FlashLoader(connection.serial());
@@ -125,15 +149,15 @@ var Studio = function() {
 			studio.emit('flashComplete');
 		});
 		loader.on('error', function(error) {
-			console.error(error);
+			console.error('Flash Error', error);
 			studio.emit('flashError', error);
 		});
 		loader.load(program, cubelet.id, cubelet.mcu);
 	};
 
-	buildService.on('complete', function(build) {
-		studio.build = build;
-		studio.emit('buildComplete', build);
+	buildService.on('complete', function(b) {
+		build = b;
+		studio.emit('buildComplete', b);
 	});
 
 	buildService.on('error', function(error) {
@@ -148,26 +172,30 @@ var Studio = function() {
 		infoService.fetchCubeletInfo(cubelets);
 	};
 
-	infoService.on('info', function(info, cubelet) {
-		cubelet.mcu = info.mcu;
-		cubelet.type = cubelets.Cubelet.typeForTypeID(info.typeID);
-		cubelet.currentFirmwareVersion = parseFloat(info.currentFirmwareVersion);
-		cubelet.latestFirmwareVersion = parseFloat(info.latestFirmwareVersion);
-		studio.emit('cubeletChanged', cubelet);
+	infoService.on('info', function(info, c) {
+		c.mcu = info.mcu;
+		c.type = cubelets.Cubelet.typeForTypeID(info.typeID);
+		c.currentFirmwareVersion = parseFloat(info.currentFirmwareVersion);
+		c.latestFirmwareVersion = parseFloat(info.latestFirmwareVersion);
+		studio.emit('cubeletChanged', c);
+	});
+
+	infoService.on('error', function(error) {
+		studio.emit('serviceError', error);
 	});
 
 	this.mockConstruction = function() {
 		var Types = cubelets.Types;
 		var Cubelet = cubelets.Cubelet;
-		this.construction.origin = new Cubelet(32028, Types.BLUETOOTH);
-		this.construction.near = [
+		construction.origin = new Cubelet(32028, Types.BLUETOOTH);
+		construction.near = [
 			new Cubelet(26012, Types.BARGRAPH),
 			new Cubelet(23825, Types.PASSIVE),
 			new Cubelet(24003, Types.BRIGHTNESS),
 			new Cubelet(21685, Types.BATTERY),
 			new Cubelet(20214, Types.DISTANCE)
 		];
-		this.emit('constructionChanged');
+		studio.emit('constructionChanged');
 	};
 
 };

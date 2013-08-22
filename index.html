@@ -149,9 +149,11 @@ body {
 	position: absolute;
 	top: 0px;
 	left: 4px;
-	right: 0px;
+	width: 1000px;
 	height: 32px;
 	border-bottom: 1px solid #333;
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 
 #studio .workspace-code-tab {
@@ -521,27 +523,22 @@ var cubelets = require('cubelets');
 var studio = new (require('./studio'))();
 
 studio.on('load', function() {
-	ui.loadProgramList(studio.programs);
+	ui.loadProgramList(studio.getPrograms());
 	ui.drawWorkspaceConstructionGraph();
 });
 
 studio.on('newProgram', function(program) {
+	studio.openProgram(program);
 	ui.addProgramListItem(program);
-	ui.openProgram(program);
 });
 
 studio.on('openProgram', function(program) {
-	ui.openProgram(program);
-	if (studio.cubelet) {
-		ui.enableBuildButton();
-	}
+	ui.showProgramTab(program);
+	ui.updateBuildAndFlashButtons();
 });
 
 studio.on('closeProgram', function(program) {
-	if (!ui.hasAnyProgramOpen()) {
-		ui.disableBuildButton();
-		ui.disableFlashButton();
-	}
+	ui.updateBuildAndFlashButtons();
 });
 
 studio.on('constructionChanged', function() {
@@ -558,9 +555,13 @@ studio.on('cubeletSelected', function(cubelet) {
 	}
 });
 
-studio.on('connected', function(device) {
+studio.on('deviceConnected', function(device) {
 	ui.setConnectionStatusConnected();
 	ui.setWorkspaceTitleDeviceName(device);
+});
+
+studio.on('deviceDisconnected', function() {
+	ui.setConnectionStatusDisconnected();
 });
 
 studio.on('buildComplete', function(build) {
@@ -656,51 +657,90 @@ var ui = {
 			.attr('height', height);
 	},
 	initializeBuildButton: function() {
-		d3.select('#studio .console-toolbar-button-build')
-			.on('click', function() {
-				log.info('Building...');
-				var tab = ui.getWorkspaceCodeTabActive();
-				var program = tab.ref.program;
-				program.code = tab.ref.session.getValue();
-				console.log(program.code);
-				studio.buildProgram(program);
-				ui.disableBuildButton();
-				ui.showBuildProgressIndicator();
+		ui.flashButton = this
+			.createButton('#studio .console-toolbar-button-build', {
+				type: 'console-toolbar-button',
+				enabled: false,
+				click: function(button) {
+					var tab = ui.getWorkspaceCodeTabActive();
+					var program = tab.ref.program;
+					log.info('Building \'' + program.name + '\'... ');
+					program.code = tab.ref.session.getValue();
+					studio.buildProgram(program);
+					ui.disableBuildButton();
+					ui.showBuildProgressIndicator();
+				}
 			});
-		ui.disableBuildButton();
 	},
 	initializeFlashButton: function() {
-		d3.select('#studio .console-toolbar-button-flash')
-			.on('click', function() {
-				studio.flashCubelet();
-				ui.disableFlashButton();
-				ui.showFlashProgressBar(0);
+		ui.flashButton = this
+			.createButton('#studio .console-toolbar-button-flash', {
+				type: 'console-toolbar-button',
+				enabled: false,
+				click: function(button) {
+					log.info('Flashing...');
+					button.disable();
+					studio.flashCubelet();
+					ui.showFlashProgressBar(0);
+				}
 			});
-		ui.disableFlashButton();
+	},
+
+	// UI Elements
+	createButton: function(selector, definition) {
+		d3.select(selector)
+			.datum(definition)
+			.each(function(button) {
+				var el = d3.select(this);
+				var type = button.type || 'button';
+				button.enable = function() {
+					button.enabled = true;
+					el.classed(type + '-disabled', false)
+						.classed(type + '-enabled', true);
+				}
+				button.disable = function() {
+					button.enabled = false;
+					el.classed(type + '-enabled', false)
+						.classed(type + '-disabled', true);
+				}
+				if (button.enabled !== false) button.enable()
+				else button.disable();
+			})
+			.on('click', function(button) {
+				if (button.enabled !== false) {
+					if (button.click) button.click(button);
+				}
+			});
+		return definition;
 	},
 
 	// Buttons
-	enableConsoleToolbarButton: function(selector) {
-		d3.select(selector)
-			.classed('console-toolbar-button-disabled', false)
-			.classed('console-toolbar-button-enabled', true);
-	},
-	disableConsoleToolbarButton: function(selector) {
-		d3.select(selector)
-			.classed('console-toolbar-button-enabled', false)
-			.classed('console-toolbar-button-disabled', true);
-	},
 	enableBuildButton: function() {
-		ui.enableConsoleToolbarButton('#studio .console-toolbar-button-build');
+		d3.select('#studio .console-toolbar-button-build').datum().enable();
 	},
 	disableBuildButton: function() {
-		ui.disableConsoleToolbarButton('#studio .console-toolbar-button-build');
+		d3.select('#studio .console-toolbar-button-build').datum().disable();
 	},
 	enableFlashButton: function() {
-		ui.enableConsoleToolbarButton('#studio .console-toolbar-button-flash');
+		d3.select('#studio .console-toolbar-button-flash').datum().enable();
 	},
 	disableFlashButton: function() {
-		ui.disableConsoleToolbarButton('#studio .console-toolbar-button-flash');
+		d3.select('#studio .console-toolbar-button-flash').datum().enable();
+	},
+	updateBuildAndFlashButtons: function() {
+		var cubelet = studio.getCubelet();
+		if (cubelet) {
+			ui.enableBuildButton();
+			if (studio.hasBuild()) {
+				ui.enableFlashButton();
+			}
+			else {
+				ui.disableFlashButton();
+			}
+		}
+		else {
+			ui.disableBuildButton();
+		}
 	},
 
 	// Dialogs
@@ -713,19 +753,19 @@ var ui = {
 				.classed('dialog-button', true)
 				.text(function(button) { return button.label })
 				.each(function(button) {
-					var element = d3.select(this);
-					var enable = button.enable = function() {
+					var el = d3.select(this);
+					button.enable = function() {
 						button.enabled = true;
-						element.classed('dialog-button-disabled', false)
+						el.classed('dialog-button-disabled', false)
 							.classed('dialog-button-enabled', true);
 					}
-					var disable = button.disable = function() {
+					button.disable = function() {
 						button.enabled = false;
-						element.classed('dialog-button-enabled', false)
+						el.classed('dialog-button-enabled', false)
 							.classed('dialog-button-disabled', true);
 					}
-					if (button.enabled !== false) enable()
-					else disable();
+					if (button.enabled !== false) button.enable()
+					else button.disable();
 				})
 				.on('click', function(button) {
 					if (button.enabled !== false) {
@@ -768,7 +808,7 @@ var ui = {
 				var connection = new cubelets.Connection(device.comName);
 				connection.connect(function(e) {
 					status.text('Error. Could not connect.');
-					console.log(e);
+					log.error('Error. Could not connect to device \'' + device.comName + '\'.');
 				}, function() {
 					status.text('Connection successful!');
 					ui.hideDialog();
@@ -785,7 +825,7 @@ var ui = {
 			if (devices.length === 0) {
 				contents.append('div')
 					.classed('dialog-connection-devices-empty', true)
-					.text('No cubelets found. Please pair a cubelet to your computer, and try again.');
+					.text('No Cubelets found. Please pair a Cubelet to your computer, and try again.');
 				return;
 			}
 			contents.append('ul')
@@ -831,10 +871,10 @@ var ui = {
 			.datum(tab)
 			.text(tab.title)
 			.on('click', function() {
-				ui.openProgram(program);
+				ui.showProgramTab(program);
 			})
 			.on('contextmenu', function() {
-				ui.closeProgram(program);
+				ui.closeProgramTab(program);
 			});
 		tab.element = element[0][0];
 		ui.setWorkspaceCodeTabActive(tab);
@@ -868,7 +908,7 @@ var ui = {
 	loadProgramList: function(programs) {
 		d3.select('#studio .workspace-programs-list')
 			.selectAll('li')
-			.data(studio.programs)
+			.data(studio.getPrograms())
 			.enter()
 				.append('li')
 				.append('a').attr('href', '#')
@@ -890,7 +930,7 @@ var ui = {
 				studio.openProgram(program);
 			});
 	},
-	openProgram: function(program) {
+	showProgramTab: function(program) {
 		ui.showWorkspaceEditor();
 		if (ui.tabs.length === 0) {
 			// Initial tab
@@ -932,7 +972,7 @@ var ui = {
 			});
 		}
 	},
-	closeProgram: function(program) {
+	closeProgramTab: function(program) {
 		var tab = _(ui.tabs).find(function(tab) {
 			return tab.type === 'program' && tab.ref.program === program;
 		});
@@ -943,7 +983,7 @@ var ui = {
 			if (length > 0) {
 				var nextTab = ui.tabs[Math.max(0, Math.min(index - 1, length - 1))];
 				if (nextTab) {
-					ui.openProgram(nextTab.ref.program);
+					ui.showProgramTab(nextTab.ref.program);
 					return;
 				}
 			}
@@ -979,7 +1019,7 @@ var ui = {
 	updateWorkspaceConstructionGraphNode: function(node) {
 		d3.select(node.element)
 			.attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode);
-		if (node == studio.cubelet) {
+		if (node == studio.getCubelet()) {
 			ui.setWorkspaceConstructionDetail(node);
 		}
 	},
@@ -987,13 +1027,13 @@ var ui = {
 		// Clear graph
 		ui.graph.selectAll('*').remove();
 
-		if (!studio.construction) {
+		var construction = studio.getConstruction();
+		if (!construction) {
 			// Nothing to draw
 			return;
 		}
 
 		// Draw construction
-		var construction = studio.construction;
 		var w = 300; // Width
 		var h = 300; // Height
 		var s = 32; // Size
@@ -1073,8 +1113,9 @@ var ui = {
 					.call(draw);
 		}
 		// Select cubelet
-		if (studio.cubelet) {
-			ui.selectWorkspaceConstructionCubelet(studio.cubelet);
+		var cubelet = studio.getCubelet();
+		if (cubelet) {
+			ui.selectWorkspaceConstructionCubelet(cubelet);
 		}
 	},
 	setWorkspaceConstructionDetail: function(node) {
@@ -1127,6 +1168,7 @@ var ui = {
 			.style('background-image', 'url(img/connection-connected.png)');
 	},
 	setConnectionStatusDisconnected: function() {
+		ui.setWorkspaceTitleDeviceName('Disconnected');
 		d3.select('#studio .titlebar-connection-status-label')
 			.text('Disconnected');
 		d3.select('#studio .titlebar-connection-status-icon')
@@ -1183,7 +1225,9 @@ var ui = {
 d3.select('.titlebar-connection-status').on('click', function(e) {
 	cubelets.list(function(error, devices) {
 		if (error) {
-			ui.showErrorDialog('Connection Error', 'Could not list connected cubelets.');
+			var msg = 'Could not list connected cubelets.';
+			log.error(msg, error);
+			ui.showErrorDialog('Connection Error', msg);
 			return;
 		}
 		ui.showConnectionDialog(devices);
@@ -1191,6 +1235,18 @@ d3.select('.titlebar-connection-status').on('click', function(e) {
 });
 
 ui.initialize();
+
+studio.on('error', function(error) {
+    console.error('Unhandled Error', error);
+    log.error('Unhandled Error. Please report this bug.', error);
+    ui.updateBuildAndFlashButtons();
+});
+
+studio.on('serviceError', function(error) {
+	console.error('Service Error', error);
+	log.error('Service Error. Please try again, and report a bug if the problem persists.', error);
+});
+
 studio.load();
 
 	</script>
