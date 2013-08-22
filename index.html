@@ -166,7 +166,7 @@ body {
 	margin: 3px 0px 0px 2px;
 	padding: 0px 9px;
 	text-align: left;
-	background: #333;
+	background-color: #333;
 	border-top: 1px solid #555;
 	border-left: 1px solid #555;
 	border-radius: 6px 6px 0px 0px;
@@ -176,9 +176,25 @@ body {
 }
 
 #studio .workspace-code-tab-active {
-	background: rgba(85,97,255,0.5);
+	background-color: rgba(85,97,255,0.5);
 	border-top: 1px solid rgba(85,97,255,1);
 	border-left: 1px solid rgba(85,97,255,1);
+}
+
+#studio .workspace-code-tab .workspace-code-tab-control {
+	display: block;
+	width: 10px;
+	height: 10px;
+	margin-top: -20px;
+	margin-left: 90px;
+}
+
+#studio .workspace-code-tab-dirty .workspace-code-tab-control {
+	background-image: url(img/tab-dirty.png);
+}
+
+#studio .workspace-code-tab-clean .workspace-code-tab-control {
+	background-image: url(img/tab-clean.png);
 }
 
 #studio .workspace-construction {
@@ -529,17 +545,22 @@ studio.on('load', function() {
 	ui.drawWorkspaceConstructionGraph();
 });
 
-studio.on('newProgram', function(program) {
+studio.on('programCreated', function(program) {
 	studio.openProgram(program);
 	ui.addProgramListItem(program);
 });
 
-studio.on('openProgram', function(program) {
+studio.on('programOpened', function(program) {
 	ui.showProgramTab(program);
 	ui.updateBuildAndFlashButtons();
 });
 
-studio.on('closeProgram', function(program) {
+studio.on('programSaved', function(program) {
+
+});
+
+studio.on('programClosed', function(program) {
+	ui.closeProgramTab(program);
 	ui.updateBuildAndFlashButtons();
 });
 
@@ -618,6 +639,7 @@ var ui = {
 	editor: undefined,
 	graph: undefined,
 	menu: undefined,
+	sessions: {},
 
 	// Initialization
 	initialize: function() {
@@ -885,6 +907,15 @@ var ui = {
 					});
 		}, [connectButton, cancelButton]);
 	},
+	showYesNoDialog: function(title, message, callback) {
+		ui.showDialog(title, message, [{
+			label: 'Yes',
+			click: function() { callback(true) }
+		},{
+			label: 'No',
+			click: function() { callback(false) }
+		}]);
+	},
 
 	// Workspace Title Formatting
 	setWorkspaceTitle: function(documentName, deviceName) {
@@ -903,9 +934,9 @@ var ui = {
 	addWorkspaceCodeTab: function(tab) {
 		ui.tabs.push(tab);
 		var program = tab.ref.program;
+		var session = tab.ref.session;
 		var element = d3.select('#studio .workspace-code-tabs')
-			.append('a')
-			.attr('href', '#')
+			.append('div')
 			.classed('workspace-code-tab', true)
 			.datum(tab)
 			.text(tab.title)
@@ -913,16 +944,48 @@ var ui = {
 				ui.showProgramTab(program);
 			})
 			.on('contextmenu', function() {
-				ui.closeProgramTab(program);
+				studio.closeProgram(program);
 			});
+		// element.append('a')
+		// 	.attr('href', '#')
+		// 	.classed('workspace-code-tab-control', true)
+		// 	.on('click', function() {
+		// 		if (!program.dirty) {
+		// 			studio.closeProgram(program);
+		// 			return;
+		// 		}
+		// 		ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program?', function(answer) {
+		// 			if (answer) {
+		// 				program.saveProgram(program, session);
+		// 				program.closeProgram(program);
+		// 			}
+		// 			else {
+		// 				program.closeProgram(program);							
+		// 			}
+		// 		});
+		// 	});
 		tab.element = element[0][0];
 		ui.setWorkspaceCodeTabActive(tab);
+		if (program.dirty) ui.setWorkspaceCodeTabDirty(tab);
+		else ui.setWorkspaceCodeTabClean(tab);
 	},
 	setWorkspaceCodeTabActive: function(tab) {
 		d3.selectAll('#studio .workspace-code-tab')
 			.classed('workspace-code-tab-active', false);
 		d3.select(tab.element)
 			.classed('workspace-code-tab-active', true);
+	},
+	setWorkspaceCodeTabClean: function(tab) {
+		d3.selectAll('#studio .workspace-code-tab')
+			.classed('workspace-code-tab-dirty', false);
+		d3.select(tab.element)
+			.classed('workspace-code-tab-clean', true);
+	},
+	setWorkspaceCodeTabDirty: function(tab) {
+		d3.selectAll('#studio .workspace-code-tab')
+			.classed('workspace-code-tab-clean', false);
+		d3.select(tab.element)
+			.classed('workspace-code-tab-dirty', true);
 	},
 	getWorkspaceCodeTabActive: function() {
 		return d3.select('#studio .workspace-code-tab-active').datum();
@@ -1017,7 +1080,6 @@ var ui = {
 		});
 		if (tab) {
 			var index = ui.removeWorkspaceCodeTab(tab);
-			studio.closeProgram(tab.ref.program);
 			var length = ui.tabs.length;
 			if (length > 0) {
 				var nextTab = ui.tabs[Math.max(0, Math.min(index - 1, length - 1))];
@@ -1255,7 +1317,7 @@ var ui = {
 			.replace(/^(.)/, function(s) { return s.toUpperCase() });
 	},
 
-	// Console
+	// Console autoscroll
 	scrollConsoleToBottom: function() {
 		var c = d3.select('#studio .console-messages')[0][0];
 		c.scrollTop = c.scrollHeight;
@@ -1288,7 +1350,6 @@ studio.on('serviceError', function(error) {
 });
 
 studio.load();
-studio.mockConstruction();
 
 	</script>
 </body>

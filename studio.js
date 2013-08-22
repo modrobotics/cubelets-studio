@@ -27,24 +27,24 @@ var Studio = function() {
 		studio.emit('load');
 	};
 
-	var autoProgramName = 1;
-
 	this.getPrograms = function() {
 		return programs;
 	};
 
-	this.openProgramFile = function(file) {
-		if (fs.existsSync(file)) {
-			var code = fs.readFileSync(file, 'utf8');
+	this.openProgramFile = function(filepath) {
+		if (fs.existsSync(filepath)) {
+			var code = fs.readFileSync(filepath, 'utf8');
 			if (code) {
-				var programName = path.basename(file);
-				studio.createNewProgram(programName, code);
+				var programName = path.basename(filepath);
+				studio.createNewProgram(programName, code, filepath);
 			}
 		}
 	};
 
-	this.createNewProgram = function(programName, code) {
-		programName = programName || ((autoProgramName++) + '.c');
+	var autoProgramName = 1;
+
+	this.createNewProgram = function(programName, code, filepath) {
+		programName = (programName) || ('Program' + (autoProgramName++) + '.c');
 		code = code || [
 			'void setup()',
 			'{',
@@ -54,9 +54,11 @@ var Studio = function() {
 			'{',
 			'}'
 		].join('\n');
-		studio.emit('newProgram', {
+		studio.emit('programCreated', {
 			name: programName,
-			code: code
+			code: code,
+			filepath: filepath,
+			dirty: (filepath === null)
 		});
 	};
 
@@ -64,16 +66,22 @@ var Studio = function() {
 		if (!__(programs).contains(program)) {
 			programs.push(program);
 		}
-		studio.emit('openProgram', program);
+		studio.emit('programOpened', program);
 	};
 
 	this.saveProgram = function(program, session) {
-		program.code = session.getValue();
-		studio.emit('saveProgram');
+		if (program.dirty) {
+			program.code = session.getValue();
+			if (!program.filepath) {
+				studio.emit('error', new Error('No filepath specified for program.'));
+				return;
+			}
+			studio.emit('programSaved', program);
+		}
 	};
 
 	this.closeProgram = function(program) {
-		studio.emit('closeProgram', program);
+		studio.emit('programClosed', program);
 	};
 
 	this.getConstruction = function() {
