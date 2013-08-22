@@ -1096,7 +1096,6 @@ var ui = {
 		}
 	},
 	loadWorkspaceCodeTabs: function() {
-		ui.hideWorkspaceEditor();
 		var storage = localStorage['tabs'];
 		if (storage) {
 			var tabs = JSON.parse(storage);
@@ -1132,6 +1131,7 @@ var ui = {
 		if (ui.tabs.length === 0) {
 			// Initial tab
 			var session = ui.editor.getSession();
+			session.setMode('ace/mode/c_cpp');
 			session.getDocument().setValue(program.code);
 			ui.setWorkspaceTitleDocumentName(program.name);
 			ui.addWorkspaceCodeTab({
@@ -1157,6 +1157,7 @@ var ui = {
 			// Create a new tab
 			var mode = ui.editor.getSession().getMode();
 			var session = new ace.EditSession(program.code, mode);
+			session.setMode('ace/mode/c_cpp');
 			ui.editor.setSession(session);
 			ui.setWorkspaceTitleDocumentName(program.name);
 			ui.addWorkspaceCodeTab({
