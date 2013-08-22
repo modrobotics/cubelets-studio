@@ -547,7 +547,7 @@ var cubelets = require('cubelets');
 var studio = new (require('./studio'))();
 
 studio.on('load', function() {
-	ui.loadProgramList();
+	ui.updateProgramList();
 	ui.drawWorkspaceConstructionGraph();
 });
 
@@ -579,7 +579,7 @@ studio.on('programHasNoFile', function(program, session, callback) {
 
 studio.on('programClosed', function(program) {
 	ui.closeProgramTab(program);
-	ui.updateBuildAndFlashButtons();
+	ui.updateProgramList();
 });
 
 studio.on('constructionChanged', function() {
@@ -1051,35 +1051,33 @@ var ui = {
 
 	// Program List/Display
 	loadProgramList: function() {
-		d3.select('#studio .workspace-programs-list')
-			.selectAll('li')
-			.data(studio.getPrograms())
-			.enter()
-				.append('li')
-				.append('a').attr('href', '#')
-				.attr('title', function(d) { return d.file })
-				.text(function(d) { return d.name });
-		d3.selectAll('#studio .workspace-programs-list li').each(function(d, i) {
-			d3.select(this).on('click', function() {
-				studio.openProgram(d);
-			});
-		});
+		return studio.load();
+		var storage = localStorage['programList'];
+		if (storage) {
+			var programs = JSON.parse(storage);
+			if (programs) {
+				studio.load(programs);
+				return;
+			}
+		}
+		studio.load();
 	},
 	updateProgramList: function() {
-		d3.select('#studio .workspace-programs-list')
-			.selectAll('li a')
-			.attr('title', function(d) { return d.file })
-			.text(function(d) { return d.name });
-	},
-	addProgramListItem: function(program) {
-		d3.select('#studio .workspace-programs-list')
-			.insert('li', ':first-child')
+		console.log(studio.getPrograms());
+		var list = d3.select('#studio .workspace-programs-list')
+			.selectAll('li')
+			.data(studio.getPrograms());
+		list.enter()
+			.append('li')
 			.append('a').attr('href', '#')
-			.datum(program)
-			.attr('title', program.file)
-			.text(program.name)
-			.on('click', function() {
-				studio.openProgram(program);
+			.attr('title', function(d) { return d.file })
+			.text(function(d) { return d.name })
+			.on('click', function(d) {
+				studio.openProgram(d);
+			})
+			.on('contextmenu', function(d) {
+				console.log('Clicked', d);
+				studio.closeProgram(d);
 			});
 	},
 	saveProgramList: function() {
@@ -1147,6 +1145,7 @@ var ui = {
 			}
 			// Hide editor if no next tab
 			ui.hideWorkspaceEditor();
+			ui.updateBuildAndFlashButtons();
 		}
 	},
 	getTabForProgram: function(program) {
@@ -1422,17 +1421,17 @@ var ui = {
 			var session = tab.ref.session;
 			// No changes to save. Close.
 			if (!program.dirty) {
-				studio.closeProgram(program);
+				ui.closeProgramTab(program);
 				return;
 			}
 			// Unsaved changes. Ask to save.
 			ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program before closing?', function(yes) {
 				if (!yes) {
-					studio.closeProgram(program);
+					ui.closeProgramTab(program);
 					return;
 				}
 				studio.saveProgram(program, session, function() {
-					studio.closeProgram(program);
+					ui.closeProgramTab(program);
 				});
 			});
 		}
@@ -1469,17 +1468,7 @@ studio.on('serviceError', function(error) {
 	log.error('Service Error. Please try again, and report a bug if the problem persists.', error);
 });
 
-(function() {
-	var storage = localStorage['programList'];
-	if (storage) {
-		var programs = JSON.parse(storage);
-		if (programs) {
-			studio.load(programs);
-			return;
-		}
-	}
-	studio.load();
-})();
+ui.loadProgramList();
 
 	</script>
 </body>

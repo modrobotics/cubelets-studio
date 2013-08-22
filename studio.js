@@ -101,9 +101,14 @@ var Studio = function() {
 		if (callback) callback(program);
 	};
 
-	this.closeProgram = function(program) {
+	this.closeProgram = function(program, callback) {
 		program.dirty = false;
-		studio.emit('programClosed', program);
+		var index = programs.indexOf(program);
+		if (index >= 0) {
+			programs.splice(index, 1);
+			studio.emit('programClosed', program);
+			if (callback) callback(program);
+		}
 	};
 
 	this.getConstruction = function() {
