@@ -103,7 +103,11 @@ var Studio = function() {
 
 	this.closeProgram = function(program) {
 		program.dirty = false;
-		studio.emit('programClosed', program);
+		var index = programs.indexOf(program);
+		if (index >= 0) {
+			programs.splice(index, 1);
+			studio.emit('programClosed', program);
+		}
 	};
 
 	this.getConstruction = function() {
