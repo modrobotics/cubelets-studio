@@ -547,8 +547,13 @@ var cubelets = require('cubelets');
 var studio = new (require('./studio'))();
 
 studio.on('load', function() {
-	ui.updateProgramList();
+	ui.loadProgramList();
+	ui.loadWorkspaceCodeTabs();
 	ui.drawWorkspaceConstructionGraph();
+});
+
+studio.on('programsLoaded', function() {
+	ui.updateProgramList();
 });
 
 studio.on('programCreated', function(program) {
@@ -676,6 +681,7 @@ var ui = {
 			this.hide();
 			ui.saveAll();
 			ui.saveProgramList();
+			ui.saveWorkspaceCodeTabs();
 			this.close(true);
 		});
 	},
@@ -1051,18 +1057,6 @@ var ui = {
 	},
 
 	// Program List/Display
-	loadProgramList: function() {
-		return studio.load();
-		var storage = localStorage['programList'];
-		if (storage) {
-			var programs = JSON.parse(storage);
-			if (programs) {
-				studio.load(programs);
-				return;
-			}
-		}
-		studio.load();
-	},
 	updateProgramList: function() {
 		var programs = studio.getPrograms();
 		var list = d3.select('#studio .workspace-programs-list');
@@ -1081,11 +1075,54 @@ var ui = {
 				.attr('title', function(d) { return d.file })
 				.text(function(d) { return d.name });
 	},
+
+	// Local Storage
+	loadProgramList: function() {
+		var storage = localStorage['programList'];
+		if (storage) {
+			var programs = JSON.parse(storage);
+			if (programs) {
+				studio.loadPrograms(programs);
+				return;
+			}
+		}
+		studio.loadPrograms();
+	},
 	saveProgramList: function() {
 		var programs = studio.getPrograms();
 		var storage = JSON.stringify(programs);
 		if (storage) {
 			localStorage['programList'] = storage;
+		}
+	},
+	loadWorkspaceCodeTabs: function() {
+		ui.hideWorkspaceEditor();
+		var storage = localStorage['tabs'];
+		if (storage) {
+			var tabs = JSON.parse(storage);
+			if (tabs) {
+				_(tabs).each(function(file) {
+					var program = _(studio.getPrograms()).find(function(program) {
+						return program.file == file;
+					});
+					if (program) {
+						studio.openProgram(program);
+					}
+				});
+			}
+		}
+	},
+	saveWorkspaceCodeTabs: function() {
+		var tabs = [];
+		_(ui.tabs).each(function(tab) {
+			var file = tab.ref.program.file;
+			if (file) {
+				tabs.push(file);
+			}
+		});
+		var storage = JSON.stringify(tabs);
+		if (storage) {
+			localStorage['tabs'] = storage;
 		}
 	},
 
@@ -1468,7 +1505,7 @@ studio.on('serviceError', function(error) {
 	log.error('Service Error. Please try again, and report a bug if the problem persists.', error);
 });
 
-ui.loadProgramList();
+studio.load();
 
 	</script>
 </body>

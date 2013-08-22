@@ -18,7 +18,11 @@ var Studio = function() {
 	var buildService = new cubelets.BuildService();
 	var infoService = new cubelets.InfoService();
 
-	this.load = function(p) {
+	this.load = function() {
+		studio.emit('load');
+	};
+
+	this.loadPrograms = function(p) {
 		if (!p) {
 			var glob = require('glob');
 			var found = [];
@@ -40,10 +44,7 @@ var Studio = function() {
 			return;
 		}
 		programs = p || [];
-		if (programs && programs.length > 0) {
-			studio.openProgram(programs[0]);
-		}
-		studio.emit('load');
+		studio.emit('programsLoaded');
 	};
 
 	this.getPrograms = function() {
