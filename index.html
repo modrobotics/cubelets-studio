@@ -558,10 +558,14 @@ studio.on('cubeletSelected', function(cubelet) {
 studio.on('deviceConnected', function(device) {
 	ui.setConnectionStatusConnected();
 	ui.setWorkspaceTitleDeviceName(device);
+	if (studio.getConstruction().all().length == 0) {
+		studio.discoverConstruction();
+	}
 });
 
 studio.on('deviceDisconnected', function() {
 	ui.setConnectionStatusDisconnected();
+	ui.updateBuildAndFlashButtons();
 });
 
 studio.on('buildComplete', function(build) {
@@ -664,8 +668,9 @@ var ui = {
 				click: function(button) {
 					var tab = ui.getWorkspaceCodeTabActive();
 					var program = tab.ref.program;
+					var session = tab.ref.session;
 					log.info('Building \'' + program.name + '\'... ');
-					program.code = tab.ref.session.getValue();
+					studio.saveProgram(program, session);
 					studio.buildProgram(program);
 					ui.disableBuildButton();
 					ui.showBuildProgressIndicator();
@@ -728,6 +733,11 @@ var ui = {
 		d3.select('#studio .console-toolbar-button-flash').datum().enable();
 	},
 	updateBuildAndFlashButtons: function() {
+		var connection = studio.getConnection();
+		if (!connection || !connection.connected) {
+			ui.disableFlashButton();
+			return;
+		}
 		var cubelet = studio.getCubelet();
 		if (cubelet) {
 			ui.enableBuildButton();
@@ -1198,6 +1208,7 @@ var ui = {
 	},
 	hideFlashProgressBar: function() {
 		d3.select('#studio .console-toolbar-button-flash')
+			.style('background-position', '0 0')
 			.classed('console-toolbar-progress-bar-enabled', false);
 	},
 	showFlashError: function(error) {

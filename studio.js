@@ -55,6 +55,11 @@ var Studio = function() {
 		studio.emit('openProgram', program);
 	};
 
+	this.saveProgram = function(program, session) {
+		program.code = session.getValue();
+		studio.emit('saveProgram');
+	};
+
 	this.closeProgram = function(program) {
 		studio.emit('closeProgram', program);
 	};
@@ -64,6 +69,7 @@ var Studio = function() {
 	};
 
 	this.discoverConstruction = function() {
+		console.log('Discover construction...')
 		construction.discover();
 	};
 
