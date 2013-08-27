@@ -9,4 +9,5 @@ void loop()
 
 void sense()
 {
+    block_value = get_distance();
 }

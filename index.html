@@ -1110,6 +1110,9 @@ var ui = {
 				});
 			}
 		}
+		if (ui.tabs.length === 0) {
+			ui.hideWorkspaceEditor();
+		}
 	},
 	saveWorkspaceCodeTabs: function() {
 		var tabs = [];

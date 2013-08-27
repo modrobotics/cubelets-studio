@@ -39,7 +39,7 @@ var Studio = function() {
 						});
 					}
 				});
-				studio.load(found);
+				studio.loadPrograms(found);
 			});
 			return;
 		}
