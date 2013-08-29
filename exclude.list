@@ -1,0 +1,9 @@
+exclude.list
+Makefile
+package/*
+build/*
+.git/*
+.gitignore
+*.DS_Store*
+*Thumbs.db*
+*nw-gyp*

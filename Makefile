@@ -1,11 +1,21 @@
 NW="/opt/node-webkit/node-webkit.app/Contents/MacOS/node-webkit"
 
-web: nw
-	$(NW) cubelets-studio.nw
+all:osx windows linux
 
-nw: clean
-	zip -r cubelets-studio.nw .
+osx:zip
+	cp -R package/osx/Cubelets\ Studio.app build/Cubelets\ Studio.app
+	mv build/app.nw build/Cubelets\ Studio.app/Contents/Resources/app.nw
+
+linux:zip
+	cat $NW build/app.nw > build/cubelets-studio && chmod +x build/cubelets-studio
+	rm build/app.nw
+
+windows:zip
+	copy /b $NW+build/app.nw build/Cubelets\ Studio.exe
+	rm build/app.nw
+
+zip:
+	zip -r build/app.nw * -x@exclude.list
 
 clean:
-	rm -rf cubelets-studio.nw
-	rm -rf cubelets-studio.app
+	rm -rf build/*
