@@ -102,7 +102,7 @@ var Studio = function() {
 		if (callback) callback(program);
 	};
 
-	this.closeProgram = function(program) {
+	this.closeProgram = function(program, callback) {
 		program.dirty = false;
 		var index = programs.indexOf(program);
 		if (index >= 0) {
