@@ -1,0 +1,19 @@
+{
+  "name": "cubelets",
+  "description": "A package for interacting with Cubelets.",
+  "author": {
+    "name": "Donald Ness",
+    "email": "donald@modrobotics.com",
+    "url": "http://www.modrobotics.com"
+  },
+  "dependencies": {
+    "async": "0.2.8",
+    "hashish": "0.0.4",
+    "multimeter": "0.1.1",
+    "pad": "0.0.4",
+    "request": "2.26.0",
+    "serialport": "1.1.1",
+    "temp": "0.5.1"
+  },
+  "main": "index.js"
+}

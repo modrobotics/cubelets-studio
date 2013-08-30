@@ -3,7 +3,7 @@ NW="/opt/node-webkit/node-webkit.app/Contents/MacOS/node-webkit"
 all:osx windows linux
 
 osx:zip
-	cp -R package/osx/Cubelets\ Studio.app build/Cubelets\ Studio.app
+	cp -R package/osx/Cubelets\ Studio.app build
 	mv build/app.nw build/Cubelets\ Studio.app/Contents/Resources/app.nw
 
 linux:zip
