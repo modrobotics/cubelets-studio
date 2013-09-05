@@ -731,10 +731,10 @@ var ui = {
 		var helpMenuItem = new g.MenuItem({ label: 'Help' });
 		var helpMenu = helpMenuItem.submenu = new g.Menu();
 		helpMenu.append(new g.MenuItem({ label: 'Cubelets API Reference', click: function() {
-			process.open('http://code.modrobotics.com/documentation/');
+			g.Shell.openExternal('http://code.modrobotics.com/documentation/');
 		}}));
 		helpMenu.append(new g.MenuItem({ label: 'Cubelets Programming Forum', click: function() {
-			process.open('https://www.modrobotics.com/blog/?forum=cubelets-programming');
+			g.Shell.openExternal('https://www.modrobotics.com/blog/?forum=cubelets-programming');
 		}}));
 		menu.append(helpMenuItem);
 

@@ -1,7 +1,8 @@
 exclude.list
 Makefile
-package/*
+platform/*
 build/*
+tools/*
 .git/*
 .gitignore
 *.DS_Store*
