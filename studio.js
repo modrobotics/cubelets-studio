@@ -17,6 +17,7 @@ var Studio = function() {
 	var studio = this;
 	var buildService = new cubelets.BuildService();
 	var infoService = new cubelets.InfoService();
+	var firmwareService = new cubelets.FirmwareService();
 
 	this.load = function() {
 		studio.emit('load');
@@ -260,6 +261,90 @@ var Studio = function() {
 
 	infoService.on('error', function(error) {
 		studio.emit('serviceError', error);
+	});
+
+	this.upgradeCubelet = function(version) {
+		if (!cubelet) {
+			studio.emit('error', new Error('No cubelet selected to upgrade.'));
+			return;
+		}
+		if (!version) {
+			studio.emit('error', new Error('Cannot upgrade cubelet. No version specified.'));
+			return;
+		}
+		if (!cubelet.mcu) {
+			studio.emit('error', new Error('Cannot upgrade cubelet. No MCU type defined.'));
+			return;
+		}
+		if (!cubelet.type || cubelet.type === cubelets.Types.UNKNOWN) {
+			studio.emit('error', new Error('Cannot upgrade cubelet. Unknown type.'));
+			return;
+		}
+		firmwareService.downloadVersion(cubelet, version);
+	};
+
+	this.restoreCubelet = function() {
+		if (!cubelet) {
+			studio.emit('error', new Error('No cubelet selected to restore.'));
+			return;
+		}
+		if (!cubelet.latestFirmwareVersion) {
+			studio.emit('error', new Error('Cannot restore cubelet. No firmware version defined.'));
+			return;
+		}
+		if (!cubelet.mcu) {
+			studio.emit('error', new Error('Cannot restore cubelet. No MCU type defined.'));
+			return;
+		}
+		if (!cubelet.type || cubelet.type === cubelets.Types.UNKNOWN) {
+			studio.emit('error', new Error('Cannot restore cubelet. Unknown type.'));
+			return;
+		}
+		this.upgradeCubelet(cubelet, cubelet.latestFirmwareVersion);
+	};
+
+	firmwareService.on('error', function(error) {
+		studio.emit('firmwareError', error);
+	});
+
+	firmwareService.on('download', function(cubelet, version, hex) {
+		var program = new cubelets.FlashProgram(hex);
+		if (!program.valid) {
+			studio.emit('error', new Error('Flash program is invalid.'));
+			return;
+		}
+		if (!connection) {
+			studio.emit('error', new Error('No cubelet connection available.'));
+			return;
+		}
+		var loader = new cubelets.FlashLoader(connection.serial());
+		loader.on('upload', function(p) {
+			studio.emit('flashProgress', {
+				action: 'upload',
+				percent: p.percent
+			});
+		});
+		loader.on('flash', function(p) {
+			studio.emit('flashProgress', {
+				action: 'flash',
+				percent: p.percent
+			});
+		});
+		loader.on('success', function() {
+			studio.emit('firmwareComplete', cubelet, version);
+			cubelet.currentFirmwareVersion = version;
+			studio.emit('cubeletChanged', cubelet);
+			firmwareService.updateVersion(cubelet, version);
+		});
+		loader.on('error', function(error) {
+			studio.emit('firmwareError', error);
+		});
+		loader.load(program, cubelet.id, cubelet.mcu);
+	});
+
+	firmwareService.on('update', function(cubelet, version) {
+		cubelet.currentFirmwareVersion = version;
+		studio.emit('cubeletChanged', cubelet);
 	});
 
 	this.mockConstruction = function() {

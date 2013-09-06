@@ -293,6 +293,44 @@ body {
 	font-weight: normal;
 }
 
+#studio .workspace-construction-detail-action {
+	text-align: center;
+}
+
+#studio .workspace-construction-detail-action-button {
+	text-align: center;
+	display: inline-block;
+	color: #fff;
+	background-color: #444;
+	border-top: 1px solid #555;
+	border-right: 1px solid #222;
+	border-bottom: 1px solid #222;
+	border-left: 1px solid #555;
+	border-radius: 3px;
+	height: 18px;
+	line-height: 18px;
+	margin: 6px;
+	padding: 0px 9px;
+	font-size: 0.7em;
+	font-weight: normal;
+	text-decoration: none;
+}
+
+#studio .workspace-construction-detail-action-button-enabled {
+	cursor: hand;
+}
+
+#studio .workspace-construction-detail-action-button-disabled {
+	background-color: #333;
+	background-image: none;
+	border-top: 1px solid #222;
+	border-right: 1px solid #111;
+	border-bottom: 1px solid #111;
+	border-left: 1px solid #222;
+	color: #555;
+	cursor: default;
+}
+
 #studio .workspace-construction-detail-info tr td:first-child {
 	text-align: right;
 	color: #fff;
@@ -538,6 +576,7 @@ body {
 					<div class="workspace-construction-detail-icon"></div>
 					<div class="workspace-construction-detail-label"></div>
 					<table class="workspace-construction-detail-info"></table>
+					<div class="workspace-construction-detail-action"></div>
 				</div>
 			</div>
 		</div>
@@ -623,8 +662,11 @@ studio.on('constructionChanged', function() {
 
 studio.on('cubeletChanged', function(cubelet) {
 	ui.updateWorkspaceConstructionGraphNode(cubelet);
-	if (studio.getCubelet() === cubelet && studio.hasBuild() && cubelet.type !== cubelets.Types.UNKNOWN) {
-		ui.enableFlashButton();
+	if (cubelet === studio.getCubelet()) {
+		ui.setWorkspaceConstructionDetail(cubelet);
+		if (studio.hasBuild() && cubelet.type !== cubelets.Types.UNKNOWN) {
+			ui.enableFlashButton();
+		}
 	}
 });
 
@@ -691,6 +733,16 @@ studio.on('flashError', function(error) {
 
 studio.on('cubeletsNearbyDiscoveryStarted', function() {
 	log.info('Discovering nearby cubelets...');
+});
+
+studio.on('firmwareError', function(error) {
+	log.error('Firmware update error:', error);
+	ui.updateBuildAndFlashButtons();
+});
+
+studio.on('firmwareComplete', function(cubelet, version) {
+	ui.updateBuildAndFlashButtons();
+	log.info('Successfully upgraded cubelet', cubelet.id, 'to version', version + '.');
 });
 
 var log = new (function() {
@@ -857,7 +909,7 @@ var ui = {
 
 	// UI Elements
 	createButton: function(selector, definition) {
-		d3.select(selector)
+		(_(selector).isString() ? d3.select(selector) : selector)
 			.datum(definition)
 			.each(function(button) {
 				var el = d3.select(this);
@@ -1435,6 +1487,44 @@ var ui = {
 					row.append('td').text(function(data) { return data.key });
 					row.append('td').text(function(data) { return data.value });
 				});
+
+		var action = d3.select('#studio .workspace-construction-detail-action');
+		action.selectAll('a').remove();
+
+		function addActionButton(text, click) {
+			var element = action.append('a')
+				.attr('href', '#')
+				.text(text)
+				.classed('workspace-construction-detail-action-button', true);
+			ui.createButton(element, {
+				enabled: true,
+				type: 'workspace-construction-detail-action-button',
+				click: click
+			});
+		}
+
+		function disableAllActionButtons() {
+			d3.selectAll('#studio .workspace-construction-detail-action-button')
+				.each(function(button) {
+					button.disable();
+				});
+		}
+
+		if (node.hasFirmwareUpgrade()) {
+			addActionButton('Upgrade to Version ' + node.latestFirmwareVersion, function(button) {
+				disableAllActionButtons();
+				ui.disableBuildButton();
+				ui.disableFlashButton();
+				studio.upgradeCubelet(node.latestFirmwareVersion);
+			});
+		}
+
+		addActionButton('Restore Default Firmware', function(button) {
+			disableAllActionButtons();
+			ui.disableBuildButton();
+			ui.disableFlashButton();
+			studio.restoreCubelet();
+		});
 	},
 
 	// Connection status
