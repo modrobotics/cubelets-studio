@@ -3,7 +3,7 @@
     "main": "index.html",
     "window": {
         "title": "Cubelets Studio",
-		"toolbar": true,
+		"toolbar": false,
 		"resizable": true,
 		"width": 1200,
 		"height": 725,
