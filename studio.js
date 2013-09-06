@@ -116,6 +116,7 @@ var Studio = function() {
 	};
 
 	this.discoverConstruction = function() {
+		studio.emit('cubeletsNearbyDiscoveryStarted');
 		construction.discover();
 	};
 
@@ -124,17 +125,34 @@ var Studio = function() {
 		studio.fetchCubeletInfo(construction.all());
 	});
 
+	this.disconnect = function() {
+		studio.setConnection(null);
+	};
+
 	this.setConnection = function(c) {
+		if (c === connection) {
+			return;
+		}
 		connection = c;
+		construction.reset();
 		construction.setConnection(c);
-		c.on('close', function() {
-			studio.emit('deviceDisconnected');
-		});
-		studio.emit('deviceConnected', c.device);
+		if (c) {
+			studio.emit('deviceConnected', c.device);
+			c.on('close', function() {
+				studio.emit('deviceDisconnected');
+			});
+		}
+		else {
+			construction.reset();
+		}
 	};
 
 	this.getConnection = function() {
 		return connection;
+	};
+
+	this.hasConnection = function() {
+		return connection && connection.connected;
 	};
 
 	this.buildProgram = function(program) {
@@ -210,6 +228,10 @@ var Studio = function() {
 	buildService.on('complete', function(b) {
 		build = b;
 		studio.emit('buildComplete', b);
+	});
+
+	buildService.on('fail', function(b, result) {
+		studio.emit('buildFailed', b, result);
 	});
 
 	buildService.on('error', function(error) {

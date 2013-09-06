@@ -233,6 +233,14 @@ body {
 	stroke-width: 2px;
 }
 
+#studio .workspace-construction-graph-circle-near-connected {
+	stroke: rgba(85,255,97,0.5) !important;
+}
+
+#studio .workspace-construction-graph-circle-near-disconnected {
+	stroke: rgba(255,85,97,0.5) !important;
+}
+
 #studio .workspace-construction-graph-circle-far {
 	stroke: rgba(51,51,51,1);
 	stroke-width: 2px;
@@ -555,6 +563,15 @@ body {
 
 	<script type="text/javascript">
 
+if (!process) {
+	console.error('Node JS is not configured.');
+	return;
+}
+
+process.on('uncaughtException', function(e) {
+ 	console.error('Unhandled Exception', e);
+});
+
 var cubelets = require('cubelets');
 var studio = new (require('./studio'))();
 
@@ -617,6 +634,8 @@ studio.on('cubeletSelected', function(cubelet) {
 studio.on('deviceConnected', function(device) {
 	ui.setConnectionStatusConnected();
 	ui.setWorkspaceTitleDeviceName(device);
+	ui.drawWorkspaceConstructionGraph();
+	log.info('Cubelet connected.');
 	if (studio.getConstruction().all().length == 0) {
 		studio.discoverConstruction();
 	}
@@ -625,6 +644,8 @@ studio.on('deviceConnected', function(device) {
 studio.on('deviceDisconnected', function() {
 	ui.setConnectionStatusDisconnected();
 	ui.updateBuildAndFlashButtons();
+	ui.drawWorkspaceConstructionGraph();
+	log.info('Cubelet disconnected.');
 });
 
 studio.on('buildComplete', function(build) {
@@ -632,6 +653,12 @@ studio.on('buildComplete', function(build) {
 	ui.enableBuildButton();
 	ui.enableFlashButton();
 	log.info('Build complete.');
+});
+
+studio.on('buildFailed', function(build, result) {
+	ui.hideBuildProgressIndicator();
+	ui.enableBuildButton();
+	log.error(ui.formatBuildResult(result));
 });
 
 studio.on('buildError', function(error) {
@@ -654,6 +681,10 @@ studio.on('flashError', function(error) {
 	ui.hideFlashProgressBar();
 	ui.enableFlashButton();
 	ui.showFlashError(error);
+});
+
+studio.on('cubeletsNearbyDiscoveryStarted', function() {
+	log.info('Discovering nearby cubelets...');
 });
 
 var log = new (function() {
@@ -1301,9 +1332,12 @@ var ui = {
 				.attr({ 'r': 2.5 * p, 'cx': cx, 'cy': cy });
 		}
 		// Draw flashable ring
+		var connected = studio.hasConnection();
 		ui.graph
 			.append('circle')
 			.classed('workspace-construction-graph-circle-near', true)
+			.classed('workspace-construction-graph-circle-near-connected', connected)
+			.classed('workspace-construction-graph-circle-near-disconnected', !connected)
 			.attr({ 'r': 1.5 * p, 'cx': cx, 'cy': cy });
 		// Draw origin
 		if (construction.origin) {
@@ -1458,6 +1492,12 @@ var ui = {
 		return category
 			.replace(/^(.)/, function(s) { return s.toUpperCase() });
 	},
+	formatBuildResult: function(result) {
+		var line = result.lineNumber;
+		var message = result.message;
+		return (line > 0) ? 
+			'Syntax error on line ' + line + ': ' + message : message;
+	},
 
 	// Console autoscroll
 	scrollConsoleToBottom: function() {
@@ -1550,6 +1590,7 @@ studio.on('serviceError', function(error) {
 });
 
 studio.load();
+studio.mockConstruction();
 
 	</script>
 </body>
