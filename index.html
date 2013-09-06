@@ -623,6 +623,9 @@ studio.on('constructionChanged', function() {
 
 studio.on('cubeletChanged', function(cubelet) {
 	ui.updateWorkspaceConstructionGraphNode(cubelet);
+	if (studio.getCubelet() === cubelet && studio.hasBuild() && cubelet.type !== cubelets.Types.UNKNOWN) {
+		ui.enableFlashButton();
+	}
 });
 
 studio.on('cubeletSelected', function(cubelet) {
@@ -651,7 +654,10 @@ studio.on('deviceDisconnected', function() {
 studio.on('buildComplete', function(build) {
 	ui.hideBuildProgressIndicator();
 	ui.enableBuildButton();
-	ui.enableFlashButton();
+	var cubelet = studio.getCubelet();
+	if (cubelet && cubelet.type !== cubelets.Types.UNKNOWN) {
+		ui.enableFlashButton();
+	}
 	log.info('Build complete.');
 });
 
@@ -664,7 +670,7 @@ studio.on('buildFailed', function(build, result) {
 studio.on('buildError', function(error) {
 	ui.hideBuildProgressIndicator();
 	ui.enableBuildButton();
-	ui.showBuildError(build, error);
+	ui.showBuildError(error);
 });
 
 studio.on('flashProgress', function(progress) {
@@ -789,7 +795,15 @@ var ui = {
 			.attr('width', width)
 			.attr('height', height)
 			.on('contextmenu', function() {
-				studio.discoverConstruction();
+				var g = require('nw.gui');
+				var menu = new g.Menu();
+				menu.append(new g.MenuItem({ label: 'Discover nearby cubelets', click: function() {
+					studio.discoverConstruction();
+				}}));
+				menu.append(new g.MenuItem({ label: 'Identify cubelets', click: function() {
+					studio.fetchCubeletInfo();
+				}}));
+				menu.popup(d3.event.x, d3.event.y);
 			});
 	},
 	initializeBuildButton: function() {
@@ -1461,7 +1475,7 @@ var ui = {
 		d3.select('#studio .console-toolbar-button-build')
 			.classed('console-toolbar-progress-indicator-enabled', false);
 	},
-	showBuildError: function(build, error) {
+	showBuildError: function(error) {
 		log.error(error);
 	},
 
@@ -1590,6 +1604,7 @@ studio.on('serviceError', function(error) {
 });
 
 studio.load();
+studio.mockConstruction();
 
 	</script>
 </body>

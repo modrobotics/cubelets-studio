@@ -184,6 +184,10 @@ var Studio = function() {
 			studio.emit('error', new Error('No cubelet selected to flash.'));
 			return;
 		}
+		if (!cubelet.mcu) {
+			studio.emit('error', new Error('Cannot flash cubelet. No MCU type defined.'));
+			return;
+		}
 		if (!build) {
 			studio.emit('error', new Error('No program compiled to build.'));
 			return;
@@ -238,8 +242,8 @@ var Studio = function() {
 		studio.emit('buildError', error);
 	});
 
-	buildService.on('progress', function(build, progress) {
-		studio.emit('buildProgress', build, progress);
+	buildService.on('progress', function(b, progress) {
+		studio.emit('buildProgress', b, progress);
 	});
 
 	this.fetchCubeletInfo = function(cubelets) {
@@ -267,7 +271,8 @@ var Studio = function() {
 			new Cubelet(23825, Types.PASSIVE),
 			new Cubelet(24003, Types.BRIGHTNESS),
 			new Cubelet(21685, Types.BATTERY),
-			new Cubelet(20214, Types.DISTANCE)
+			new Cubelet(20214, Types.DISTANCE),
+			new Cubelet(0, Types.UNKNOWN)
 		];
 		studio.emit('constructionChanged');
 	};
