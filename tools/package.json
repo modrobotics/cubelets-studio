@@ -1,3 +1,7 @@
 {
-    "name": "cubelets-studio-tools"
+  "name": "cubelets-studio-tools",
+  "description": "build tools for cubelets-studio.",
+  "dependencies": {
+  	"plist": "0.4.3"
+  }
 }

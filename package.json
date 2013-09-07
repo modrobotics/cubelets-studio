@@ -1,13 +1,22 @@
 {
-    "name": "Cubelets Studio",
-    "main": "index.html",
-    "window": {
-        "title": "Cubelets Studio",
-		"toolbar": false,
-		"resizable": true,
-		"width": 1200,
-		"height": 725,
-		"min_width": 800,
-		"min_height": 450
-    }
+  "name": "cubelets-studio",
+  "description": "Cubelets Studio is a programming environment for creating new behaviors for Cubelets.",
+  "window": {
+    "title": "Cubelets Studio",
+    "toolbar": false,
+    "resizable": true,
+    "width": 1200,
+    "height": 725,
+    "min_width": 800,
+    "min_height": 450
+  },
+  "dependencies": {
+    "cubelets": "0.0.1",
+    "glob": "3.2.6",
+    "underscore": "1.5.0"
+  },
+  "bundledDependencies": [
+    "cubelets"
+  ],
+  "main": "index.html"
 }
