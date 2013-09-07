@@ -792,7 +792,8 @@ var ui = {
 	initializeMenu: function() {
 		var g = require('nw.gui');
 		var menu = new g.Menu({ type: 'menubar' });
-		g.Window.get().menu = menu;
+		var win = g.Window.get();
+		win.menu = menu;
 
 		var fileMenuItem = new g.MenuItem({ label: 'File' });
 		var fileMenu = fileMenuItem.submenu = new g.Menu();
@@ -819,6 +820,13 @@ var ui = {
 			ui.closeAll();
 		}}));
 		menu.insert(fileMenuItem, 1);
+
+		var debugMenuItem = new g.MenuItem({ label: 'Debug' });
+		var debugMenu = debugMenuItem.submenu = new g.Menu();
+		debugMenu.append(new g.MenuItem({ label: 'Show Debug Tools', click: function() {
+			win.showDevTools();
+		}}));
+		menu.append(debugMenuItem);
 
 		var helpMenuItem = new g.MenuItem({ label: 'Help' });
 		var helpMenu = helpMenuItem.submenu = new g.Menu();
