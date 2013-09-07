@@ -300,7 +300,7 @@ var Studio = function() {
 			studio.emit('error', new Error('Cannot restore cubelet. Unknown type.'));
 			return;
 		}
-		this.upgradeCubelet(cubelet, cubelet.latestFirmwareVersion);
+		this.upgradeCubelet(cubelet.latestFirmwareVersion);
 	};
 
 	firmwareService.on('error', function(error) {

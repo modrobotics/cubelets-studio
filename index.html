@@ -608,7 +608,7 @@ if (!process) {
 }
 
 process.on('uncaughtException', function(e) {
- 	console.error('Unhandled Exception', e);
+ 	console.error('Uncaught Exception. Please report this bug.', e);
 });
 
 var cubelets = require('cubelets');
