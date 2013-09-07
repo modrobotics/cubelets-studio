@@ -716,7 +716,10 @@ studio.on('buildError', function(error) {
 });
 
 studio.on('flashProgress', function(progress) {
-	ui.showFlashProgressBar(progress.percent);
+	var p = progress.action === 'upload' ? (progress.percent / 2) :
+		    progress.action === 'flash' ? 50 + (progress.percent / 2) :
+		    50;
+	ui.showFlashProgressBar(p);
 });
 
 studio.on('flashComplete', function() {
@@ -1558,12 +1561,14 @@ var ui = {
 
 	// Building
 	showBuildProgressIndicator: function() {
-		d3.select('#studio .console-toolbar-button-build')
-			.classed('console-toolbar-progress-indicator-enabled', true);
+		var button = d3.select('#studio .console-toolbar-button-build');
+		button.classed('console-toolbar-progress-indicator-enabled', true);
+		button.text('Building...');
 	},
 	hideBuildProgressIndicator: function() {
-		d3.select('#studio .console-toolbar-button-build')
-			.classed('console-toolbar-progress-indicator-enabled', false);
+		var button = d3.select('#studio .console-toolbar-button-build');
+		button.classed('console-toolbar-progress-indicator-enabled', false);
+		button.text('Build');
 	},
 	showBuildError: function(error) {
 		log.error(error);
@@ -1576,11 +1581,15 @@ var ui = {
 		var x = w * (percent || 0.0) / 100.0;
 		button.style('background-position', [x - w, 0].join(' '));
 		button.classed('console-toolbar-progress-bar-enabled', true);
+		button.text(percent  <  50 ? 'Uploading...' :
+			        percent === 50 ? 'Targeting...'
+			                       : 'Flashing...');
 	},
 	hideFlashProgressBar: function() {
 		d3.select('#studio .console-toolbar-button-flash')
 			.style('background-position', '0 0')
-			.classed('console-toolbar-progress-bar-enabled', false);
+			.classed('console-toolbar-progress-bar-enabled', false)
+			.text('Flash');
 	},
 	showFlashError: function(error) {
 		log.error(error);
