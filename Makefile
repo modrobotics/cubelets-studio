@@ -1,5 +1,5 @@
 # Node-WebKit
-NW_VERSION="0.6.3"
+NW_VERSION="0.7.2"
 NW_PATH="/Users/Donald/Development/Tools/node-webkit/node-webkit-v$(VERSION)-osx-ia32"
 
 # Node package manager
@@ -35,7 +35,9 @@ build-serialport:
 
 build-zip:
 	mkdir -p build
+	node ./tools/set-app-name "Cubelets Studio" # proper formatting in node-webkit
 	zip -r build/app.nw * -x@exclude.list
+	node ./tools/set-app-name "cubelets-studio" # restore npm compatibility
 
 clean:
 	rm -rf build/*
