@@ -19,6 +19,8 @@ module.exports.list = function(callback) {
 
 module.exports.Cubelet = require('./cubelet');
 module.exports.Connection = require('./connection');
+module.exports.SerialConnection = require('./connection/serial');
+module.exports.NetConnection = require('./connection/net');
 module.exports.Construction = require('./construction');
 module.exports.Types = require('./config.json')['types'];
 module.exports.Responses = require('./config.json')['responses'];

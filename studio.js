@@ -138,7 +138,7 @@ var Studio = function() {
 		construction.reset();
 		construction.setConnection(c);
 		if (c) {
-			studio.emit('deviceConnected', c.device);
+			studio.emit('deviceConnected', c.name);
 			c.on('close', function() {
 				studio.emit('deviceDisconnected');
 			});
@@ -207,7 +207,7 @@ var Studio = function() {
 			studio.emit('error', new Error('No Cubelet connection available.'));
 			return;
 		}
-		var loader = new cubelets.FlashLoader(connection.serial());
+		var loader = new cubelets.FlashLoader(connection.stream());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',
@@ -317,7 +317,7 @@ var Studio = function() {
 			studio.emit('error', new Error('No cubelet connection available.'));
 			return;
 		}
-		var loader = new cubelets.FlashLoader(connection.serial());
+		var loader = new cubelets.FlashLoader(connection.stream());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',

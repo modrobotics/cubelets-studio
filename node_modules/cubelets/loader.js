@@ -7,7 +7,8 @@ var ResponseTypes = require('./config.json')['responses'];
 var Encoder = require('./encoder');
 var Decoder = require('./decoder');
 
-var FlashLoader = function(connection, encoding) {
+var FlashLoader = function(stream, encoding) {
+    
     events.EventEmitter.call(this);
 
     var Mode = {
@@ -19,7 +20,7 @@ var FlashLoader = function(connection, encoding) {
     var parser = new ResponseParser(encoding);
 
     // Begin parsing responses
-    connection.on('data', function(data) {
+    stream.on('data', function(data) {
         parser.parse(data);
     });
 
@@ -124,13 +125,13 @@ var FlashLoader = function(connection, encoding) {
         }
 
         function sendReadyCommand(callback) {
-            connection.write(new Buffer([
+            stream.write(new Buffer([
                 '3'.charCodeAt(0)
             ]), callback);
         }
 
         function sendChecksumData(callback) {
-            connection.write(new Buffer([
+            stream.write(new Buffer([
                 '8'.charCodeAt(0),
                 program.checksum.xor,
                 program.checksum.sum
@@ -151,7 +152,7 @@ var FlashLoader = function(connection, encoding) {
                             progress: progress += data.length,
                             total: program.data.length
                         });
-                        connection.write(data, callback);
+                        stream.write(data, callback);
                     }, wait(chunkInterval));
                 }
                 return data;
@@ -162,7 +163,7 @@ var FlashLoader = function(connection, encoding) {
 
         function send(data) {
             return function(callback) {
-                connection.write(data, callback);
+                stream.write(data, callback);
             }
         }
 
@@ -190,7 +191,7 @@ var FlashLoader = function(connection, encoding) {
                     break;
                 case Mode.PIC:
                     var encodedID = Encoder.encodeID(id);
-                    connection.write(new Buffer([
+                    stream.write(new Buffer([
                         'L'.charCodeAt(0),
                         encodedID.readUInt8(0),
                         encodedID.readUInt8(1),

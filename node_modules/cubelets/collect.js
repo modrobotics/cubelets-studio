@@ -10,10 +10,10 @@ var Logger = require('./logger');
 
 var device = process.argv[2];
 var filename = process.argv[3];
-var connection = new SerialPort(device, { baudrate: 38400 });
+var serial = new SerialPort(device, { baudrate: 38400 });
 var encoding = 'ascii';
 
-connection.on('open', function() {
+serial.on('open', function() {
     console.log('Connected.');
 
     // Create a parser to interpret messages.
@@ -27,23 +27,23 @@ connection.on('open', function() {
         logger.log(message);
     });
 
-    // Once connection is open, begin listening for data.
-    connection.on('data', function(data) {
+    // Once serial connection is open, begin listening for data.
+    serial.on('data', function(data) {
         parser.parse(data);
     });
 
     // Write data to serial connection.
     keyboard.on('data', function(data) {
-        connection.write(data);
+        serial.write(data);
     });
 });
 
-connection.on('close', function() {
+serial.on('close', function() {
     console.log('Goodbye.');
     process.exit(0);
 });
 
-connection.on('error', function(e) {
+serial.on('error', function(e) {
     console.error(e);
     process.exit(1);
 });

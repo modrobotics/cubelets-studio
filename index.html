@@ -826,6 +826,14 @@ var ui = {
 		debugMenu.append(new g.MenuItem({ label: 'Show Debug Tools', click: function() {
 			win.showDevTools();
 		}}));
+		debugMenu.append(new g.MenuItem({ label: 'Connect to Development Server...', click: function() {
+			var connection = new cubelets.NetConnection('localhost', 6000);
+			connection.connect(function(e) {
+				log.error('Error. Could not connect to server \'' + connection.name + '\'.');
+			}, function() {
+				studio.setConnection(connection);
+			});
+		}}));
 		menu.append(debugMenuItem);
 
 		var helpMenuItem = new g.MenuItem({ label: 'Help' });
@@ -1043,7 +1051,7 @@ var ui = {
 					.classed('dialog-connection-status', true)
 					.text('Connecting...');
 				var device = item.datum()
-				var connection = new cubelets.Connection(device.comName);
+				var connection = new cubelets.SerialConnection(device.comName);
 				connection.connect(function(e) {
 					status.text('Error. Could not connect.');
 					log.error('Error. Could not connect to device \'' + device.comName + '\'.');

@@ -7,10 +7,10 @@ var SerialPort = require('serialport').SerialPort;
 var ResponseParser = require('./parser');
 
 var device = process.argv[2];
-var connection = new SerialPort(device, { baudrate: 38400 });
+var serial = new SerialPort(device, { baudrate: 38400 });
 
-connection.on('open', function() {
-    console.log('Connected.');
+serial.on('open', function() {
+    console.log('Connected to', device);
 
     // Create a parser to interpret responses.
     var parser = new ResponseParser();
@@ -30,14 +30,14 @@ connection.on('open', function() {
         console.log('Raw:', data);
     });
 
-    // Once connection is open, begin listening for data.
-    connection.on('data', function(data) {
+    // Once serial connection is open, begin listening for data.
+    serial.on('data', function(data) {
         parser.parse(data);
     });
 
     // Write data to serial connection.
     keyboard.on('data', function(data) {
-        connection.write(data);
+        serial.write(data);
     });
 
     // Respond to control events
@@ -46,7 +46,7 @@ connection.on('open', function() {
         switch (key) {
             case 0x04:
                 // Disconnect
-                connection.close();
+                serial.close();
                 break;
             case 0x12:
                 // Toggle raw
@@ -58,12 +58,12 @@ connection.on('open', function() {
     });
 });
 
-connection.on('close', function() {
+serial.on('close', function() {
     console.log('Goodbye.');
     process.exit(0);
 });
 
-connection.on('error', function(e) {
+serial.on('error', function(e) {
     console.error(e);
     process.exit(1);
 });
