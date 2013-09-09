@@ -105,7 +105,7 @@ body {
 	width: 300px;
 	border-right: 4px solid #333;
 	overflow-x: auto;
-	overflow-y: scroll;
+	overflow-y: auto;
 	background: #111;
 }
 
@@ -160,17 +160,16 @@ body {
 	position: absolute;
 	top: 0px;
 	left: 4px;
-	width: 1000px;
 	height: 32px;
+	width: 100%;
 	border-bottom: 1px solid #333;
+	white-space: nowrap;
 	overflow-x: auto;
 	overflow-y: hidden;
 }
 
 #studio .workspace-code-tab {
-	display: block;
-	float: left;
-	width: 100px;
+	display: inline-block;
 	height: 28px;
 	line-height: 30px;
 	margin: 3px 0px 0px 2px;
@@ -181,9 +180,13 @@ body {
 	border-left: 1px solid #555;
 	border-radius: 6px 6px 0px 0px;
 	text-decoration: none;
+	cursor: default;
+	width: 100px;
 }
 
 #studio .workspace-code-tab-title {
+	display: block;
+	float: left;
 	font-size: 0.7em;
 	color: #fff;
 }
@@ -196,10 +199,11 @@ body {
 
 #studio .workspace-code-tab .workspace-code-tab-control {
 	display: block;
+	float: right;
 	width: 10px;
 	height: 10px;
-	margin-top: -20px;
-	margin-left: 90px;
+	margin-top: 10px;
+	margin-right: 0px;
 }
 
 #studio .workspace-code-tab-dirty .workspace-code-tab-control {
@@ -263,7 +267,7 @@ body {
 	left: 0px;
 	right: 0px;
 	overflow-x: auto;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 #studio .workspace-construction-detail-icon {
@@ -412,7 +416,7 @@ body {
 #studio .console-messages {
 	height: 76px;
 	font-size: 0.75em;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 #studio .console-message-info {
@@ -745,7 +749,7 @@ studio.on('firmwareError', function(error) {
 
 studio.on('firmwareComplete', function(cubelet, version) {
 	ui.updateBuildAndFlashButtons();
-	log.info('Firmware updated on cubelet \'', cubelet.id, '\' to version \'', version + '\'.');
+	log.info('Firmware updated on cubelet \'' + cubelet.id + '\' to version \'' + version + '\'.');
 });
 
 var log = new (function() {
@@ -1121,7 +1125,8 @@ var ui = {
 		var program = tab.ref.program;
 		var session = tab.ref.session;
 		var element = d3.select('#studio .workspace-code-tabs')
-			.append('div')
+			.append('a')
+			.attr('href', '#')
 			.classed('workspace-code-tab', true)
 			.datum(tab)
 			.on('click', function() {
