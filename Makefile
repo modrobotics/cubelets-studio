@@ -1,13 +1,13 @@
 # Node-WebKit
 NW_VERSION="0.7.2"
-NW_PATH="/Users/Donald/Development/Tools/node-webkit/node-webkit-v$(VERSION)-osx-ia32"
+NW_PATH="/opt/node-webkit/$(VERSION)"
 
 # Node package manager
 NPM_PATH="/usr/local/share/npm"
 
 # Binaries
 NW="$(NW_PATH)/node-webkit.app/Contents/MacOS/node-webkit"
-GYP="$(NPM_PATH)/lib/node_modules/nw-gyp/bin/nw-gyp.js"
+GYP="$(NPM_PATH)/bin/nw-gyp"
 
 build:build-osx build-windows build-linux
 
