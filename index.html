@@ -745,7 +745,7 @@ studio.on('firmwareError', function(error) {
 
 studio.on('firmwareComplete', function(cubelet, version) {
 	ui.updateBuildAndFlashButtons();
-	log.info('Successfully upgraded cubelet', cubelet.id, 'to version', version + '.');
+	log.info('Firmware updated on cubelet \'', cubelet.id, '\' to version \'', version + '\'.');
 });
 
 var log = new (function() {

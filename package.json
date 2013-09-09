@@ -3,7 +3,7 @@
   "description": "Cubelets Studio is a programming environment for creating new behaviors for Cubelets.",
   "window": {
     "title": "Cubelets Studio",
-    "toolbar": true,
+    "toolbar": false,
     "resizable": true,
     "width": 1200,
     "height": 725,
