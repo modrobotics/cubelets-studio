@@ -685,7 +685,7 @@ studio.on('deviceConnected', function(device) {
 	ui.setWorkspaceTitleDeviceName(device);
 	ui.drawWorkspaceConstructionGraph();
 	log.info('Cubelet connected.');
-	if (studio.getConstruction().all().length == 0) {
+	if (studio.getConstruction().all().length <= 1) {
 		studio.discoverConstruction();
 	}
 });
