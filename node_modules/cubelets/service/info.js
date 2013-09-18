@@ -48,11 +48,12 @@ var InfoService = function() {
 				console.error('Bad response. Expected an array.', body);
 				return;
 			}
+			var index = 0;
 			__(cubelets).each(function(cubelet) {
 				__(body).each(function(item) {
 					if (item['id'] == cubelet.id) {
 						console.log('Found', cubelet.id);
-						service.emit('info', new Info(item), cubelet);
+						service.emit('info', new Info(item), cubelet, index++);
 					}
 				});
 			});

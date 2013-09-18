@@ -207,7 +207,7 @@ var Studio = function() {
 			studio.emit('error', new Error('No Cubelet connection available.'));
 			return;
 		}
-		var loader = new cubelets.FlashLoader(connection.stream());
+		var loader = new cubelets.FlashLoader(construction.origin, connection.stream());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',
@@ -227,7 +227,7 @@ var Studio = function() {
 			console.error('Flash Error', error);
 			studio.emit('flashError', error);
 		});
-		loader.load(program, cubelet.id, cubelet.mcu);
+		loader.load(program, cubelet);
 	};
 
 	buildService.on('complete', function(b) {
@@ -317,7 +317,7 @@ var Studio = function() {
 			studio.emit('error', new Error('No cubelet connection available.'));
 			return;
 		}
-		var loader = new cubelets.FlashLoader(connection.stream());
+		var loader = new cubelets.FlashLoader(construction.origin, connection.stream());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',
@@ -339,7 +339,7 @@ var Studio = function() {
 		loader.on('error', function(error) {
 			studio.emit('firmwareError', error);
 		});
-		loader.load(program, cubelet.id, cubelet.mcu);
+		loader.load(program, cubelet);
 	});
 
 	firmwareService.on('update', function(cubelet, version) {

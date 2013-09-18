@@ -1,5 +1,5 @@
 if (process.argv.length < 5) {
-    console.log('Usage: node flash.js SERIALPORT FILENAME ID MODE');
+    console.log('Usage: node flash.js SERIALPORT FILENAME ID TARGET');
     return;
 }
 
@@ -7,11 +7,12 @@ var fs = require('fs');
 var SerialPort = require('serialport').SerialPort;
 var FlashProgram = require('./program');
 var FlashLoader = require('./loader');
+var Cubelet = require('./cubelet');
 
 var device = process.argv[2];
 var filename = process.argv[3];
 var id = process.argv[4];
-var mode = process.argv[5];
+var target = process.argv[5];
 
 if (!fs.existsSync(filename)) {
     console.log("File '" + filename + "' does not exist.");
@@ -22,12 +23,31 @@ var serial = new SerialPort(device, { baudrate: 38400 });
 var encoding = 'ascii';
 
 serial.on('open', function() {
-    // Create a flash loader to load the image
-    var loader = new FlashLoader(serial, encoding);
+    var type = undefined;
+    var mcu = target;
+    flash(new Cubelet(id, type, mcu));
+});
+
+serial.on('close', function() {
+    console.log('Goodbye.');
+    process.exit(0);
+});
+
+serial.on('error', function(e) {
+    console.log(e);
+    process.exit(1);
+});
+
+function flash(cubelet) {
+    // Create a default origin cubelet
+    var origin = new Cubelet();
+
+    // Create a flash loader on serial port for target cubelet
+    var loader = new FlashLoader(new Cubelet(), serial, encoding);
 
     // Create a meter
     var meter = require('multimeter')(process);
-    meter.write('Connected.\n');
+    meter.write('Flashing.\n');
 
     // Use the meter to measure progress
     function measure(label, x, y, event) {
@@ -62,15 +82,5 @@ serial.on('open', function() {
     // Load the program
     var data = fs.readFileSync(filename);
     var program = new FlashProgram(data);
-    loader.load(program, id, mode);
-});
-
-serial.on('close', function() {
-    console.log('Goodbye.');
-    process.exit(0);
-});
-
-serial.on('error', function(e) {
-    console.log(e);
-    process.exit(1);
-});
+    loader.load(program, cubelet);
+};
