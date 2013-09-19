@@ -1,1730 +1,1730 @@
 <html>
 <head>
-	<title>Cubelets Studio</title>
+  <title>Cubelets Studio</title>
 
-	<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/d3.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/underscore.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-	<link rel="stylesheet" type="text/css" href="css/ace.css" />
+  <script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/d3.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/underscore.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" type="text/css" href="css/ace.css" />
 
-	<style type="text/css">
+  <style type="text/css">
 
 body {
-	background: #111;
-	color: #fff;
-	margin: 0;
-	padding: 0;
-	font-family: 'Andale Mono', 'Courier New', monospace;
-	overflow: hidden;
+  background: #111;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  font-family: 'Andale Mono', 'Courier New', monospace;
+  overflow: hidden;
 }
 
 #studio {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 #studio .titlebar {
-	background: #333;
-	height: 44px;
+  background: #333;
+  height: 44px;
 }
 
 #studio .titlebar-title {
-	line-height: 44px;
-	margin: auto;
-	text-align: center;
-	width: 400px;
-	font-size: 1.2em;
-	font-weight: bold;
-	padding: 0;
-	white-space: nowrap;
-	overflow: visible;
+  line-height: 44px;
+  margin: auto;
+  text-align: center;
+  width: 400px;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 0;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 #studio .titlebar-title-document-name,
 #studio .titlebar-title-separator,
 #studio .titlebar-title-device-name {
-	display: inline-block;
+  display: inline-block;
 }
 
 #studio .titlebar-connection-status {
-	display: inline-block;
-	color: #fff;
-	background: #444;
-	border-top: 1px solid #555;
-	border-right: 1px solid #222;
-	border-bottom: 1px solid #222;
-	border-left: 1px solid #555;
-	border-radius: 3px;
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	height: 24px;
-	margin: 9px;
+  display: inline-block;
+  color: #fff;
+  background: #444;
+  border-top: 1px solid #555;
+  border-right: 1px solid #222;
+  border-bottom: 1px solid #222;
+  border-left: 1px solid #555;
+  border-radius: 3px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 24px;
+  margin: 9px;
 }
 
 #studio .titlebar-connection-status-icon {
-	background: url(img/connection-disconnected.png);
-	width: 20px;
-	height: 20px;
-	display: inline-block;
-	margin: 2px;
-	float: left;
+  background: url(img/connection-disconnected.png);
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin: 2px;
+  float: left;
 }
 
 #studio .titlebar-connection-status-bluetooth-icon {
-	background: url(img/bluetooth.png);
-	width: 20px;
-	height: 20px;
-	display: inline-block;
-	margin: 2px 0px;
-	float: right;
+  background: url(img/bluetooth.png);
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  margin: 2px 0px;
+  float: right;
 }
 
 #studio .titlebar-connection-status-label {
-	display: inline-block;
-	float: left;
-	line-height: 20px;
-	margin: 2px 6px;
-	font-size: 15px;
-	font-weight: bold;
+  display: inline-block;
+  float: left;
+  line-height: 20px;
+  margin: 2px 6px;
+  font-size: 15px;
+  font-weight: bold;
 }
 
 #studio .workspace {
-	position: absolute;
-	width: 100%;
-	top: 44px;
-	bottom: 0px;
+  position: absolute;
+  width: 100%;
+  top: 44px;
+  bottom: 0px;
 }
 
 #studio .workspace-programs {
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	bottom: 100px;
-	width: 300px;
-	border-right: 4px solid #333;
-	overflow-x: auto;
-	overflow-y: auto;
-	background: #111;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 100px;
+  width: 300px;
+  border-right: 4px solid #333;
+  overflow-x: auto;
+  overflow-y: auto;
+  background: #111;
 }
 
 #studio .workspace-programs-title {
-	font-size: 1.1em;
-	font-weight: bold;
-	margin: 0px;
-	padding: 6px;
-	text-align: left;
-	background-color: rgba(85,97,255,0.5);
+  font-size: 1.1em;
+  font-weight: bold;
+  margin: 0px;
+  padding: 6px;
+  text-align: left;
+  background-color: rgba(85,97,255,0.5);
 }
 
 #studio .workspace-programs-list {
-	list-style: inside square;
-	padding: 0px;
-	margin: 0px;
+  list-style: inside square;
+  padding: 0px;
+  margin: 0px;
 }
 
 #studio .workspace-programs-list li {
-	font-size: 0.9em;
-	margin: 6px;
+  font-size: 0.9em;
+  margin: 6px;
 }
 
 #studio .workspace-programs-list li a {
-	color: #fff;
-	text-decoration: none;
-	font-weight: none;
+  color: #fff;
+  text-decoration: none;
+  font-weight: normal;
 }
 
 #studio .workspace-programs-list li a:hover {
-	color: #fff;
-	background: rgba(85,97,255,1.0);
+  color: #fff;
+  background: rgba(85,97,255,1.0);
 }
 
 #studio .workspace-code {
-	position: absolute;
-	top: 0px;
-	left: 300px;
-	right: 300px;
-	bottom: 100px;
+  position: absolute;
+  top: 0px;
+  left: 300px;
+  right: 300px;
+  bottom: 100px;
 }
 
 #studio .workspace-code-editor {
-	position: absolute;
-	left: 4px;
-	right: 4px;
-	top: 33px;
-	bottom: 4px;
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 33px;
+  bottom: 4px;
 }
 
 #studio .workspace-code-tabs {
-	position: absolute;
-	top: 0px;
-	left: 4px;
-	height: 32px;
-	width: 100%;
-	border-bottom: 1px solid #333;
-	white-space: nowrap;
-	overflow-x: auto;
-	overflow-y: hidden;
+  position: absolute;
+  top: 0px;
+  left: 4px;
+  height: 32px;
+  width: 100%;
+  border-bottom: 1px solid #333;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 #studio .workspace-code-tab {
-	display: inline-block;
-	height: 28px;
-	line-height: 30px;
-	margin: 3px 0px 0px 2px;
-	padding: 0px 9px;
-	text-align: left;
-	background-color: #333;
-	border-top: 1px solid #555;
-	border-left: 1px solid #555;
-	border-radius: 6px 6px 0px 0px;
-	text-decoration: none;
-	cursor: default;
-	width: 100px;
+  display: inline-block;
+  height: 28px;
+  line-height: 30px;
+  margin: 3px 0px 0px 2px;
+  padding: 0px 9px;
+  text-align: left;
+  background-color: #333;
+  border-top: 1px solid #555;
+  border-left: 1px solid #555;
+  border-radius: 6px 6px 0px 0px;
+  text-decoration: none;
+  cursor: default;
+  width: 100px;
 }
 
 #studio .workspace-code-tab-title {
-	display: block;
-	float: left;
-	font-size: 0.7em;
-	color: #fff;
+  display: block;
+  float: left;
+  font-size: 0.7em;
+  color: #fff;
 }
 
 #studio .workspace-code-tab-active {
-	background-color: rgba(85,97,255,0.5);
-	border-top: 1px solid rgba(85,97,255,1);
-	border-left: 1px solid rgba(85,97,255,1);
+  background-color: rgba(85,97,255,0.5);
+  border-top: 1px solid rgba(85,97,255,1);
+  border-left: 1px solid rgba(85,97,255,1);
 }
 
 #studio .workspace-code-tab .workspace-code-tab-control {
-	display: block;
-	float: right;
-	width: 10px;
-	height: 10px;
-	margin-top: 10px;
-	margin-right: 0px;
+  display: block;
+  float: right;
+  width: 10px;
+  height: 10px;
+  margin-top: 10px;
+  margin-right: 0px;
 }
 
 #studio .workspace-code-tab-dirty .workspace-code-tab-control {
-	background-image: url(img/tab-dirty.png);
+  background-image: url(img/tab-dirty.png);
 }
 
 #studio .workspace-code-tab-clean .workspace-code-tab-control {
-	background-image: url(img/tab-clean.png);
+  background-image: url(img/tab-clean.png);
 }
 
 #studio .workspace-construction {
-	position: absolute;
-	top: 0px;
-	right: 0px;
-	bottom: 100px;
-	width: 300px;
-	border-left: 4px solid #333;
-	background: #111;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 100px;
+  width: 300px;
+  border-left: 4px solid #333;
+  background: #111;
 }
 
 #studio .workspace-construction-graph {
-	position: absolute;
-	width: 300px;
-	height: 300px;
-	border-bottom: 1px solid #333;
-	background: #000;
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-bottom: 1px solid #333;
+  background: #000;
 }
 
 #studio .workspace-construction-graph-circle-near {
-	stroke: rgba(85,255,97,0.5);
-	stroke-width: 2px;
+  stroke: rgba(85,255,97,0.5);
+  stroke-width: 2px;
 }
 
 #studio .workspace-construction-graph-circle-near-connected {
-	stroke: rgba(85,255,97,0.5) !important;
+  stroke: rgba(85,255,97,0.5) !important;
 }
 
 #studio .workspace-construction-graph-circle-near-disconnected {
-	stroke: rgba(255,85,97,0.5) !important;
+  stroke: rgba(255,85,97,0.5) !important;
 }
 
 #studio .workspace-construction-graph-circle-far {
-	stroke: rgba(51,51,51,1);
-	stroke-width: 2px;
-	stroke-dasharray: 10px, 5px;
+  stroke: rgba(51,51,51,1);
+  stroke-width: 2px;
+  stroke-dasharray: 10px, 5px;
 }
 
 #studio .workspace-construction-graph-node {
-	opacity: 0.5;
+  opacity: 0.5;
 }
 
 #studio .workspace-construction-graph-node-active {
-	opacity: 1.0;
+  opacity: 1.0;
 }
 
 #studio .workspace-construction-detail {
-	padding: 9px;
-	position: absolute;
-	top: 301px;
-	bottom: 4px;
-	left: 0px;
-	right: 0px;
-	overflow-x: auto;
-	overflow-y: auto;
+  padding: 9px;
+  position: absolute;
+  top: 301px;
+  bottom: 4px;
+  left: 0px;
+  right: 0px;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 #studio .workspace-construction-detail-icon {
-	width: 90px;
-	height: 90px;
-	margin: auto;
+  width: 90px;
+  height: 90px;
+  margin: auto;
 }
 
 #studio .workspace-construction-detail-label {
-	font-size: 1.1em;
-	text-align: center;
-	margin: 9px auto;
+  font-size: 1.1em;
+  text-align: center;
+  margin: 9px auto;
 }
 
 #studio .workspace-construction-detail-info {
-	font-size: 0.7em;
-	border-collapse: collapse;
-	margin: 27px auto;
+  font-size: 0.7em;
+  border-collapse: collapse;
+  margin: 27px auto;
 }
 
 #studio .workspace-construction-detail-info tr td {
-	text-align: left;
-	width: 50%;
-	color: #ccc;
-	border: 1px solid #222;
-	padding: 4px 9px;
-	font-weight: normal;
+  text-align: left;
+  width: 50%;
+  color: #ccc;
+  border: 1px solid #222;
+  padding: 4px 9px;
+  font-weight: normal;
 }
 
 #studio .workspace-construction-detail-action {
-	text-align: center;
+  text-align: center;
 }
 
 #studio .workspace-construction-detail-action-button {
-	text-align: center;
-	display: inline-block;
-	color: #fff;
-	background-color: #444;
-	border-top: 1px solid #555;
-	border-right: 1px solid #222;
-	border-bottom: 1px solid #222;
-	border-left: 1px solid #555;
-	border-radius: 3px;
-	height: 18px;
-	line-height: 18px;
-	margin: 6px;
-	padding: 0px 9px;
-	font-size: 0.7em;
-	font-weight: normal;
-	text-decoration: none;
+  text-align: center;
+  display: inline-block;
+  color: #fff;
+  background-color: #444;
+  border-top: 1px solid #555;
+  border-right: 1px solid #222;
+  border-bottom: 1px solid #222;
+  border-left: 1px solid #555;
+  border-radius: 3px;
+  height: 18px;
+  line-height: 18px;
+  margin: 6px;
+  padding: 0px 9px;
+  font-size: 0.7em;
+  font-weight: normal;
+  text-decoration: none;
 }
 
 #studio .workspace-construction-detail-action-button-enabled {
-	cursor: hand;
+  cursor: hand;
 }
 
 #studio .workspace-construction-detail-action-button-disabled {
-	background-color: #333;
-	background-image: none;
-	border-top: 1px solid #222;
-	border-right: 1px solid #111;
-	border-bottom: 1px solid #111;
-	border-left: 1px solid #222;
-	color: #555;
-	cursor: default;
+  background-color: #333;
+  background-image: none;
+  border-top: 1px solid #222;
+  border-right: 1px solid #111;
+  border-bottom: 1px solid #111;
+  border-left: 1px solid #222;
+  color: #555;
+  cursor: default;
 }
 
 #studio .workspace-construction-detail-info tr td:first-child {
-	text-align: right;
-	color: #fff;
-	font-weight: bold;
+  text-align: right;
+  color: #fff;
+  font-weight: bold;
 }
 
 #studio .console {
-	position: absolute;
-	height: 100px;
-	bottom: 0px;
-	left: 0px;
-	right: 0px;
-	background: #111;
-	border-top: 4px solid #333;
+  position: absolute;
+  height: 100px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  background: #111;
+  border-top: 4px solid #333;
 }
 
 #studio .console-toolbar {
-	height: 24px;
-	background: #222;
-	text-align: right;
+  height: 24px;
+  background: #222;
+  text-align: right;
 }
 
 #studio .console-toolbar-button {
-	text-align: center;
-	display: block;
-	float: right;
-	color: #fff;
-	background-color: #444;
-	border-top: 1px solid #555;
-	border-right: 1px solid #222;
-	border-bottom: 1px solid #222;
-	border-left: 1px solid #555;
-	border-radius: 3px;
-	height: 18px;
-	line-height: 18px;
-	width: 132px;
-	margin: 2px 9px 2px 0px;
-	font-size: 0.7em;
-	font-weight: bold;
-	text-decoration: none;
+  text-align: center;
+  display: block;
+  float: right;
+  color: #fff;
+  background-color: #444;
+  border-top: 1px solid #555;
+  border-right: 1px solid #222;
+  border-bottom: 1px solid #222;
+  border-left: 1px solid #555;
+  border-radius: 3px;
+  height: 18px;
+  line-height: 18px;
+  width: 132px;
+  margin: 2px 9px 2px 0px;
+  font-size: 0.7em;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 #studio .console-toolbar-button-enabled {
-	cursor: hand;
+  cursor: hand;
 }
 
 #studio .console-toolbar-button-disabled {
-	background-color: #333;
-	background-image: none;
-	border-top: 1px solid #222;
-	border-right: 1px solid #111;
-	border-bottom: 1px solid #111;
-	border-left: 1px solid #222;
-	color: #555;
-	cursor: default;
+  background-color: #333;
+  background-image: none;
+  border-top: 1px solid #222;
+  border-right: 1px solid #111;
+  border-bottom: 1px solid #111;
+  border-left: 1px solid #222;
+  color: #555;
+  cursor: default;
 }
 
 #studio .console-toolbar-progress-indicator-enabled {
-	color: rgb(85,255,97) !important;
-	background-image: url(img/progress-indicator.gif) !important;
-	background-position: right center !important;
-	background-repeat: no-repeat !important;
-	border-top: 1px solid rgb(85,255,97) !important;
-	border-right: 1px solid rgb(85,255,97) !important;
-	border-bottom: 1px solid rgb(85,255,97) !important;
-	border-left: 1px solid rgb(85,255,97) !important;
+  color: rgb(85,255,97) !important;
+  background-image: url(img/progress-indicator.gif) !important;
+  background-position: right center !important;
+  background-repeat: no-repeat !important;
+  border-top: 1px solid rgb(85,255,97) !important;
+  border-right: 1px solid rgb(85,255,97) !important;
+  border-bottom: 1px solid rgb(85,255,97) !important;
+  border-left: 1px solid rgb(85,255,97) !important;
 }
 
 #studio .console-toolbar-progress-bar-enabled {
-	color: rgb(85,255,97) !important;
-	background-image: url(img/progress-bar.png) !important;
-	background-repeat: no-repeat !important;
-	border-top: 1px solid rgb(85,255,97) !important;
-	border-right: 1px solid rgb(85,255,97) !important;
-	border-bottom: 1px solid rgb(85,255,97) !important;
-	border-left: 1px solid rgb(85,255,97) !important;
+  color: rgb(85,255,97) !important;
+  background-image: url(img/progress-bar.png) !important;
+  background-repeat: no-repeat !important;
+  border-top: 1px solid rgb(85,255,97) !important;
+  border-right: 1px solid rgb(85,255,97) !important;
+  border-bottom: 1px solid rgb(85,255,97) !important;
+  border-left: 1px solid rgb(85,255,97) !important;
 }
 
 #studio .console-messages {
-	height: 76px;
-	font-size: 0.75em;
-	overflow-y: auto;
+  height: 76px;
+  font-size: 0.75em;
+  overflow-y: auto;
 }
 
 #studio .console-message-info {
-	color: #fff;
+  color: #fff;
 }
 
 #studio .console-message-error {
-	color: #f55;
+  color: #f55;
 }
 
 #studio .console-message-warn {
-	color: #ff5;
+  color: #ff5;
 }
 
 #studio .console-message-debug {
-	color: #5f5;
+  color: #5f5;
 }
 
 #studio .dialog-container {
-	display: none;
-	background: rgba(0,0,0,0.75);
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	bottom: 0px;
-	right: 0px;
-	z-index: 999;
+  display: none;
+  background: rgba(0,0,0,0.75);
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  right: 0px;
+  z-index: 999;
 }
 
 #studio .dialog {
-	position: fixed;
-	left: 50%;
-	top: 50%;
-	width: 400px;
-	margin-left: -200px;
-	margin-top: -150px;
-	background: #111;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 400px;
+  margin-left: -200px;
+  margin-top: -150px;
+  background: #111;
 }
 
 #studio .dialog-title {
-	text-align: center;
-	font-size: 0.8em;
-	font-weight: bold;
-	height: 32px;
-	line-height: 32px;
-	padding: 0px;
-	margin: 0px;
-	background-color: #333;
-	border-top: 2px solid #333;
-	border-right: 2px solid #333;
-	border-left: 2px solid #333;
-	border-radius: 9px 9px 0px 0px;
+  text-align: center;
+  font-size: 0.8em;
+  font-weight: bold;
+  height: 32px;
+  line-height: 32px;
+  padding: 0px;
+  margin: 0px;
+  background-color: #333;
+  border-top: 2px solid #333;
+  border-right: 2px solid #333;
+  border-left: 2px solid #333;
+  border-radius: 9px 9px 0px 0px;
 }
 
 #studio .dialog-contents {
-	padding: 9px;
-	font-size: 0.8em;
-	border-right: 2px solid #333;
-	border-left: 2px solid #333;
+  padding: 9px;
+  font-size: 0.8em;
+  border-right: 2px solid #333;
+  border-left: 2px solid #333;
 }
 
 #studio .dialog-buttons {
-	height: 32px;
-	border-right: 2px solid #333;
-	border-left: 2px solid #333;
-	border-bottom: 2px solid #333;
-	border-radius: 0px 0px 9px 9px;
-	text-align: right;
+  height: 32px;
+  border-right: 2px solid #333;
+  border-left: 2px solid #333;
+  border-bottom: 2px solid #333;
+  border-radius: 0px 0px 9px 9px;
+  text-align: right;
 }
 
 #studio .dialog-button {
-	display: inline-block;
-	height: 24px;
-	min-width: 60px;
-	line-height: 24px;
-	padding: 0px 9px;
-	margin: 2px 3px 2px 0px;
-	color: #fff;
-	background: #444;
-	border-top: 1px solid #555;
-	border-right: 1px solid #222;
-	border-bottom: 1px solid #222;
-	border-left: 1px solid #555;
-	font-size: 0.7em;
-	font-weight: bold;
-	text-align: center;
-	text-decoration: none;
-	border-radius: 3px;
-	cursor: hand;
+  display: inline-block;
+  height: 24px;
+  min-width: 60px;
+  line-height: 24px;
+  padding: 0px 9px;
+  margin: 2px 3px 2px 0px;
+  color: #fff;
+  background: #444;
+  border-top: 1px solid #555;
+  border-right: 1px solid #222;
+  border-bottom: 1px solid #222;
+  border-left: 1px solid #555;
+  font-size: 0.7em;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 3px;
+  cursor: hand;
 }
 
 #studio .dialog-button-enabled {
-	cursor: hand;
+  cursor: hand;
 }
 
 #studio .dialog-button-disabled {
-	background: #333;
-	border-top: 1px solid #222;
-	border-right: 1px solid #111;
-	border-bottom: 1px solid #111;
-	border-left: 1px solid #222;
-	color: #555;
-	cursor: default;
+  background: #333;
+  border-top: 1px solid #222;
+  border-right: 1px solid #111;
+  border-bottom: 1px solid #111;
+  border-left: 1px solid #222;
+  color: #555;
+  cursor: default;
 }
 
 #studio .dialog-connection-devices {
-	margin: 4px;
-	padding: 0px;
-	background-color: #000;
-	border: 1px solid #555;
+  margin: 4px;
+  padding: 0px;
+  background-color: #000;
+  border: 1px solid #555;
 }
 
 #studio .dialog-connection-devices li {
-	display: block;
-	padding: 4px;
-	border-top: 1px solid #222;
-	cursor: hand;
+  display: block;
+  padding: 4px;
+  border-top: 1px solid #222;
+  cursor: hand;
 }
 
 #studio .dialog-connection-devices li.selected {
-	background: rgba(85,255,97,0.5);
+  background: rgba(85,255,97,0.5);
 }
 
 #studio .dialog-connection-devices-empty {
-	color: #fff;
+  color: #fff;
 }
 
 #studio .dialog-connection-status {
-	padding: 4px;
+  padding: 4px;
 }
 
-	</style>
+  </style>
 </head>
 <body>
 
-	<div id="studio">
-		<div class="titlebar">
-			<h1 class="titlebar-title">
-				<div class="titlebar-title-document-name">Untitled.c</div>
-				<div class="titlebar-title-separator">&mdash;</div>
-				<div class="titlebar-title-device-name"></div>
-			</h1>
-			<a href="#" class="titlebar-connection-status">
-				<div class="titlebar-connection-status-icon"></div>
-				<div class="titlebar-connection-status-bluetooth-icon"></div>
-				<div class="titlebar-connection-status-label">Disconnected</div>
-			</a>
-		</div>
-		<div class="workspace">
-			<div class="workspace-programs">
-				<h2 class="workspace-programs-title">Programs</h2>
-				<ul class="workspace-programs-list"></ul>
-			</div>
-			<div class="workspace-code">
-				<div class="workspace-code-tabs"></div>
-				<div class="workspace-code-editor"></div>
-			</div>
-			<div class="workspace-construction">
-				<div class="workspace-construction-graph"></div>
-				<div class="workspace-construction-detail">
-					<div class="workspace-construction-detail-icon"></div>
-					<div class="workspace-construction-detail-label"></div>
-					<table class="workspace-construction-detail-info"></table>
-					<div class="workspace-construction-detail-action"></div>
-				</div>
-			</div>
-		</div>
-		<div class="console">
-			<div class="console-toolbar">
-				<a href="#" class="console-toolbar-button console-toolbar-button-flash">Flash</a>
-				<a href="#" class="console-toolbar-button console-toolbar-button-build">Build</a>
-			</div>
-			<div class="console-messages"></div>
-		</div>
-		<div class="dialog-container">
-			<div class="dialog">
-				<div class="dialog-title"></div>
-				<div class="dialog-contents"></div>
-				<div class="dialog-buttons"></div>
-			</div>
-		</div>
-		<div style="display:none" class="file-browser">
-			<input type="file" class="file-browser-open" />
-			<input type="file" class="file-browser-save-as" nwsaveas />
-		</div>
-	</div>
+  <div id="studio">
+    <div class="titlebar">
+      <h1 class="titlebar-title">
+        <div class="titlebar-title-document-name">Untitled.c</div>
+        <div class="titlebar-title-separator">&mdash;</div>
+        <div class="titlebar-title-device-name"></div>
+      </h1>
+      <a href="#" class="titlebar-connection-status">
+        <div class="titlebar-connection-status-icon"></div>
+        <div class="titlebar-connection-status-bluetooth-icon"></div>
+        <div class="titlebar-connection-status-label">Disconnected</div>
+      </a>
+    </div>
+    <div class="workspace">
+      <div class="workspace-programs">
+        <h2 class="workspace-programs-title">Programs</h2>
+        <ul class="workspace-programs-list"></ul>
+      </div>
+      <div class="workspace-code">
+        <div class="workspace-code-tabs"></div>
+        <div class="workspace-code-editor"></div>
+      </div>
+      <div class="workspace-construction">
+        <div class="workspace-construction-graph"></div>
+        <div class="workspace-construction-detail">
+          <div class="workspace-construction-detail-icon"></div>
+          <div class="workspace-construction-detail-label"></div>
+          <table class="workspace-construction-detail-info"></table>
+          <div class="workspace-construction-detail-action"></div>
+        </div>
+      </div>
+    </div>
+    <div class="console">
+      <div class="console-toolbar">
+        <a href="#" class="console-toolbar-button console-toolbar-button-flash">Flash</a>
+        <a href="#" class="console-toolbar-button console-toolbar-button-build">Build</a>
+      </div>
+      <div class="console-messages"></div>
+    </div>
+    <div class="dialog-container">
+      <div class="dialog">
+        <div class="dialog-title"></div>
+        <div class="dialog-contents"></div>
+        <div class="dialog-buttons"></div>
+      </div>
+    </div>
+    <div style="display:none" class="file-browser">
+      <input type="file" class="file-browser-open" />
+      <input type="file" class="file-browser-save-as" nwsaveas />
+    </div>
+  </div>
 
-	<script type="text/javascript">
+  <script type="text/javascript">
 
 if (!process) {
-	console.error('Node JS is not configured.');
-	return;
+  console.error('Node JS is not configured.');
+  return;
 }
 
 process.on('uncaughtException', function(e) {
- 	console.error('Uncaught Exception. Please report this bug.', e);
+  console.error('Uncaught Exception. Please report this bug.', e);
 });
 
 var cubelets = require('cubelets');
 var studio = new (require('./studio'))();
 
 studio.on('load', function() {
-	ui.loadProgramList();
-	ui.loadWorkspaceCodeTabs();
-	ui.drawWorkspaceConstructionGraph();
+  ui.loadProgramList();
+  ui.loadWorkspaceCodeTabs();
+  ui.drawWorkspaceConstructionGraph();
 });
 
 studio.on('programsLoaded', function() {
-	ui.updateProgramList();
+  ui.updateProgramList();
 });
 
 studio.on('programCreated', function(program) {
-	studio.openProgram(program);
+  studio.openProgram(program);
 });
 
 studio.on('programOpened', function(program) {
-	ui.showProgramTab(program);
-	ui.updateProgramList();
-	ui.updateBuildAndFlashButtons();
+  ui.showProgramTab(program);
+  ui.updateProgramList();
+  ui.updateBuildAndFlashButtons();
 });
 
 studio.on('programSaved', function(program) {
-	ui.updateProgramList();
-	var tab = ui.getTabForProgram(program);
-	if (tab) {
-		ui.setWorkspaceCodeTabClean(tab);
-		ui.updateWorkspaceCodeTab(tab);
-	}
+  ui.updateProgramList();
+  var tab = ui.getTabForProgram(program);
+  if (tab) {
+    ui.setWorkspaceCodeTabClean(tab);
+    ui.updateWorkspaceCodeTab(tab);
+  }
 });
 
 studio.on('programHasNoFile', function(program, session, callback) {
-	ui.showSaveAsFileBrowser(function(file) {
-		program.file = file;
-		studio.saveProgram(program, session, callback);
-	});
+  ui.showSaveAsFileBrowser(function(file) {
+    program.file = file;
+    studio.saveProgram(program, session, callback);
+  });
 });
 
 studio.on('programClosed', function(program) {
-	ui.updateBuildAndFlashButtons();
-	ui.updateProgramList();
-	ui.closeProgramTab(program);
+  ui.updateBuildAndFlashButtons();
+  ui.updateProgramList();
+  ui.closeProgramTab(program);
 });
 
 studio.on('constructionChanged', function() {
-	ui.drawWorkspaceConstructionGraph();
+  ui.drawWorkspaceConstructionGraph();
 });
 
 studio.on('cubeletChanged', function(cubelet) {
-	ui.updateWorkspaceConstructionGraphNode(cubelet);
-	if (cubelet === studio.getCubelet()) {
-		ui.setWorkspaceConstructionDetail(cubelet);
-		if (studio.hasBuild() && cubelet.type !== cubelets.Types.UNKNOWN) {
-			ui.enableFlashButton();
-		}
-	}
+  ui.updateWorkspaceConstructionGraphNode(cubelet);
+  if (cubelet === studio.getCubelet()) {
+    ui.setWorkspaceConstructionDetail(cubelet);
+    if (studio.hasBuild() && cubelet.type !== cubelets.Types.UNKNOWN) {
+      ui.enableFlashButton();
+    }
+  }
 });
 
 studio.on('cubeletSelected', function(cubelet) {
-	if (ui.hasAnyProgramOpen()) {
-		ui.enableBuildButton();
-	}
+  if (ui.hasAnyProgramOpen()) {
+    ui.enableBuildButton();
+  }
 });
 
 studio.on('deviceConnected', function(device) {
-	ui.setConnectionStatusConnected();
-	ui.setWorkspaceTitleDeviceName(device);
-	ui.drawWorkspaceConstructionGraph();
-	log.info('Cubelet connected.');
-	if (studio.getConstruction().all().length <= 1) {
-		studio.discoverConstruction();
-	}
+  ui.setConnectionStatusConnected();
+  ui.setWorkspaceTitleDeviceName(device);
+  ui.drawWorkspaceConstructionGraph();
+  log.info('Cubelet connected.');
+  if (studio.getConstruction().all().length <= 1) {
+    studio.discoverConstruction();
+  }
 });
 
 studio.on('deviceDisconnected', function() {
-	ui.setConnectionStatusDisconnected();
-	ui.updateBuildAndFlashButtons();
-	ui.drawWorkspaceConstructionGraph();
-	log.info('Cubelet disconnected.');
+  ui.setConnectionStatusDisconnected();
+  ui.updateBuildAndFlashButtons();
+  ui.drawWorkspaceConstructionGraph();
+  log.info('Cubelet disconnected.');
 });
 
 studio.on('buildComplete', function(build) {
-	ui.hideBuildProgressIndicator();
-	ui.enableBuildButton();
-	var cubelet = studio.getCubelet();
-	if (cubelet && cubelet.type !== cubelets.Types.UNKNOWN) {
-		ui.enableFlashButton();
-	}
-	log.info('Build complete.');
+  ui.hideBuildProgressIndicator();
+  ui.enableBuildButton();
+  var cubelet = studio.getCubelet();
+  if (cubelet && cubelet.type !== cubelets.Types.UNKNOWN) {
+    ui.enableFlashButton();
+  }
+  log.info('Build complete.');
 });
 
 studio.on('buildFailed', function(build, result) {
-	ui.hideBuildProgressIndicator();
-	ui.enableBuildButton();
-	log.error(ui.formatBuildResult(result));
+  ui.hideBuildProgressIndicator();
+  ui.enableBuildButton();
+  log.error(ui.formatBuildResult(result));
 });
 
 studio.on('buildError', function(error) {
-	ui.hideBuildProgressIndicator();
-	ui.enableBuildButton();
-	ui.showBuildError(error);
+  ui.hideBuildProgressIndicator();
+  ui.enableBuildButton();
+  ui.showBuildError(error);
 });
 
 studio.on('flashProgress', function(progress) {
-	var p = progress.action === 'upload' ? (progress.percent / 2) :
-		    progress.action === 'flash' ? 50 + (progress.percent / 2) :
-		    50;
-	ui.showFlashProgressBar(p);
+  var p = progress.action === 'upload' ? (progress.percent / 2) :
+      progress.action === 'flash' ? 50 + (progress.percent / 2) :
+      50;
+  ui.showFlashProgressBar(p);
 });
 
 studio.on('flashComplete', function() {
-	ui.hideFlashProgressBar();
-	ui.enableFlashButton();
-	log.info('Flash complete.');
+  ui.hideFlashProgressBar();
+  ui.enableFlashButton();
+  log.info('Flash complete.');
 });
 
 studio.on('flashError', function(error) {
-	ui.hideFlashProgressBar();
-	ui.enableFlashButton();
-	ui.showFlashError(error);
+  ui.hideFlashProgressBar();
+  ui.enableFlashButton();
+  ui.showFlashError(error);
 });
 
 studio.on('cubeletsNearbyDiscoveryStarted', function() {
-	log.info('Discovering nearby cubelets...');
+  log.info('Discovering nearby cubelets...');
 });
 
 studio.on('firmwareError', function(error) {
-	log.error('Firmware update error:', error);
-	ui.updateBuildAndFlashButtons();
+  log.error('Firmware update error:', error);
+  ui.updateBuildAndFlashButtons();
 });
 
 studio.on('firmwareComplete', function(cubelet, version) {
-	ui.updateBuildAndFlashButtons();
-	log.info('Firmware updated on cubelet \'' + cubelet.id + '\' to version \'' + version + '\'.');
+  ui.updateBuildAndFlashButtons();
+  log.info('Firmware updated on cubelet \'' + cubelet.id + '\' to version \'' + version + '\'.');
 });
 
 var log = new (function() {
-	var instance = this;
-	_(['info', 'debug', 'warn', 'error']).each(function(type) {
-		instance[type] = function() {
-			d3.select('#studio .console-messages')
-				.append('div')
-				.classed('console-message-' + type, true)
-				.text(Array.prototype.join.call(arguments, ' '));
-			ui.scrollConsoleToBottom();
-		}
-	});
+  var instance = this;
+  _(['info', 'debug', 'warn', 'error']).each(function(type) {
+    instance[type] = function() {
+      d3.select('#studio .console-messages')
+        .append('div')
+        .classed('console-message-' + type, true)
+        .text(Array.prototype.join.call(arguments, ' '));
+      ui.scrollConsoleToBottom();
+    }
+  });
 });
 
 var ui = {
-	// UI Properties
-	tabs: [],
-	editor: undefined,
-	graph: undefined,
-	menu: undefined,
-	sessions: {},
+  // UI Properties
+  tabs: [],
+  editor: undefined,
+  graph: undefined,
+  menu: undefined,
+  sessions: {},
 
-	// Initialization
-	initialize: function() {
-		ui.initializeWindow();
-		ui.initializeMenu();
-		ui.initializeWorkspaceCodeEditor();
-		ui.initializeWorkspaceConstructionGraph();
-		ui.initializeBuildButton();
-		ui.initializeFlashButton();
-		ui.setConnectionStatusDisconnected();
-	},
-	initializeWindow: function() {
-		var g = require('nw.gui');
-		g.Window.get().on('close', function() {
-			this.hide();
-			ui.saveAll();
-			ui.saveProgramList();
-			ui.saveWorkspaceCodeTabs();
-			this.close(true);
-		});
-	},
-	initializeMenu: function() {
-		var g = require('nw.gui');
-		var menu = new g.Menu({ type: 'menubar' });
-		var win = g.Window.get();
-		win.menu = menu;
+  // Initialization
+  initialize: function() {
+    ui.initializeWindow();
+    ui.initializeMenu();
+    ui.initializeWorkspaceCodeEditor();
+    ui.initializeWorkspaceConstructionGraph();
+    ui.initializeBuildButton();
+    ui.initializeFlashButton();
+    ui.setConnectionStatusDisconnected();
+  },
+  initializeWindow: function() {
+    var g = require('nw.gui');
+    g.Window.get().on('close', function() {
+      this.hide();
+      ui.saveAll();
+      ui.saveProgramList();
+      ui.saveWorkspaceCodeTabs();
+      this.close(true);
+    });
+  },
+  initializeMenu: function() {
+    var g = require('nw.gui');
+    var menu = new g.Menu({ type: 'menubar' });
+    var win = g.Window.get();
+    win.menu = menu;
 
-		var fileMenuItem = new g.MenuItem({ label: 'File' });
-		var fileMenu = fileMenuItem.submenu = new g.Menu();
-		fileMenu.append(new g.MenuItem({ label: 'New Program', click: function() {
-			studio.createNewProgram();
-		}}));
-		fileMenu.append(new g.MenuItem({ label: 'Open', click: function() {
-			ui.open();
-		}}));
-		fileMenu.append(new g.MenuItem({ label: 'Save', click: function() {
-			ui.save();
-		}}));
-		fileMenu.append(new g.MenuItem({ label: 'Save As...', click: function() {
-			ui.saveAs();
-		}}));
-		fileMenu.append(new g.MenuItem({ label: 'Save All', click: function() {
-			ui.saveAll();
-		}}));
-		fileMenu.append(new g.MenuItem({ type: 'separator' }));
-		fileMenu.append(new g.MenuItem({ label: 'Close Program', click: function() {
-			ui.close();
-		}}));
-		fileMenu.append(new g.MenuItem({ label: 'Close All Programs', click: function() {
-			ui.closeAll();
-		}}));
-		menu.insert(fileMenuItem, 1);
+    var fileMenuItem = new g.MenuItem({ label: 'File' });
+    var fileMenu = fileMenuItem.submenu = new g.Menu();
+    fileMenu.append(new g.MenuItem({ label: 'New Program', click: function() {
+      studio.createNewProgram();
+    }}));
+    fileMenu.append(new g.MenuItem({ label: 'Open', click: function() {
+      ui.open();
+    }}));
+    fileMenu.append(new g.MenuItem({ label: 'Save', click: function() {
+      ui.save();
+    }}));
+    fileMenu.append(new g.MenuItem({ label: 'Save As...', click: function() {
+      ui.saveAs();
+    }}));
+    fileMenu.append(new g.MenuItem({ label: 'Save All', click: function() {
+      ui.saveAll();
+    }}));
+    fileMenu.append(new g.MenuItem({ type: 'separator' }));
+    fileMenu.append(new g.MenuItem({ label: 'Close Program', click: function() {
+      ui.close();
+    }}));
+    fileMenu.append(new g.MenuItem({ label: 'Close All Programs', click: function() {
+      ui.closeAll();
+    }}));
+    menu.insert(fileMenuItem, 1);
 
-		var debugMenuItem = new g.MenuItem({ label: 'Debug' });
-		var debugMenu = debugMenuItem.submenu = new g.Menu();
-		debugMenu.append(new g.MenuItem({ label: 'Show Debug Tools', click: function() {
-			win.showDevTools();
-		}}));
-		debugMenu.append(new g.MenuItem({ label: 'Connect to Development Server...', click: function() {
-			var connection = new cubelets.NetConnection('localhost', 6000);
-			connection.connect(function(e) {
-				log.error('Error. Could not connect to server \'' + connection.name + '\'.');
-			}, function() {
-				studio.setConnection(connection);
-			});
-		}}));
-		menu.append(debugMenuItem);
+    var debugMenuItem = new g.MenuItem({ label: 'Debug' });
+    var debugMenu = debugMenuItem.submenu = new g.Menu();
+    debugMenu.append(new g.MenuItem({ label: 'Show Debug Tools', click: function() {
+      win.showDevTools();
+    }}));
+    debugMenu.append(new g.MenuItem({ label: 'Connect to Development Server...', click: function() {
+      var connection = new cubelets.NetConnection('localhost', 6000);
+      connection.connect(function(e) {
+        log.error('Error. Could not connect to server \'' + connection.name + '\'.');
+      }, function() {
+        studio.setConnection(connection);
+      });
+    }}));
+    menu.append(debugMenuItem);
 
-		var helpMenuItem = new g.MenuItem({ label: 'Help' });
-		var helpMenu = helpMenuItem.submenu = new g.Menu();
-		helpMenu.append(new g.MenuItem({ label: 'Cubelets API Reference', click: function() {
-			g.Shell.openExternal('http://code.modrobotics.com/documentation/');
-		}}));
-		helpMenu.append(new g.MenuItem({ label: 'Cubelets Programming Forum', click: function() {
-			g.Shell.openExternal('https://www.modrobotics.com/blog/?forum=cubelets-programming');
-		}}));
-		menu.append(helpMenuItem);
+    var helpMenuItem = new g.MenuItem({ label: 'Help' });
+    var helpMenu = helpMenuItem.submenu = new g.Menu();
+    helpMenu.append(new g.MenuItem({ label: 'Cubelets API Reference', click: function() {
+      g.Shell.openExternal('http://code.modrobotics.com/documentation/');
+    }}));
+    helpMenu.append(new g.MenuItem({ label: 'Cubelets Programming Forum', click: function() {
+      g.Shell.openExternal('https://www.modrobotics.com/blog/?forum=cubelets-programming');
+    }}));
+    menu.append(helpMenuItem);
 
-		ui.menu = menu;
-	},
-	initializeWorkspaceCodeEditor: function() {
-		var container = d3.select('#studio .workspace-code-editor')[0][0];
-		var editor = ace.edit(container);
-		editor.setTheme('ace/theme/twilight');
-		editor.getSession().setMode('ace/mode/c_cpp');
-		editor.setShowPrintMargin(false);
-		editor.setFontSize(14);
-		ui.editor = editor;
-	},
-	initializeWorkspaceConstructionGraph: function() {
-		var width = 300;
-		var height = 300;
-		ui.graph = d3.select('#studio .workspace-construction-graph')
-			.append('svg:svg')
-			.classed('workspace-construction-graph-svg', true)
-			.attr('width', width)
-			.attr('height', height)
-			.on('contextmenu', function() {
-				var g = require('nw.gui');
-				var menu = new g.Menu();
-				menu.append(new g.MenuItem({ label: 'Discover nearby cubelets', click: function() {
-					studio.discoverConstruction();
-				}}));
-				menu.append(new g.MenuItem({ label: 'Identify cubelets', click: function() {
-					studio.fetchCubeletInfo();
-				}}));
-				menu.popup(d3.event.x, d3.event.y);
-			});
-	},
-	initializeBuildButton: function() {
-		ui.flashButton = this
-			.createButton('#studio .console-toolbar-button-build', {
-				type: 'console-toolbar-button',
-				enabled: false,
-				click: function(button) {
-					var tab = ui.getWorkspaceCodeTabActive();
-					var program = tab.ref.program;
-					var session = tab.ref.session;
-					log.info('Building \'' + program.name + '\'... ');
-					studio.saveProgram(program, session);
-					studio.buildProgram(program);
-					ui.disableBuildButton();
-					ui.showBuildProgressIndicator();
-				}
-			});
-	},
-	initializeFlashButton: function() {
-		ui.flashButton = this
-			.createButton('#studio .console-toolbar-button-flash', {
-				type: 'console-toolbar-button',
-				enabled: false,
-				click: function(button) {
-					log.info('Flashing...');
-					button.disable();
-					ui.showFlashProgressBar(0);
-					studio.flashCubelet();
-				}
-			});
-	},
+    ui.menu = menu;
+  },
+  initializeWorkspaceCodeEditor: function() {
+    var container = d3.select('#studio .workspace-code-editor')[0][0];
+    var editor = ace.edit(container);
+    editor.setTheme('ace/theme/twilight');
+    editor.getSession().setMode('ace/mode/c_cpp');
+    editor.setShowPrintMargin(false);
+    editor.setFontSize(14);
+    ui.editor = editor;
+  },
+  initializeWorkspaceConstructionGraph: function() {
+    var width = 300;
+    var height = 300;
+    ui.graph = d3.select('#studio .workspace-construction-graph')
+      .append('svg:svg')
+      .classed('workspace-construction-graph-svg', true)
+      .attr('width', width)
+      .attr('height', height)
+      .on('contextmenu', function() {
+        var g = require('nw.gui');
+        var menu = new g.Menu();
+        menu.append(new g.MenuItem({ label: 'Discover nearby cubelets', click: function() {
+          studio.discoverConstruction();
+        }}));
+        menu.append(new g.MenuItem({ label: 'Identify cubelets', click: function() {
+          studio.fetchCubeletInfo();
+        }}));
+        menu.popup(d3.event.x, d3.event.y);
+      });
+  },
+  initializeBuildButton: function() {
+    ui.flashButton = this
+      .createButton('#studio .console-toolbar-button-build', {
+        type: 'console-toolbar-button',
+        enabled: false,
+        click: function(button) {
+          var tab = ui.getWorkspaceCodeTabActive();
+          var program = tab.ref.program;
+          var session = tab.ref.session;
+          log.info('Building \'' + program.name + '\'... ');
+          studio.saveProgram(program, session);
+          studio.buildProgram(program);
+          ui.disableBuildButton();
+          ui.showBuildProgressIndicator();
+        }
+      });
+  },
+  initializeFlashButton: function() {
+    ui.flashButton = this
+      .createButton('#studio .console-toolbar-button-flash', {
+        type: 'console-toolbar-button',
+        enabled: false,
+        click: function(button) {
+          log.info('Flashing...');
+          button.disable();
+          ui.showFlashProgressBar(0);
+          studio.flashCubelet();
+        }
+      });
+  },
 
-	// File Browser
-	showFileBrowser: function(selector, callback) {
-		var browser = d3.select(selector);
-		browser.on('change', function() {
-			var file = this.value;
-			if (file) callback(file);
-		})
-		var e = document.createEvent('UIEvents');
-		e.initUIEvent('click', true, true);
-		browser.node().dispatchEvent(e);
-	},
-	showOpenFileBrowser: function(callback) {
-		ui.showFileBrowser('#studio .file-browser-open', callback);
-	},
-	showSaveAsFileBrowser: function(callback) {
-		ui.showFileBrowser('#studio .file-browser-save-as', callback);
-	},
+  // File Browser
+  showFileBrowser: function(selector, callback) {
+    var browser = d3.select(selector);
+    browser.on('change', function() {
+      var file = this.value;
+      if (file) callback(file);
+    })
+    var e = document.createEvent('UIEvents');
+    e.initUIEvent('click', true, true);
+    browser.node().dispatchEvent(e);
+  },
+  showOpenFileBrowser: function(callback) {
+    ui.showFileBrowser('#studio .file-browser-open', callback);
+  },
+  showSaveAsFileBrowser: function(callback) {
+    ui.showFileBrowser('#studio .file-browser-save-as', callback);
+  },
 
-	// UI Elements
-	createButton: function(selector, definition) {
-		(_(selector).isString() ? d3.select(selector) : selector)
-			.datum(definition)
-			.each(function(button) {
-				var el = d3.select(this);
-				var type = button.type || 'button';
-				button.enable = function() {
-					button.enabled = true;
-					el.classed(type + '-disabled', false)
-						.classed(type + '-enabled', true);
-				}
-				button.disable = function() {
-					button.enabled = false;
-					el.classed(type + '-enabled', false)
-						.classed(type + '-disabled', true);
-				}
-				if (button.enabled !== false) button.enable()
-				else button.disable();
-			})
-			.on('click', function(button) {
-				if (button.enabled !== false) {
-					if (button.click) button.click(button);
-				}
-			});
-		return definition;
-	},
+  // UI Elements
+  createButton: function(selector, definition) {
+    (_(selector).isString() ? d3.select(selector) : selector)
+      .datum(definition)
+      .each(function(button) {
+        var el = d3.select(this);
+        var type = button.type || 'button';
+        button.enable = function() {
+          button.enabled = true;
+          el.classed(type + '-disabled', false)
+            .classed(type + '-enabled', true);
+        }
+        button.disable = function() {
+          button.enabled = false;
+          el.classed(type + '-enabled', false)
+            .classed(type + '-disabled', true);
+        }
+        if (button.enabled !== false) button.enable()
+        else button.disable();
+      })
+      .on('click', function(button) {
+        if (button.enabled !== false) {
+          if (button.click) button.click(button);
+        }
+      });
+    return definition;
+  },
 
-	// Buttons
-	enableBuildButton: function() {
-		d3.select('#studio .console-toolbar-button-build').datum().enable();
-	},
-	disableBuildButton: function() {
-		d3.select('#studio .console-toolbar-button-build').datum().disable();
-	},
-	enableFlashButton: function() {
-		d3.select('#studio .console-toolbar-button-flash').datum().enable();
-	},
-	disableFlashButton: function() {
-		d3.select('#studio .console-toolbar-button-flash').datum().disable();
-	},
-	updateBuildAndFlashButtons: function() {
-		ui.hideFlashProgressBar();
-		ui.hideBuildProgressIndicator();
-		var connection = studio.getConnection();
-		if (!connection || !connection.connected) {
-			ui.disableFlashButton();
-			return;
-		}
-		var cubelet = studio.getCubelet();
-		if (cubelet) {
-			ui.enableBuildButton();
-			if (studio.hasBuild()) {
-				ui.enableFlashButton();
-			}
-			else {
-				ui.disableFlashButton();
-			}
-		}
-		else {
-			ui.disableBuildButton();
-		}
-	},
+  // Buttons
+  enableBuildButton: function() {
+    d3.select('#studio .console-toolbar-button-build').datum().enable();
+  },
+  disableBuildButton: function() {
+    d3.select('#studio .console-toolbar-button-build').datum().disable();
+  },
+  enableFlashButton: function() {
+    d3.select('#studio .console-toolbar-button-flash').datum().enable();
+  },
+  disableFlashButton: function() {
+    d3.select('#studio .console-toolbar-button-flash').datum().disable();
+  },
+  updateBuildAndFlashButtons: function() {
+    ui.hideFlashProgressBar();
+    ui.hideBuildProgressIndicator();
+    var connection = studio.getConnection();
+    if (!connection || !connection.connected) {
+      ui.disableFlashButton();
+      return;
+    }
+    var cubelet = studio.getCubelet();
+    if (cubelet) {
+      ui.enableBuildButton();
+      if (studio.hasBuild()) {
+        ui.enableFlashButton();
+      }
+      else {
+        ui.disableFlashButton();
+      }
+    }
+    else {
+      ui.disableBuildButton();
+    }
+  },
 
-	// Dialogs
-	showDialog: function(title, contents, buttons) {
-		d3.select('#studio .dialog-container').style('display', 'block');
-		d3.select('#studio .dialog-buttons').selectAll('.dialog-button')
-			.data(buttons)
-			.enter()
-				.append('div')
-				.classed('dialog-button', true)
-				.text(function(button) { return button.label })
-				.each(function(button) {
-					var el = d3.select(this);
-					button.enable = function() {
-						button.enabled = true;
-						el.classed('dialog-button-disabled', false)
-							.classed('dialog-button-enabled', true);
-					}
-					button.disable = function() {
-						button.enabled = false;
-						el.classed('dialog-button-enabled', false)
-							.classed('dialog-button-disabled', true);
-					}
-					if (button.enabled !== false) button.enable()
-					else button.disable();
-				})
-				.on('click', function(button) {
-					if (button.enabled !== false) {
-						button.click(this)
-					}
-				});
-		d3.select('#studio .dialog-title').text(title);
-		d3.select('#studio .dialog-contents').call(function(selection) {
-			if (_(contents).isFunction()) contents(selection, buttons);
-			if (_(contents).isString()) selection.text(contents);
-		});
-		d3.select('#studio .dialog').style('display', 'block');
-	},
-	hideDialog: function() {
-		d3.select('#studio .dialog-container').style('display', 'none');
-		d3.selectAll('#studio .dialog-contents').html('');
-		d3.selectAll('#studio .dialog-buttons').html('');
-		d3.select('#studio .dialog').style('display', 'none');
-	},
-	showErrorDialog: function(message) {
-		ui.showDialog('Error', function(contents) {
-			contents.text(message);
-		}, [{
-			label: 'OK',
-			click: ui.hideDialog
-		}]);
-	},
-	showConnectionDialog: function(devices) {
-		var connectButton = {
-			label: 'Connect',
-			enabled: false,
-			click: function() {
-				var item = d3.select('#studio .dialog-connection-devices li.selected');
-				var status = d3.select('#studio .dialog-contents')
-					.append('div')
-					.classed('dialog-connection-status', true)
-					.text('Connecting...');
-				var device = item.datum()
-				var connection = new cubelets.SerialConnection(device.comName);
-				connection.connect(function(e) {
-					status.text('Error. Could not connect.');
-					log.error('Error. Could not connect to device \'' + device.comName + '\'.');
-				}, function() {
-					status.text('Connection successful!');
-					ui.hideDialog();
-					studio.setConnection(connection);
-				});
-			}
-		};
-		var cancelButton = {
-			label: 'Cancel',
-			click: ui.hideDialog
-		};
-		ui.showDialog('Connect', function(contents) {
-			contents.selectAll('*').remove();
-			if (devices.length === 0) {
-				contents.append('div')
-					.classed('dialog-connection-devices-empty', true)
-					.text('No Cubelets found. Please pair a Cubelet to your computer, and try again.');
-				return;
-			}
-			contents.append('ul')
-				.classed('dialog-connection-devices', true)
-				.selectAll('li')
-				.data(devices)
-				.enter()
-					.append('li')
-					.text(function(device) {
-						return device.comName;
-					})
-					.on('click', function() {
-						var list = d3.selectAll('#studio .dialog-connection-devices li');
-						var item = d3.select(this);
-						list.classed('selected', false);
-						item.classed('selected', true);
-						connectButton.enable();
-					});
-		}, [connectButton, cancelButton]);
-	},
-	showYesNoDialog: function(title, message, callback) {
-		ui.showDialog(title, message, [{
-			label: 'Yes',
-			click: function() { callback(true); ui.hideDialog() }
-		},{
-			label: 'No',
-			click: function() { callback(false); ui.hideDialog() }
-		}]);
-	},
+  // Dialogs
+  showDialog: function(title, contents, buttons) {
+    d3.select('#studio .dialog-container').style('display', 'block');
+    d3.select('#studio .dialog-buttons').selectAll('.dialog-button')
+      .data(buttons)
+      .enter()
+        .append('div')
+        .classed('dialog-button', true)
+        .text(function(button) { return button.label })
+        .each(function(button) {
+          var el = d3.select(this);
+          button.enable = function() {
+            button.enabled = true;
+            el.classed('dialog-button-disabled', false)
+              .classed('dialog-button-enabled', true);
+          }
+          button.disable = function() {
+            button.enabled = false;
+            el.classed('dialog-button-enabled', false)
+              .classed('dialog-button-disabled', true);
+          }
+          if (button.enabled !== false) button.enable()
+          else button.disable();
+        })
+        .on('click', function(button) {
+          if (button.enabled !== false) {
+            button.click(this)
+          }
+        });
+    d3.select('#studio .dialog-title').text(title);
+    d3.select('#studio .dialog-contents').call(function(selection) {
+      if (_(contents).isFunction()) contents(selection, buttons);
+      if (_(contents).isString()) selection.text(contents);
+    });
+    d3.select('#studio .dialog').style('display', 'block');
+  },
+  hideDialog: function() {
+    d3.select('#studio .dialog-container').style('display', 'none');
+    d3.selectAll('#studio .dialog-contents').html('');
+    d3.selectAll('#studio .dialog-buttons').html('');
+    d3.select('#studio .dialog').style('display', 'none');
+  },
+  showErrorDialog: function(message) {
+    ui.showDialog('Error', function(contents) {
+      contents.text(message);
+    }, [{
+      label: 'OK',
+      click: ui.hideDialog
+    }]);
+  },
+  showConnectionDialog: function(devices) {
+    var connectButton = {
+      label: 'Connect',
+      enabled: false,
+      click: function() {
+        var item = d3.select('#studio .dialog-connection-devices li.selected');
+        var status = d3.select('#studio .dialog-contents')
+          .append('div')
+          .classed('dialog-connection-status', true)
+          .text('Connecting...');
+        var device = item.datum()
+        var connection = new cubelets.SerialConnection(device.comName);
+        connection.connect(function(e) {
+          status.text('Error. Could not connect.');
+          log.error('Error. Could not connect to device \'' + device.comName + '\'.');
+        }, function() {
+          status.text('Connection successful!');
+          ui.hideDialog();
+          studio.setConnection(connection);
+        });
+      }
+    };
+    var cancelButton = {
+      label: 'Cancel',
+      click: ui.hideDialog
+    };
+    ui.showDialog('Connect', function(contents) {
+      contents.selectAll('*').remove();
+      if (devices.length === 0) {
+        contents.append('div')
+          .classed('dialog-connection-devices-empty', true)
+          .text('No Cubelets found. Please pair a Cubelet to your computer, and try again.');
+        return;
+      }
+      contents.append('ul')
+        .classed('dialog-connection-devices', true)
+        .selectAll('li')
+        .data(devices)
+        .enter()
+          .append('li')
+          .text(function(device) {
+            return device.comName;
+          })
+          .on('click', function() {
+            var list = d3.selectAll('#studio .dialog-connection-devices li');
+            var item = d3.select(this);
+            list.classed('selected', false);
+            item.classed('selected', true);
+            connectButton.enable();
+          });
+    }, [connectButton, cancelButton]);
+  },
+  showYesNoDialog: function(title, message, callback) {
+    ui.showDialog(title, message, [{
+      label: 'Yes',
+      click: function() { callback(true); ui.hideDialog() }
+    },{
+      label: 'No',
+      click: function() { callback(false); ui.hideDialog() }
+    }]);
+  },
 
-	// Workspace Title Formatting
-	setWorkspaceTitle: function(documentName, deviceName) {
-		ui.setWorkspaceTitleDocumentName(documentName);
-		ui.setWorkspaceTitleDeviceName(deviceName);
-		d3.select('#studio .titlebar-title-separator').html((documentName && deviceName) ? '&mdash;' : '');
-	},
-	setWorkspaceTitleDocumentName: function(documentName) {
-		d3.select('#studio .titlebar-title-document-name').text(documentName);
-	},
-	setWorkspaceTitleDeviceName: function(deviceName) {
-		d3.select('#studio .titlebar-title-device-name').text(deviceName);
-	},
+  // Workspace Title Formatting
+  setWorkspaceTitle: function(documentName, deviceName) {
+    ui.setWorkspaceTitleDocumentName(documentName);
+    ui.setWorkspaceTitleDeviceName(deviceName);
+    d3.select('#studio .titlebar-title-separator').html((documentName && deviceName) ? '&mdash;' : '');
+  },
+  setWorkspaceTitleDocumentName: function(documentName) {
+    d3.select('#studio .titlebar-title-document-name').text(documentName);
+  },
+  setWorkspaceTitleDeviceName: function(deviceName) {
+    d3.select('#studio .titlebar-title-device-name').text(deviceName);
+  },
 
-	// Workspace Code Tabs/Editor
-	addWorkspaceCodeTab: function(tab) {
-		ui.tabs.push(tab);
-		var program = tab.ref.program;
-		var session = tab.ref.session;
-		var element = d3.select('#studio .workspace-code-tabs')
-			.append('a')
-			.attr('href', '#')
-			.classed('workspace-code-tab', true)
-			.datum(tab)
-			.on('click', function() {
-				ui.showProgramTab(program);
-			});
-		element.append('span')
-			.classed('workspace-code-tab-title', true)
-			.text(tab.title);
-		element.append('a')
-			.attr('href', '#')
-			.classed('workspace-code-tab-control', true)
-			.on('click', function(tab) {
-				d3.event.preventDefault();
-				d3.event.stopPropagation();
-				ui.close(tab);
-			});
-		tab.element = element[0][0];
-		ui.setWorkspaceCodeTabActive(tab);
-		if (program.dirty) ui.setWorkspaceCodeTabDirty(tab);
-		else ui.setWorkspaceCodeTabClean(tab);
-		tab.ref.change = function() {
-			// Ignore changes while saving
-			if (program.saving) {
-				console.log('Program is saving.');
-				return;
-			}
-			program.dirty = true;
-			ui.setWorkspaceCodeTabDirty(tab);
-		};
-		session.on('change', tab.ref.change);
-	},
-	updateWorkspaceCodeTab: function(tab) {
-		var program = tab.ref.program;
-		tab.title = program.name;
-		d3.select(tab.element).select('.workspace-code-tab-title')
-			.text(tab.title);
-	},
-	setWorkspaceCodeTabActive: function(tab) {
-		d3.selectAll('#studio .workspace-code-tab')
-			.classed('workspace-code-tab-active', false);
-		d3.select(tab.element)
-			.classed('workspace-code-tab-active', true);
-	},
-	setWorkspaceCodeTabClean: function(tab) {
-		d3.select(tab.element)
-			.classed('workspace-code-tab-dirty', false)
-			.classed('workspace-code-tab-clean', true);
-	},
-	setWorkspaceCodeTabDirty: function(tab) {
-		d3.select(tab.element)
-			.classed('workspace-code-tab-clean', false)
-			.classed('workspace-code-tab-dirty', true);
-	},
-	getWorkspaceCodeTabActive: function() {
-		return d3.select('#studio .workspace-code-tab-active').datum();
-	},
-	removeWorkspaceCodeTab: function(tab) {
-		var index = ui.tabs.indexOf(tab);
-		if (index >= 0) {
-			var session = tab.ref.session;
-			var change = tab.ref.change;
-			session.off('change', change);
-			ui.tabs.splice(index, 1);
-			d3.select(tab.element).remove();
-		}
-		return index;
-	},
-	hideWorkspaceEditor: function() {
-		ui.editor.getSession().setValue('');
-		d3.select('#studio .workspace-code-editor').style('visibility', 'hidden');
-	},
-	showWorkspaceEditor: function() {
-		d3.select('#studio .workspace-code-editor').style('visibility', 'visible');
-	},
+  // Workspace Code Tabs/Editor
+  addWorkspaceCodeTab: function(tab) {
+    ui.tabs.push(tab);
+    var program = tab.ref.program;
+    var session = tab.ref.session;
+    var element = d3.select('#studio .workspace-code-tabs')
+      .append('a')
+      .attr('href', '#')
+      .classed('workspace-code-tab', true)
+      .datum(tab)
+      .on('click', function() {
+        ui.showProgramTab(program);
+      });
+    element.append('span')
+      .classed('workspace-code-tab-title', true)
+      .text(tab.title);
+    element.append('a')
+      .attr('href', '#')
+      .classed('workspace-code-tab-control', true)
+      .on('click', function(tab) {
+        d3.event.preventDefault();
+        d3.event.stopPropagation();
+        ui.close(tab);
+      });
+    tab.element = element[0][0];
+    ui.setWorkspaceCodeTabActive(tab);
+    if (program.dirty) ui.setWorkspaceCodeTabDirty(tab);
+    else ui.setWorkspaceCodeTabClean(tab);
+    tab.ref.change = function() {
+      // Ignore changes while saving
+      if (program.saving) {
+        console.log('Program is saving.');
+        return;
+      }
+      program.dirty = true;
+      ui.setWorkspaceCodeTabDirty(tab);
+    };
+    session.on('change', tab.ref.change);
+  },
+  updateWorkspaceCodeTab: function(tab) {
+    var program = tab.ref.program;
+    tab.title = program.name;
+    d3.select(tab.element).select('.workspace-code-tab-title')
+      .text(tab.title);
+  },
+  setWorkspaceCodeTabActive: function(tab) {
+    d3.selectAll('#studio .workspace-code-tab')
+      .classed('workspace-code-tab-active', false);
+    d3.select(tab.element)
+      .classed('workspace-code-tab-active', true);
+  },
+  setWorkspaceCodeTabClean: function(tab) {
+    d3.select(tab.element)
+      .classed('workspace-code-tab-dirty', false)
+      .classed('workspace-code-tab-clean', true);
+  },
+  setWorkspaceCodeTabDirty: function(tab) {
+    d3.select(tab.element)
+      .classed('workspace-code-tab-clean', false)
+      .classed('workspace-code-tab-dirty', true);
+  },
+  getWorkspaceCodeTabActive: function() {
+    return d3.select('#studio .workspace-code-tab-active').datum();
+  },
+  removeWorkspaceCodeTab: function(tab) {
+    var index = ui.tabs.indexOf(tab);
+    if (index >= 0) {
+      var session = tab.ref.session;
+      var change = tab.ref.change;
+      session.off('change', change);
+      ui.tabs.splice(index, 1);
+      d3.select(tab.element).remove();
+    }
+    return index;
+  },
+  hideWorkspaceEditor: function() {
+    ui.editor.getSession().setValue('');
+    d3.select('#studio .workspace-code-editor').style('visibility', 'hidden');
+  },
+  showWorkspaceEditor: function() {
+    d3.select('#studio .workspace-code-editor').style('visibility', 'visible');
+  },
 
-	// Program List/Display
-	updateProgramList: function() {
-		var programs = studio.getPrograms();
-		var list = d3.select('#studio .workspace-programs-list');
-		list.selectAll('li').remove();
-		list.selectAll('li')
-			.data(programs)
-			.enter()
-				.append('li')
-				.append('a').attr('href', '#')
-				.on('click', function(d) {
-					studio.openProgram(d);
-				})
-				.on('contextmenu', function(d) {
-					studio.closeProgram(d);
-				})
-				.attr('title', function(d) { return d.file })
-				.text(function(d) { return d.name });
-	},
+  // Program List/Display
+  updateProgramList: function() {
+    var programs = studio.getPrograms();
+    var list = d3.select('#studio .workspace-programs-list');
+    list.selectAll('li').remove();
+    list.selectAll('li')
+      .data(programs)
+      .enter()
+        .append('li')
+        .append('a').attr('href', '#')
+        .on('click', function(d) {
+          studio.openProgram(d);
+        })
+        .on('contextmenu', function(d) {
+          studio.closeProgram(d);
+        })
+        .attr('title', function(d) { return d.file })
+        .text(function(d) { return d.name });
+  },
 
-	// Local Storage
-	loadProgramList: function() {
-		var storage = localStorage['programList'];
-		if (storage) {
-			var programs = JSON.parse(storage);
-			if (programs) {
-				studio.loadPrograms(programs);
-				return;
-			}
-		}
-		studio.loadPrograms();
-	},
-	saveProgramList: function() {
-		var programs = studio.getPrograms();
-		var storage = JSON.stringify(programs);
-		if (storage) {
-			localStorage['programList'] = storage;
-		}
-	},
-	loadWorkspaceCodeTabs: function() {
-		var storage = localStorage['tabs'];
-		if (storage) {
-			var tabs = JSON.parse(storage);
-			if (tabs) {
-				_(tabs).each(function(file) {
-					var program = _(studio.getPrograms()).find(function(program) {
-						return program.file == file;
-					});
-					if (program) {
-						studio.openProgram(program);
-					}
-				});
-			}
-		}
-		if (ui.tabs.length === 0) {
-			ui.hideWorkspaceEditor();
-		}
-	},
-	saveWorkspaceCodeTabs: function() {
-		var tabs = [];
-		_(ui.tabs).each(function(tab) {
-			var file = tab.ref.program.file;
-			if (file) {
-				tabs.push(file);
-			}
-		});
-		var storage = JSON.stringify(tabs);
-		if (storage) {
-			localStorage['tabs'] = storage;
-		}
-	},
+  // Local Storage
+  loadProgramList: function() {
+    var storage = localStorage['programList'];
+    if (storage) {
+      var programs = JSON.parse(storage);
+      if (programs) {
+        studio.loadPrograms(programs);
+        return;
+      }
+    }
+    studio.loadPrograms();
+  },
+  saveProgramList: function() {
+    var programs = studio.getPrograms();
+    var storage = JSON.stringify(programs);
+    if (storage) {
+      localStorage['programList'] = storage;
+    }
+  },
+  loadWorkspaceCodeTabs: function() {
+    var storage = localStorage['tabs'];
+    if (storage) {
+      var tabs = JSON.parse(storage);
+      if (tabs) {
+        _(tabs).each(function(file) {
+          var program = _(studio.getPrograms()).find(function(program) {
+            return program.file == file;
+          });
+          if (program) {
+            studio.openProgram(program);
+          }
+        });
+      }
+    }
+    if (ui.tabs.length === 0) {
+      ui.hideWorkspaceEditor();
+    }
+  },
+  saveWorkspaceCodeTabs: function() {
+    var tabs = [];
+    _(ui.tabs).each(function(tab) {
+      var file = tab.ref.program.file;
+      if (file) {
+        tabs.push(file);
+      }
+    });
+    var storage = JSON.stringify(tabs);
+    if (storage) {
+      localStorage['tabs'] = storage;
+    }
+  },
 
-	// Program Tabs
-	showProgramTab: function(program) {
-		ui.showWorkspaceEditor();
-		if (ui.tabs.length === 0) {
-			// Initial tab
-			var session = ui.editor.getSession();
-			session.setMode('ace/mode/c_cpp');
-			session.getDocument().setValue(program.code);
-			ui.setWorkspaceTitleDocumentName(program.name);
-			ui.addWorkspaceCodeTab({
-				type: 'program',
-				title: program.name,
-				ref: {
-					program: program,
-					session: session
-				}
-			});
-			return;
-		}
-		var tab = _(ui.tabs).find(function(tab) {
-			return tab.type === 'program' && tab.ref.program === program;
-		});
-		if (tab) {
-			// Tab already exists
-			ui.editor.setSession(tab.ref.session);
-			ui.setWorkspaceTitleDocumentName(program.name);
-			ui.setWorkspaceCodeTabActive(tab);
-		}
-		else {
-			// Create a new tab
-			var mode = ui.editor.getSession().getMode();
-			var session = new ace.EditSession(program.code, mode);
-			session.setMode('ace/mode/c_cpp');
-			ui.editor.setSession(session);
-			ui.setWorkspaceTitleDocumentName(program.name);
-			ui.addWorkspaceCodeTab({
-				type: 'program',
-				title: program.name,
-				ref: {
-					program: program,
-					session: session
-				}
-			});
-		}
-	},
-	closeProgramTab: function(program) {
-		var tab = ui.getTabForProgram(program);
-		if (tab) {
-			var index = ui.removeWorkspaceCodeTab(tab);
-			var length = ui.tabs.length;
-			if (length > 0) {
-				var nextTab = ui.tabs[Math.max(0, Math.min(index - 1, length - 1))];
-				if (nextTab) {
-					ui.showProgramTab(nextTab.ref.program);
-					return;
-				}
-			}
-			// Hide editor if no next tab
-			ui.hideWorkspaceEditor();
-			ui.updateBuildAndFlashButtons();
-		}
-	},
-	getTabForProgram: function(program) {
-		return _(ui.tabs).find(function(tab) {
-			return tab.type === 'program' && tab.ref.program === program;
-		});
-	},
-	hasAnyProgramOpen: function() {
-		return ui.tabs.length > 0;
-	},
+  // Program Tabs
+  showProgramTab: function(program) {
+    ui.showWorkspaceEditor();
+    if (ui.tabs.length === 0) {
+      // Initial tab
+      var session = ui.editor.getSession();
+      session.setMode('ace/mode/c_cpp');
+      session.getDocument().setValue(program.code);
+      ui.setWorkspaceTitleDocumentName(program.name);
+      ui.addWorkspaceCodeTab({
+        type: 'program',
+        title: program.name,
+        ref: {
+          program: program,
+          session: session
+        }
+      });
+      return;
+    }
+    var tab = _(ui.tabs).find(function(tab) {
+      return tab.type === 'program' && tab.ref.program === program;
+    });
+    if (tab) {
+      // Tab already exists
+      ui.editor.setSession(tab.ref.session);
+      ui.setWorkspaceTitleDocumentName(program.name);
+      ui.setWorkspaceCodeTabActive(tab);
+    }
+    else {
+      // Create a new tab
+      var mode = ui.editor.getSession().getMode();
+      var session = new ace.EditSession(program.code, mode);
+      session.setMode('ace/mode/c_cpp');
+      ui.editor.setSession(session);
+      ui.setWorkspaceTitleDocumentName(program.name);
+      ui.addWorkspaceCodeTab({
+        type: 'program',
+        title: program.name,
+        ref: {
+          program: program,
+          session: session
+        }
+      });
+    }
+  },
+  closeProgramTab: function(program) {
+    var tab = ui.getTabForProgram(program);
+    if (tab) {
+      var index = ui.removeWorkspaceCodeTab(tab);
+      var length = ui.tabs.length;
+      if (length > 0) {
+        var nextTab = ui.tabs[Math.max(0, Math.min(index - 1, length - 1))];
+        if (nextTab) {
+          ui.showProgramTab(nextTab.ref.program);
+          return;
+        }
+      }
+      // Hide editor if no next tab
+      ui.hideWorkspaceEditor();
+      ui.updateBuildAndFlashButtons();
+    }
+  },
+  getTabForProgram: function(program) {
+    return _(ui.tabs).find(function(tab) {
+      return tab.type === 'program' && tab.ref.program === program;
+    });
+  },
+  hasAnyProgramOpen: function() {
+    return ui.tabs.length > 0;
+  },
 
-	// Construction Graph/Info
-	selectWorkspaceConstructionCubelet: function(cubelet) {
-		studio.selectCubelet(cubelet);
-		ui.setWorkspaceConstructionGraphNodeActive(cubelet);
-		ui.setWorkspaceConstructionDetail(cubelet);
-	},
-	getImageForWorkspaceConstructionGraphNode: function(node) {
-		return 'img/cubelet-' + node.type.name + '.png';
-	},
-	getLargeImageForWorkspaceConstructionGraphNode: function(node) {
-		return 'img/cubelet-' + node.type.name + '@2x.png';
-	},
-	setWorkspaceConstructionGraphNodeActive: function(node) {
-		d3.selectAll('#studio .workspace-construction-graph-node')
-			.classed('workspace-construction-graph-node-active', false);
-		d3.select(node.element)
-			.classed('workspace-construction-graph-node-active', true);
-	},
-	getWorkspaceConstructionGraphNodeActive: function() {
-		return d3.select('#studio .workspace-construction-graph-node-active').datum();
-	},
-	updateWorkspaceConstructionGraphNode: function(node) {
-		d3.select(node.element)
-			.attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode);
-		if (node == studio.getCubelet()) {
-			ui.setWorkspaceConstructionDetail(node);
-		}
-	},
-	drawWorkspaceConstructionGraph: function() {
-		// Clear graph
-		ui.graph.selectAll('*').remove();
+  // Construction Graph/Info
+  selectWorkspaceConstructionCubelet: function(cubelet) {
+    studio.selectCubelet(cubelet);
+    ui.setWorkspaceConstructionGraphNodeActive(cubelet);
+    ui.setWorkspaceConstructionDetail(cubelet);
+  },
+  getImageForWorkspaceConstructionGraphNode: function(node) {
+    return 'img/cubelet-' + node.type.name + '.png';
+  },
+  getLargeImageForWorkspaceConstructionGraphNode: function(node) {
+    return 'img/cubelet-' + node.type.name + '@2x.png';
+  },
+  setWorkspaceConstructionGraphNodeActive: function(node) {
+    d3.selectAll('#studio .workspace-construction-graph-node')
+      .classed('workspace-construction-graph-node-active', false);
+    d3.select(node.element)
+      .classed('workspace-construction-graph-node-active', true);
+  },
+  getWorkspaceConstructionGraphNodeActive: function() {
+    return d3.select('#studio .workspace-construction-graph-node-active').datum();
+  },
+  updateWorkspaceConstructionGraphNode: function(node) {
+    d3.select(node.element)
+      .attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode);
+    if (node == studio.getCubelet()) {
+      ui.setWorkspaceConstructionDetail(node);
+    }
+  },
+  drawWorkspaceConstructionGraph: function() {
+    // Clear graph
+    ui.graph.selectAll('*').remove();
 
-		var construction = studio.getConstruction();
-		if (!construction) {
-			// Nothing to draw
-			return;
-		}
+    var construction = studio.getConstruction();
+    if (!construction) {
+      // Nothing to draw
+      return;
+    }
 
-		// Draw construction
-		var w = 300; // Width
-		var h = 300; // Height
-		var s = 32; // Size
-		var p = (w - s * 5) / 10 + s; // Padding
-		var cx = w / 2; // Center x
-		var cy = h / 2; // Center y
-		var t = 'translate(' + -s / 2 + ',' + -s / 2 + ')';
-		function draw() {
-			this
-				.attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode)
-				.attr('width', s)
-				.attr('height', s)
-				.attr('transform', t)
-				.each(function(node) {
-					node.element = this;
-				})
-				.on('click', function(node) {
-					ui.selectWorkspaceConstructionCubelet(node);
-				});
-		}
-		function plotX(radius, spokes) {
-			return function(node, i) {
-				return cx + radius * Math.cos(2 * (i / spokes) * Math.PI + Math.PI / 2);
-			}
-		}
-		function plotY(radius, spokes) {
-			return function(node, i) {
-				return cy + radius * Math.sin(2 * (i / spokes) * Math.PI + Math.PI / 2);
-			}
-		}
-		// Draw outer ring
-		if (construction.far.length > 0) {
-			ui.graph
-				.append('circle')
-				.classed('workspace-construction-graph-circle-far', true)
-				.attr({ 'r': 2.5 * p, 'cx': cx, 'cy': cy });
-		}
-		// Draw flashable ring
-		var connected = studio.hasConnection();
-		ui.graph
-			.append('circle')
-			.classed('workspace-construction-graph-circle-near', true)
-			.classed('workspace-construction-graph-circle-near-connected', connected)
-			.classed('workspace-construction-graph-circle-near-disconnected', !connected)
-			.attr({ 'r': 1.5 * p, 'cx': cx, 'cy': cy });
-		// Draw origin
-		if (construction.origin) {
-			ui.graph.selectAll('image.workspace-construction-graph-node-origin')
-				.data([construction.origin])
-				.enter()
-					.append('image')
-					.classed('workspace-construction-graph-node', true)
-					.classed('workspace-construction-graph-node-origin', true)
-					.attr('x', cx)
-					.attr('y', cy)
-					.call(draw);
-		}
-		// Draw inner ring of cubelets
-		if (construction.near.length > 0) {
-			ui.graph.selectAll('image.workspace-construction-graph-node-near')
-				.data(construction.near)
-				.enter()
-					.append('image')
-					.classed('workspace-construction-graph-node', true)
-					.classed('workspace-construction-graph-node-near', true)
-					.attr('x', plotX(p, construction.near.length))
-					.attr('y', plotY(p, construction.near.length))
-					.call(draw);
-		}
-		// Draw outer ring of cubelets
-		if (construction.far.length > 0) {
-			ui.graph.selectAll('image.workspace-construction-graph-node-far')
-				.data(construction.far)
-				.enter()
-					.append('image')
-					.classed('workspace-construction-graph-node', true)
-					.classed('workspace-construction-graph-node-far', true)
-					.attr('x', plotX(2 * p, construction.far.length))
-					.attr('y', plotY(2 * p, construction.far.length))
-					.call(draw);
-		}
-		// Select cubelet
-		var cubelet = studio.getCubelet();
-		if (cubelet) {
-			ui.selectWorkspaceConstructionCubelet(cubelet);
-		}
-	},
-	setWorkspaceConstructionDetail: function(node) {
-		d3.select('#studio .workspace-construction-detail-label')
-			.text(node.id);
-		d3.select('#studio .workspace-construction-detail-icon')
-			.style('background-image', 'url(' + ui.getLargeImageForWorkspaceConstructionGraphNode(node) + ')');
+    // Draw construction
+    var w = 300; // Width
+    var h = 300; // Height
+    var s = 32; // Size
+    var p = (w - s * 5) / 10 + s; // Padding
+    var cx = w / 2; // Center x
+    var cy = h / 2; // Center y
+    var t = 'translate(' + -s / 2 + ',' + -s / 2 + ')';
+    function draw() {
+      this
+        .attr('xlink:href', ui.getImageForWorkspaceConstructionGraphNode)
+        .attr('width', s)
+        .attr('height', s)
+        .attr('transform', t)
+        .each(function(node) {
+          node.element = this;
+        })
+        .on('click', function(node) {
+          ui.selectWorkspaceConstructionCubelet(node);
+        });
+    }
+    function plotX(radius, spokes) {
+      return function(node, i) {
+        return cx + radius * Math.cos(2 * (i / spokes) * Math.PI + Math.PI / 2);
+      }
+    }
+    function plotY(radius, spokes) {
+      return function(node, i) {
+        return cy + radius * Math.sin(2 * (i / spokes) * Math.PI + Math.PI / 2);
+      }
+    }
+    // Draw outer ring
+    if (construction.far.length > 0) {
+      ui.graph
+        .append('circle')
+        .classed('workspace-construction-graph-circle-far', true)
+        .attr({ 'r': 2.5 * p, 'cx': cx, 'cy': cy });
+    }
+    // Draw flashable ring
+    var connected = studio.hasConnection();
+    ui.graph
+      .append('circle')
+      .classed('workspace-construction-graph-circle-near', true)
+      .classed('workspace-construction-graph-circle-near-connected', connected)
+      .classed('workspace-construction-graph-circle-near-disconnected', !connected)
+      .attr({ 'r': 1.5 * p, 'cx': cx, 'cy': cy });
+    // Draw origin
+    if (construction.origin) {
+      ui.graph.selectAll('image.workspace-construction-graph-node-origin')
+        .data([construction.origin])
+        .enter()
+          .append('image')
+          .classed('workspace-construction-graph-node', true)
+          .classed('workspace-construction-graph-node-origin', true)
+          .attr('x', cx)
+          .attr('y', cy)
+          .call(draw);
+    }
+    // Draw inner ring of cubelets
+    if (construction.near.length > 0) {
+      ui.graph.selectAll('image.workspace-construction-graph-node-near')
+        .data(construction.near)
+        .enter()
+          .append('image')
+          .classed('workspace-construction-graph-node', true)
+          .classed('workspace-construction-graph-node-near', true)
+          .attr('x', plotX(p, construction.near.length))
+          .attr('y', plotY(p, construction.near.length))
+          .call(draw);
+    }
+    // Draw outer ring of cubelets
+    if (construction.far.length > 0) {
+      ui.graph.selectAll('image.workspace-construction-graph-node-far')
+        .data(construction.far)
+        .enter()
+          .append('image')
+          .classed('workspace-construction-graph-node', true)
+          .classed('workspace-construction-graph-node-far', true)
+          .attr('x', plotX(2 * p, construction.far.length))
+          .attr('y', plotY(2 * p, construction.far.length))
+          .call(draw);
+    }
+    // Select cubelet
+    var cubelet = studio.getCubelet();
+    if (cubelet) {
+      ui.selectWorkspaceConstructionCubelet(cubelet);
+    }
+  },
+  setWorkspaceConstructionDetail: function(node) {
+    d3.select('#studio .workspace-construction-detail-label')
+      .text(node.id);
+    d3.select('#studio .workspace-construction-detail-icon')
+      .style('background-image', 'url(' + ui.getLargeImageForWorkspaceConstructionGraphNode(node) + ')');
 
-		var info = [];
+    var info = [];
 
-		if (node.type) {
-			info.push({
-				key: 'Type',
-				value: ui.formatCubeletTypeLabel(node.type.name)
-			})
-			info.push({
-				key: 'Category',
-				value: ui.formatCubeletCategoryLabel(node.type.category)
-			})
-		}
-		if (node.mcu) {
-			info.push({
-				key: 'MCU',
-				value: node.mcu.toUpperCase()
-			})
-		}
-		if (node.currentFirmwareVersion) {
-			info.push({
-				key: 'Version',
-				value: node.currentFirmwareVersion
-			})
-		}
+    if (node.type) {
+      info.push({
+        key: 'Type',
+        value: ui.formatCubeletTypeLabel(node.type.name)
+      })
+      info.push({
+        key: 'Category',
+        value: ui.formatCubeletCategoryLabel(node.type.category)
+      })
+    }
+    if (node.mcu) {
+      info.push({
+        key: 'MCU',
+        value: node.mcu.toUpperCase()
+      })
+    }
+    if (node.currentFirmwareVersion) {
+      info.push({
+        key: 'Version',
+        value: node.currentFirmwareVersion
+      })
+    }
 
-		d3.selectAll('#studio .workspace-construction-detail-info tr').remove();
-		d3.select('#studio .workspace-construction-detail-info').selectAll('tr')
-			.data(info)
-			.enter()
-				.append('tr')
-				.call(function(row) {
-					row.append('td').text(function(data) { return data.key });
-					row.append('td').text(function(data) { return data.value });
-				});
+    d3.selectAll('#studio .workspace-construction-detail-info tr').remove();
+    d3.select('#studio .workspace-construction-detail-info').selectAll('tr')
+      .data(info)
+      .enter()
+        .append('tr')
+        .call(function(row) {
+          row.append('td').text(function(data) { return data.key });
+          row.append('td').text(function(data) { return data.value });
+        });
 
-		var action = d3.select('#studio .workspace-construction-detail-action');
-		action.selectAll('a').remove();
+    var action = d3.select('#studio .workspace-construction-detail-action');
+    action.selectAll('a').remove();
 
-		function addActionButton(text, click) {
-			var element = action.append('a')
-				.attr('href', '#')
-				.text(text)
-				.classed('workspace-construction-detail-action-button', true);
-			ui.createButton(element, {
-				enabled: true,
-				type: 'workspace-construction-detail-action-button',
-				click: click
-			});
-		}
+    function addActionButton(text, click) {
+      var element = action.append('a')
+        .attr('href', '#')
+        .text(text)
+        .classed('workspace-construction-detail-action-button', true);
+      ui.createButton(element, {
+        enabled: true,
+        type: 'workspace-construction-detail-action-button',
+        click: click
+      });
+    }
 
-		function disableAllActionButtons() {
-			d3.selectAll('#studio .workspace-construction-detail-action-button')
-				.each(function(button) {
-					button.disable();
-				});
-		}
+    function disableAllActionButtons() {
+      d3.selectAll('#studio .workspace-construction-detail-action-button')
+        .each(function(button) {
+          button.disable();
+        });
+    }
 
-		if (node.hasFirmwareUpgrade()) {
-			addActionButton('Upgrade to Version ' + node.latestFirmwareVersion, function(button) {
-				disableAllActionButtons();
-				ui.disableBuildButton();
-				ui.disableFlashButton();
-				studio.upgradeCubelet(node.latestFirmwareVersion);
-			});
-		}
+    if (node.hasFirmwareUpgrade()) {
+      addActionButton('Upgrade to Version ' + node.latestFirmwareVersion, function(button) {
+        disableAllActionButtons();
+        ui.disableBuildButton();
+        ui.disableFlashButton();
+        studio.upgradeCubelet(node.latestFirmwareVersion);
+      });
+    }
 
-		addActionButton('Restore Default Firmware', function(button) {
-			disableAllActionButtons();
-			ui.disableBuildButton();
-			ui.disableFlashButton();
-			studio.restoreCubelet();
-		});
-	},
+    addActionButton('Restore Default Firmware', function(button) {
+      disableAllActionButtons();
+      ui.disableBuildButton();
+      ui.disableFlashButton();
+      studio.restoreCubelet();
+    });
+  },
 
-	// Connection status
-	setConnectionStatusConnected: function(blink) {
-		d3.select('#studio .titlebar-connection-status-label')
-			.text('Connected');
-		d3.select('#studio .titlebar-connection-status-icon')
-			.style('background-image', 'url(img/connection-connected.png)');
-		if (true) ui.blinkConnectionStatusIcon();
-	},
-	setConnectionStatusDisconnected: function(blink) {
-		ui.setWorkspaceTitleDeviceName('Disconnected');
-		d3.select('#studio .titlebar-connection-status-label')
-			.text('Disconnected');
-		d3.select('#studio .titlebar-connection-status-icon')
-			.style('background-image', 'url(img/connection-disconnected.png)');
-		if (true) ui.blinkConnectionStatusIcon();
-	},
-	blinkConnectionStatusIcon: function() {
-		var element = d3.select('#studio .titlebar-connection-status-icon');
-		var direction = false;
-		var blinks = 0;
-		var intervalID = setInterval(function() {
-			element.transition()
-				.duration(300)
-				.style('opacity', direction ? 0.1 : 1.0);
-			direction = !direction;
-			if (++blinks > 10) clearInterval(intervalID);
-		}, 500);
-	},
+  // Connection status
+  setConnectionStatusConnected: function(blink) {
+    d3.select('#studio .titlebar-connection-status-label')
+      .text('Connected');
+    d3.select('#studio .titlebar-connection-status-icon')
+      .style('background-image', 'url(img/connection-connected.png)');
+    if (true) ui.blinkConnectionStatusIcon();
+  },
+  setConnectionStatusDisconnected: function(blink) {
+    ui.setWorkspaceTitleDeviceName('Disconnected');
+    d3.select('#studio .titlebar-connection-status-label')
+      .text('Disconnected');
+    d3.select('#studio .titlebar-connection-status-icon')
+      .style('background-image', 'url(img/connection-disconnected.png)');
+    if (true) ui.blinkConnectionStatusIcon();
+  },
+  blinkConnectionStatusIcon: function() {
+    var element = d3.select('#studio .titlebar-connection-status-icon');
+    var direction = false;
+    var blinks = 0;
+    var intervalID = setInterval(function() {
+      element.transition()
+        .duration(300)
+        .style('opacity', direction ? 0.1 : 1.0);
+      direction = !direction;
+      if (++blinks > 10) clearInterval(intervalID);
+    }, 500);
+  },
 
-	// Building
-	showBuildProgressIndicator: function() {
-		var button = d3.select('#studio .console-toolbar-button-build');
-		button.classed('console-toolbar-progress-indicator-enabled', true);
-		button.text('Building...');
-	},
-	hideBuildProgressIndicator: function() {
-		var button = d3.select('#studio .console-toolbar-button-build');
-		button.classed('console-toolbar-progress-indicator-enabled', false);
-		button.text('Build');
-	},
-	showBuildError: function(error) {
-		log.error(error);
-	},
+  // Building
+  showBuildProgressIndicator: function() {
+    var button = d3.select('#studio .console-toolbar-button-build');
+    button.classed('console-toolbar-progress-indicator-enabled', true);
+    button.text('Building...');
+  },
+  hideBuildProgressIndicator: function() {
+    var button = d3.select('#studio .console-toolbar-button-build');
+    button.classed('console-toolbar-progress-indicator-enabled', false);
+    button.text('Build');
+  },
+  showBuildError: function(error) {
+    log.error(error);
+  },
 
-	// Flashing
-	showFlashProgressBar: function(percent) {
-		var button = d3.select('#studio .console-toolbar-button-flash');
-		var w = 132; // TODO: Get width from button dynamically
-		var x = w * (percent || 0.0) / 100.0;
-		button.style('background-position', [x - w, 0].join(' '));
-		button.classed('console-toolbar-progress-bar-enabled', true);
-		button.text(percent  <  50 ? 'Uploading...' :
-			        percent === 50 ? 'Targeting...'
-			                       : 'Flashing...');
-	},
-	hideFlashProgressBar: function() {
-		d3.select('#studio .console-toolbar-button-flash')
-			.style('background-position', '0 0')
-			.classed('console-toolbar-progress-bar-enabled', false)
-			.text('Flash');
-	},
-	showFlashError: function(error) {
-		log.error(error);
-	},
+  // Flashing
+  showFlashProgressBar: function(percent) {
+    var button = d3.select('#studio .console-toolbar-button-flash');
+    var w = 132; // TODO: Get width from button dynamically
+    var x = w * (percent || 0.0) / 100.0;
+    button.style('background-position', [x - w, 0].join(' '));
+    button.classed('console-toolbar-progress-bar-enabled', true);
+    button.text(percent  <  50 ? 'Uploading...' :
+          percent === 50 ? 'Targeting...'
+                   : 'Flashing...');
+  },
+  hideFlashProgressBar: function() {
+    d3.select('#studio .console-toolbar-button-flash')
+      .style('background-position', '0 0')
+      .classed('console-toolbar-progress-bar-enabled', false)
+      .text('Flash');
+  },
+  showFlashError: function(error) {
+    log.error(error);
+  },
 
-	// Formatting
-	formatCubeletTypeLabel: function(type) {
-		return type
-			.replace(/^(.)/, function(s) { return s.toUpperCase() })
-			.replace(/bargraph/i, 'Bar Graph');
-	},
-	formatCubeletCategoryLabel: function(category) {
-		return category
-			.replace(/^(.)/, function(s) { return s.toUpperCase() });
-	},
-	formatBuildResult: function(result) {
-		var line = result.lineNumber;
-		var message = result.message;
-		return (line > 0) ? 
-			'Syntax error on line ' + line + ': ' + message : message;
-	},
+  // Formatting
+  formatCubeletTypeLabel: function(type) {
+    return type
+      .replace(/^(.)/, function(s) { return s.toUpperCase() })
+      .replace(/bargraph/i, 'Bar Graph');
+  },
+  formatCubeletCategoryLabel: function(category) {
+    return category
+      .replace(/^(.)/, function(s) { return s.toUpperCase() });
+  },
+  formatBuildResult: function(result) {
+    var line = result.lineNumber;
+    var message = result.message;
+    return (line > 0) ? 
+      'Syntax error on line ' + line + ': ' + message : message;
+  },
 
-	// Console autoscroll
-	scrollConsoleToBottom: function() {
-		var c = d3.select('#studio .console-messages')[0][0];
-		c.scrollTop = c.scrollHeight;
-	},
+  // Console autoscroll
+  scrollConsoleToBottom: function() {
+    var c = d3.select('#studio .console-messages')[0][0];
+    c.scrollTop = c.scrollHeight;
+  },
 
-	// Saving
-	save: function(tab) {
-		tab = tab || ui.getWorkspaceCodeTabActive();
-		if (tab) {
-			var program = tab.ref.program;
-			var session = tab.ref.session;
-			studio.saveProgram(program, session);
-		}
-	},
-	saveAs: function(tab) {
-		tab = tab || ui.getWorkspaceCodeTabActive();
-		if (tab) {
-			ui.showSaveAsFileBrowser(function(file) {
-				var program = tab.ref.program;
-				var session = tab.ref.session;
-				program.file = file;
-				studio.saveProgram(program, session);
-			});
-		}
-	},
-	saveAll: function() {
-		_(ui.tabs).each(function(tab) {
-			ui.save(tab);
-		});
-	},
-	open: function() {
-		ui.showOpenFileBrowser(function(file) {
-			studio.openProgramFile(file);
-		});
-	},
-	close: function(tab) {
-		tab = tab || ui.getWorkspaceCodeTabActive();
-		if (tab) {
-			var program = tab.ref.program;
-			var session = tab.ref.session;
-			// No changes to save. Close.
-			if (!program.dirty) {
-				ui.closeProgramTab(program);
-				return;
-			}
-			// Unsaved changes. Ask to save.
-			ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program before closing?', function(yes) {
-				if (!yes) {
-					ui.closeProgramTab(program);
-					return;
-				}
-				studio.saveProgram(program, session, function() {
-					ui.closeProgramTab(program);
-				});
-			});
-		}
-	},
-	closeAll: function() {
-		_(ui.tabs).each(function(tab) {
-			ui.close(tab);
-		});
-	}
+  // Saving
+  save: function(tab) {
+    tab = tab || ui.getWorkspaceCodeTabActive();
+    if (tab) {
+      var program = tab.ref.program;
+      var session = tab.ref.session;
+      studio.saveProgram(program, session);
+    }
+  },
+  saveAs: function(tab) {
+    tab = tab || ui.getWorkspaceCodeTabActive();
+    if (tab) {
+      ui.showSaveAsFileBrowser(function(file) {
+        var program = tab.ref.program;
+        var session = tab.ref.session;
+        program.file = file;
+        studio.saveProgram(program, session);
+      });
+    }
+  },
+  saveAll: function() {
+    _(ui.tabs).each(function(tab) {
+      ui.save(tab);
+    });
+  },
+  open: function() {
+    ui.showOpenFileBrowser(function(file) {
+      studio.openProgramFile(file);
+    });
+  },
+  close: function(tab) {
+    tab = tab || ui.getWorkspaceCodeTabActive();
+    if (tab) {
+      var program = tab.ref.program;
+      var session = tab.ref.session;
+      // No changes to save. Close.
+      if (!program.dirty) {
+        ui.closeProgramTab(program);
+        return;
+      }
+      // Unsaved changes. Ask to save.
+      ui.showYesNoDialog('Unsaved Changes', 'Program has unsaved changes. Save program before closing?', function(yes) {
+        if (!yes) {
+          ui.closeProgramTab(program);
+          return;
+        }
+        studio.saveProgram(program, session, function() {
+          ui.closeProgramTab(program);
+        });
+      });
+    }
+  },
+  closeAll: function() {
+    _(ui.tabs).each(function(tab) {
+      ui.close(tab);
+    });
+  }
 };
 
 d3.select('.titlebar-connection-status').on('click', function(e) {
-	cubelets.list(function(error, devices) {
-		if (error) {
-			var msg = 'Could not list connected cubelets.';
-			log.error(msg, error);
-			ui.showErrorDialog('Connection Error', msg);
-			return;
-		}
-		ui.showConnectionDialog(devices);
-	});
+  cubelets.list(function(error, devices) {
+    if (error) {
+      var msg = 'Could not list connected cubelets.';
+      log.error(msg, error);
+      ui.showErrorDialog('Connection Error', msg);
+      return;
+    }
+    ui.showConnectionDialog(devices);
+  });
 });
 
 ui.initialize();
 
 studio.on('error', function(error) {
-    console.error('Unhandled Error', error);
-    log.error('Unhandled Error. Please report this bug.', error);
-    ui.updateBuildAndFlashButtons();
+  console.error('Unhandled Error', error);
+  log.error('Unhandled Error. Please report this bug.', error);
+  ui.updateBuildAndFlashButtons();
 });
 
 studio.on('serviceError', function(error) {
-	console.error('Service Error', error);
-	log.error('Service Error. Please try again, and report a bug if the problem persists.', error);
+  console.error('Service Error', error);
+  log.error('Service Error. Please try again, and report a bug if the problem persists.', error);
 });
 
 studio.load();
 
-	</script>
+  </script>
 </body>
 </html>
