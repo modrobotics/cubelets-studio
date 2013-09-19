@@ -1,7 +1,7 @@
 CUBELETS STUDIO
 ===============
 
-Cubelets Studio is a programming environment for Mac OS X. Connect to your Bluetooth Cubelet, and unlock the power of Cubelets CODE to create new advanced behaviors for your robot constructions.
+Cubelets Studio is a programming environment for creating new behaviors for Cubelets on Mac OS X.
 
 Step 1: Connect
 ---------------
