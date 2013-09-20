@@ -256,6 +256,14 @@ var Studio = function() {
 		c.type = cubelets.Cubelet.typeForTypeID(info.typeID);
 		c.currentFirmwareVersion = parseFloat(info.currentFirmwareVersion);
 		c.latestFirmwareVersion = parseFloat(info.latestFirmwareVersion);
+		// XXX: Exceptional case where a Bluetooth is misidentified
+		if (c.id === construction.origin.id) {
+			c.mcu = cubelets.FlashLoader.Targets.AVR;
+			c.type = cubelets.Types.BLUETOOTH;
+			c.currentFirmwareVersion = 0.0;
+			c.latestFirmwareVersion = 3.1;
+		}
+		console.log(c);
 		studio.emit('cubeletChanged', c);
 	});
 
