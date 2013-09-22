@@ -263,7 +263,6 @@ var Studio = function() {
 			c.currentFirmwareVersion = 0.0;
 			c.latestFirmwareVersion = 3.1;
 		}
-		console.log(c);
 		studio.emit('cubeletChanged', c);
 	});
 
