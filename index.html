@@ -720,10 +720,8 @@ studio.on('buildError', function(error) {
 });
 
 studio.on('flashProgress', function(progress) {
-  var p = progress.action === 'upload' ? (progress.percent / 2) :
-      progress.action === 'flash' ? 50 + (progress.percent / 2) :
-      50;
-  ui.showFlashProgressBar(p);
+  ui.showFlashProgressBar(progress.percent,
+    progress.action === 'flash' ? 'Flashing...' : 'Uploading...');
 });
 
 studio.on('flashComplete', function() {
@@ -882,7 +880,7 @@ var ui = {
       });
   },
   initializeBuildButton: function() {
-    ui.flashButton = this
+    ui.buildButton = this
       .createButton('#studio .console-toolbar-button-build', {
         type: 'console-toolbar-button',
         enabled: false,
@@ -1070,7 +1068,7 @@ var ui = {
       label: 'Cancel',
       click: ui.hideDialog
     };
-    ui.showDialog('Connect', function(contents) {
+    ui.showDialog('Select a Cubelet', function(contents) {
       contents.selectAll('*').remove();
       if (devices.length === 0) {
         contents.append('div')
@@ -1596,15 +1594,13 @@ var ui = {
   },
 
   // Flashing
-  showFlashProgressBar: function(percent) {
+  showFlashProgressBar: function(percent, text) {
     var button = d3.select('#studio .console-toolbar-button-flash');
     var w = 132; // TODO: Get width from button dynamically
     var x = w * (percent || 0.0) / 100.0;
     button.style('background-position', [x - w, 0].join(' '));
     button.classed('console-toolbar-progress-bar-enabled', true);
-    button.text(percent  <  50 ? 'Uploading...' :
-          percent === 50 ? 'Targeting...'
-                   : 'Flashing...');
+    button.text(text || 'Flashing...');
   },
   hideFlashProgressBar: function() {
     d3.select('#studio .console-toolbar-button-flash')

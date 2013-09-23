@@ -43,8 +43,6 @@ var BuildService = function() {
 			result.lineNumber = -1;
 			result.columnNumber = -1;
 			result.message = 'Build failed to compile.';
-			console.log('CompilerResult data:', data);
-			console.log('Something is ' + e);
 		}
 		this.tryParse = function(data) {
 			console.log('Here');
@@ -63,7 +61,7 @@ var BuildService = function() {
 				return;
 			}
 			if (response.statusCode != 200) {
-				service.emit('error', new Error('Bad response. Error status code.'));
+				service.emit('error', new Error('Bad response. Error status code: ' + response.statusCode));
 				return;
 			}
 			var status = body['status_code'];
@@ -121,12 +119,12 @@ var BuildService = function() {
 				return;
 			}
 			if (response.statusCode != 200) {
-				service.emit('error', new Error('Bad response. Error status code.'));
+				service.emit('error', new Error('Bad response. Error status code: ' + response.statusCode));
 				return;
 			}
 			var statusCode = body['status_code'];
 			if (statusCode != 200) {
-				service.emit('error', new Error('Bad response body. Error status code.'));
+				service.emit('error', new Error('Bad response body. Error status code: ' + statusCode));
 				return;
 			}
 			var buildID = body['u'];
@@ -157,7 +155,7 @@ var BuildService = function() {
 							break;
 						case CompilerStatus.READY:
 							clearInterval(intervalID);
-							if (mutex) return console.log('Mutex')
+							if (mutex) return;
 							mutex = true;
 							if (result['compiled'] !== true) {
 								service.emit('fail', build, new CompilerResult(result['output']));

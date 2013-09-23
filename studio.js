@@ -257,7 +257,7 @@ var Studio = function() {
 		c.currentFirmwareVersion = parseFloat(info.currentFirmwareVersion);
 		c.latestFirmwareVersion = parseFloat(info.latestFirmwareVersion);
 		// XXX: Exceptional case where a Bluetooth is misidentified
-		if (c.id === construction.origin.id) {
+		if (c.id === construction.origin.id && c.type !== cubelets.Types.BLUETOOTH) {
 			c.mcu = cubelets.FlashLoader.Targets.AVR;
 			c.type = cubelets.Types.BLUETOOTH;
 			c.currentFirmwareVersion = 0.0;
