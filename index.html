@@ -836,6 +836,12 @@ var ui = {
         studio.setConnection(connection);
       });
     }}));
+    debugMenu.append(new g.MenuItem({ label: 'Load Hex File...', click: function() {
+      ui.showOpenFileBrowser(function(file) {
+        studio.openHexFile(file);
+        studio.flashCubelet();
+      });
+    }}));
     menu.append(debugMenuItem);
 
     var helpMenuItem = new g.MenuItem({ label: 'Help' });

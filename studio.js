@@ -62,6 +62,15 @@ var Studio = function() {
 		}
 	};
 
+	this.openHexFile = function(file) {
+		if (fs.existsSync(file)) {
+			var hex = fs.readFileSync(file, 'ascii');
+			if (hex) {
+				build = { hex: hex };
+			}
+		}
+	};
+
 	var autoProgramName = 1;
 
 	this.createNewProgram = function(programName, code, file) {
