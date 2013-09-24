@@ -1148,7 +1148,6 @@ var ui = {
     tab.ref.change = function() {
       // Ignore changes while saving
       if (program.saving) {
-        console.log('Program is saving.');
         return;
       }
       program.dirty = true;

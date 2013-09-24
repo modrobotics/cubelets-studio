@@ -30,7 +30,6 @@ var Connection = function() {
 		if (!this.connected) {
 			return;
 		}
-		console.log(data);
 	};
 
 	this.stream = function() {
