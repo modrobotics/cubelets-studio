@@ -636,7 +636,12 @@ if (!process) {
 }
 
 process.on('uncaughtException', function(e) {
-  console.error('Uncaught Exception. Please report this bug.', e);
+  log.error([
+    'Hi. Thanks for testing the Alpha!',
+    'An uncaught exception occurred, which means you probably found a bug.',
+    'Please open Debug Tools from the Debug menu and report the error displayed in the console.'
+  ].join(' '));
+  console.error(e);
 });
 
 var cubelets = require('cubelets');
@@ -740,7 +745,7 @@ studio.on('buildFailed', function(build, result) {
 studio.on('buildError', function(error) {
   ui.hideBuildProgressIndicator();
   ui.enableBuildButton();
-  ui.showBuildError(error);
+  log.error(error);
 });
 
 studio.on('flashProgress', function(progress) {
@@ -757,7 +762,7 @@ studio.on('flashComplete', function() {
 studio.on('flashError', function(error) {
   ui.hideFlashProgressBar();
   ui.enableFlashButton();
-  ui.showFlashError(error);
+  log.error(error);
 });
 
 studio.on('cubeletsNearbyDiscoveryStarted', function() {
@@ -765,7 +770,7 @@ studio.on('cubeletsNearbyDiscoveryStarted', function() {
 });
 
 studio.on('firmwareError', function(error) {
-  log.error('Firmware update error:', error);
+  log.error(error);
   ui.updateBuildAndFlashButtons();
 });
 
@@ -851,14 +856,6 @@ var ui = {
     var debugMenu = debugMenuItem.submenu = new g.Menu();
     debugMenu.append(new g.MenuItem({ label: 'Show Debug Tools', click: function() {
       win.showDevTools();
-    }}));
-    debugMenu.append(new g.MenuItem({ label: 'Connect to Development Server...', click: function() {
-      var connection = new cubelets.NetConnection('localhost', 6000);
-      connection.connect(function(e) {
-        log.error('Error. Could not connect to server \'' + connection.name + '\'.');
-      }, function() {
-        studio.setConnection(connection);
-      });
     }}));
     debugMenu.append(new g.MenuItem({ label: 'Load Hex File...', click: function() {
       ui.showOpenFileBrowser(function(file) {
@@ -1618,9 +1615,6 @@ var ui = {
     button.classed('console-toolbar-progress-indicator-enabled', false);
     button.text('Build');
   },
-  showBuildError: function(error) {
-    log.error(error);
-  },
 
   // Flashing
   showFlashProgressBar: function(percent, text) {
@@ -1636,9 +1630,6 @@ var ui = {
       .style('background-position', '0 0')
       .classed('console-toolbar-progress-bar-enabled', false)
       .text('Flash');
-  },
-  showFlashError: function(error) {
-    log.error(error);
   },
 
   // Formatting
