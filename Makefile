@@ -26,6 +26,7 @@ build-windows:build-submodules build-serialport build-zip
 build-submodules:
 	git submodule init
 	git submodule update
+	npm install
 
 build-serialport:
 	cd node_modules/cubelets/node_modules/serialport;\
