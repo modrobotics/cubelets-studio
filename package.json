@@ -11,7 +11,7 @@
     "min_height": 450
   },
   "dependencies": {
-    "cubelets": "0.0.1",
+    "cubelets": "https://github.com/modrobotics/node-cubelets.git#1.0.0",
     "glob": "3.2.6",
     "underscore": "1.5.0"
   },
