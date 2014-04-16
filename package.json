@@ -3,7 +3,7 @@
   "description": "Cubelets Studio is a programming environment for creating new behaviors for Cubelets.",
   "window": {
     "title": "Cubelets Studio",
-    "toolbar": false,
+    "toolbar": true,
     "resizable": true,
     "width": 1200,
     "height": 725,
@@ -11,7 +11,7 @@
     "min_height": 450
   },
   "dependencies": {
-    "cubelets": "git+https://github.com/modrobotics/node-cubelets.git#1.0.0",
+    "cubelets": "git+https://github.com/modrobotics/node-cubelets.git#studio",
     "glob": "3.2.6",
     "underscore": "1.5.0"
   },

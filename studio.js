@@ -10,7 +10,7 @@ var Studio = function() {
 
 	var connection = null;
 	var cubelet = null;
-	var construction = new cubelets.Construction();
+	var construction = null;
 	var programs = [];
 	var build = null;
 
@@ -130,10 +130,10 @@ var Studio = function() {
 		construction.discover();
 	};
 
-	construction.on('change', function() {
+	function onConstructionChange() {
 		studio.emit('constructionChanged', construction);
-		studio.fetchCubeletInfo(construction.all());
-	});
+		studio.fetchCubeletInfo(construction.all());		
+	}
 
 	this.disconnect = function() {
 		studio.setConnection(null);
@@ -143,17 +143,22 @@ var Studio = function() {
 		if (c === connection) {
 			return;
 		}
+		if (connection) {
+			connection.removeListener('close', onConnectionClose);
+		}
+		if (construction) {
+			construction.removeListener('change', onConstructionChange);
+		}
 		connection = c;
-		construction.reset();
-		construction.setConnection(c);
-		if (c) {
-			studio.emit('deviceConnected', c.name);
-			c.on('close', function() {
-				studio.emit('deviceDisconnected');
-			});
+		if (connection) {
+			construction = new cubelets.Construction(connection);
+			construction.on('change', onConstructionChange);
+			studio.emit('deviceConnected', connection.name);
+			studio.discoverConstruction();
+			connection.on('close', onConnectionClose);
 		}
 		else {
-			construction.reset();
+			construction = null;
 		}
 	};
 
@@ -164,6 +169,10 @@ var Studio = function() {
 	this.hasConnection = function() {
 		return connection && connection.connected;
 	};
+
+	function onConnectionClose() {
+		studio.emit('deviceDisconnected');
+	}
 
 	this.buildProgram = function(program) {
 		if (!cubelet) {

@@ -1,44 +1,23 @@
-# Node-WebKit
-NW_VERSION="0.7.2"
-NW_PATH="/opt/node-webkit/$(VERSION)"
+REPORTER = spec
 
-# Node package manager
-NPM_PATH="/usr/local/share/npm"
+default:
+	echo "Did you mean test, build or clean?"
 
-# Binaries
-NW="$(NW_PATH)/node-webkit.app/Contents/MacOS/node-webkit"
-GYP="$(NPM_PATH)/bin/nw-gyp"
+test:
+	@NODE_ENV=test ./node_modules/.bin/mocha --reporter $(REPORTER)
 
 build:build-osx build-windows build-linux
 
-build-osx:build-submodules build-serialport build-zip
-	cp -R platform/osx/Cubelets\ Studio.app build
-	mv build/app.nw build/Cubelets\ Studio.app/Contents/Resources/app.nw
+build-osx:
+	./build.sh
 
-build-linux:build-submodules build-serialport build-zip
-	cat $(NW) build/app.nw > build/cubelets-studio && chmod +x build/cubelets-studio
-	rm build/app.nw
+build-linux:
+	./build.sh
 
-build-windows:build-submodules build-serialport build-zip
-	copy /b $(NW)+build/app.nw build/Cubelets\ Studio.exe
-	rm build/app.nw
-
-build-submodules:
-	git submodule init
-	git submodule update
-	npm install
-
-build-serialport:
-	cd node_modules/cubelets/node_modules/serialport;\
-	$(GYP) clean;\
-	$(GYP) configure --target=$(NW_VERSION);\
-	$(GYP) build
-
-build-zip:
-	mkdir -p build
-	node ./tools/set-app-name "Cubelets Studio" # proper formatting in node-webkit
-	zip -r build/app.nw * -x@exclude.list
-	node ./tools/set-app-name "cubelets-studio" # restore npm compatibility
+build-windows:
+	build.bat
 
 clean:
 	rm -rf build/*
+
+.PHONY: build-osx build-linux build-windows clean test

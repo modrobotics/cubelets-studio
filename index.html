@@ -713,10 +713,6 @@ studio.on('deviceConnected', function(device) {
   ui.setConnectionStatusConnected();
   ui.setWorkspaceTitleDeviceName(device);
   ui.drawWorkspaceConstructionGraph();
-  log.info('Cubelet connected.');
-  if (studio.getConstruction().all().length <= 1) {
-    studio.discoverConstruction();
-  }
 });
 
 studio.on('deviceDisconnected', function() {
@@ -1715,7 +1711,8 @@ var ui = {
 };
 
 d3.select('.titlebar-connection-status').on('click', function(e) {
-  cubelets.list(function(error, devices) {
+  var scanner = new cubelets.SerialScanner();
+  scanner.scan(function(error, devices) {
     if (error) {
       var msg = 'Could not list connected cubelets.';
       log.error(msg, error);
