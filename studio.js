@@ -132,30 +132,41 @@ var Studio = function() {
 
 	function onConstructionChange() {
 		studio.emit('constructionChanged', construction);
-		studio.fetchCubeletInfo(construction.all());		
+		studio.fetchCubeletInfo(construction.all());
+	}
+
+	function onConstructionError(err) {
+		studio.emit('error', new Error('A connection error occurred.'));
+		console.error(err);
 	}
 
 	this.disconnect = function() {
-		studio.setConnection(null);
+		studio.connect(null);
 	};
 
-	this.setConnection = function(c) {
+	this.connect = function(c, name) {
 		if (c === connection) {
 			return;
 		}
 		if (connection) {
 			connection.removeListener('close', onConnectionClose);
+			connection.removeListener('error', onConnectionError);
 		}
 		if (construction) {
 			construction.removeListener('change', onConstructionChange);
+			construction.removeListener('error', onConstructionChange);
 		}
 		connection = c;
 		if (connection) {
 			construction = new cubelets.Construction(connection);
-			construction.on('change', onConstructionChange);
-			studio.emit('deviceConnected', connection.name);
-			studio.discoverConstruction();
 			connection.on('close', onConnectionClose);
+			connection.on('error', onConnectionError);
+			construction.on('change', onConstructionChange);
+			construction.on('error', onConstructionError);
+			construction.connect(function(err) {
+				studio.emit('deviceConnected', connection, name);
+				studio.discoverConstruction();
+			});
 		}
 		else {
 			construction = null;
@@ -167,11 +178,16 @@ var Studio = function() {
 	};
 
 	this.hasConnection = function() {
-		return connection && connection.connected;
+		return connection && connection.isOpen();
 	};
 
 	function onConnectionClose() {
 		studio.emit('deviceDisconnected');
+	}
+
+	function onConnectionError(err) {
+		studio.emit('error', new Error('A connection error occurred.'));
+		console.error(err);
 	}
 
 	this.buildProgram = function(program) {

@@ -544,6 +544,10 @@ body {
   color: #fff;
 }
 
+#studio .dialog-connection-error {
+  color: #ff0000;
+}
+
 #studio .dialog-connection-status {
   padding: 4px;
 }
@@ -709,9 +713,9 @@ studio.on('cubeletSelected', function(cubelet) {
   }
 });
 
-studio.on('deviceConnected', function(device) {
+studio.on('deviceConnected', function(connection, name) {
   ui.setConnectionStatusConnected();
-  ui.setWorkspaceTitleDeviceName(device);
+  ui.setWorkspaceTitleDeviceName(name);
   ui.drawWorkspaceConstructionGraph();
 });
 
@@ -995,8 +999,7 @@ var ui = {
   updateBuildAndFlashButtons: function() {
     ui.hideFlashProgressBar();
     ui.hideBuildProgressIndicator();
-    var connection = studio.getConnection();
-    if (!connection || !connection.connected) {
+    if (!studio.hasConnection()) {
       ui.disableFlashButton();
       return;
     }
@@ -1065,7 +1068,7 @@ var ui = {
       click: ui.hideDialog
     }]);
   },
-  showConnectionDialog: function(devices) {
+  showConnectionDialog: function() {
     var connectButton = {
       label: 'Connect',
       enabled: false,
@@ -1075,15 +1078,22 @@ var ui = {
           .append('div')
           .classed('dialog-connection-status', true)
           .text('Connecting...');
-        var device = item.datum()
-        var connection = new cubelets.SerialConnection(device.comName);
-        connection.connect(function(e) {
-          status.text('Error. Could not connect.');
-          log.error('Error. Could not connect to device \'' + device.comName + '\'.');
-        }, function() {
-          status.text('Connection successful!');
-          ui.hideDialog();
-          studio.setConnection(connection);
+        var datum = item.datum()
+        var connection = datum.connection;
+        var name = datum.name;
+        function onConnectionError(err) {}
+        connection.on('error', onConnectionError);
+        connection.open(function(err) {
+          connection.removeListener('error', onConnectionError);
+          if (err) {
+            status.text('Error. Could not connect.');
+            log.error('Error. Could not connect to device \'' + name + '\'.');
+          }
+          else {
+            status.text('Connection successful!');
+            ui.hideDialog();
+            studio.connect(connection, name);            
+          }
         });
       }
     };
@@ -1093,28 +1103,37 @@ var ui = {
     };
     ui.showDialog('Select a Cubelet', function(contents) {
       contents.selectAll('*').remove();
-      if (devices.length === 0) {
-        contents.append('div')
-          .classed('dialog-connection-devices-empty', true)
-          .text('No Cubelets found. Please pair a Cubelet to your computer, and try again.');
-        return;
-      }
-      contents.append('ul')
-        .classed('dialog-connection-devices', true)
-        .selectAll('li')
-        .data(devices)
-        .enter()
-          .append('li')
-          .text(function(device) {
-            return device.comName;
+      var list = contents.append('ul').classed('dialog-connection-devices', true);
+      var scanner = new cubelets.SerialScanner();
+      scanner.on('pass', function(connection, name, config) {
+        list.append('li')
+          .datum({
+            connection: connection,
+            name: name
           })
+          .text(name)
           .on('click', function() {
-            var list = d3.selectAll('#studio .dialog-connection-devices li');
             var item = d3.select(this);
-            list.classed('selected', false);
+            var otherItems = d3.selectAll('#studio .dialog-connection-devices li');
+            otherItems.classed('selected', false);
             item.classed('selected', true);
             connectButton.enable();
           });
+      });
+      scanner.scan(function(error, connections) {
+        if (error) {
+          var msg = 'Could not list connected cubelets.';
+          log.error(msg, error);
+          contents.append('div')
+            .classed('dialog-connection-error', true)
+            .text(msg);
+        }
+        else if (connections.length === 0) {
+          contents.append('div')
+            .classed('dialog-connection-devices-empty', true)
+            .text('No Cubelets found. Please pair a Cubelet to your computer, and try again.');
+        }
+      });
     }, [connectButton, cancelButton]);
   },
   showYesNoDialog: function(title, message, callback) {
@@ -1434,8 +1453,11 @@ var ui = {
         return cy + radius * Math.sin(2 * (i / spokes) * Math.PI + Math.PI / 2);
       }
     }
+    var origin = construction.origin();
+    var near = construction.near();
+    var far = construction.far();
     // Draw outer ring
-    if (construction.far.length > 0) {
+    if (far.length > 0) {
       ui.graph
         .append('circle')
         .classed('workspace-construction-graph-circle-far', true)
@@ -1450,9 +1472,9 @@ var ui = {
       .classed('workspace-construction-graph-circle-near-disconnected', !connected)
       .attr({ 'r': 1.5 * p, 'cx': cx, 'cy': cy });
     // Draw origin
-    if (construction.origin) {
+    if (origin) {
       ui.graph.selectAll('image.workspace-construction-graph-node-origin')
-        .data([construction.origin])
+        .data([origin])
         .enter()
           .append('image')
           .classed('workspace-construction-graph-node', true)
@@ -1462,27 +1484,27 @@ var ui = {
           .call(draw);
     }
     // Draw inner ring of cubelets
-    if (construction.near.length > 0) {
+    if (near.length > 0) {
       ui.graph.selectAll('image.workspace-construction-graph-node-near')
-        .data(construction.near)
+        .data(near)
         .enter()
           .append('image')
           .classed('workspace-construction-graph-node', true)
           .classed('workspace-construction-graph-node-near', true)
-          .attr('x', plotX(p, construction.near.length))
-          .attr('y', plotY(p, construction.near.length))
+          .attr('x', plotX(p, near.length))
+          .attr('y', plotY(p, near.length))
           .call(draw);
     }
     // Draw outer ring of cubelets
-    if (construction.far.length > 0) {
+    if (far.length > 0) {
       ui.graph.selectAll('image.workspace-construction-graph-node-far')
-        .data(construction.far)
+        .data(far)
         .enter()
           .append('image')
           .classed('workspace-construction-graph-node', true)
           .classed('workspace-construction-graph-node-far', true)
-          .attr('x', plotX(2 * p, construction.far.length))
-          .attr('y', plotY(2 * p, construction.far.length))
+          .attr('x', plotX(2 * p, far.length))
+          .attr('y', plotY(2 * p, far.length))
           .call(draw);
     }
     // Select cubelet
@@ -1711,16 +1733,7 @@ var ui = {
 };
 
 d3.select('.titlebar-connection-status').on('click', function(e) {
-  var scanner = new cubelets.SerialScanner();
-  scanner.scan(function(error, devices) {
-    if (error) {
-      var msg = 'Could not list connected cubelets.';
-      log.error(msg, error);
-      ui.showErrorDialog('Connection Error', msg);
-      return;
-    }
-    ui.showConnectionDialog(devices);
-  });
+  ui.showConnectionDialog();
 });
 
 ui.initialize();
