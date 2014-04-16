@@ -241,7 +241,7 @@ var Studio = function() {
 			studio.emit('error', new Error('No Cubelet connection available.'));
 			return;
 		}
-		var loader = new cubelets.FlashLoader(construction.origin, connection.stream());
+		var loader = new cubelets.FlashLoader(construction.origin(), connection.getStream());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',
@@ -291,7 +291,7 @@ var Studio = function() {
 		c.currentFirmwareVersion = parseFloat(info.currentFirmwareVersion);
 		c.latestFirmwareVersion = parseFloat(info.latestFirmwareVersion);
 		// XXX: Exceptional case where a Bluetooth is misidentified
-		if (c.id === construction.origin.id && c.type !== cubelets.Types.BLUETOOTH) {
+		if (c.id === construction.origin().id && c.type !== cubelets.Types.BLUETOOTH) {
 			c.mcu = cubelets.FlashLoader.Targets.AVR;
 			c.type = cubelets.Types.BLUETOOTH;
 			c.currentFirmwareVersion = 0.0;
@@ -358,7 +358,7 @@ var Studio = function() {
 			studio.emit('error', new Error('No cubelet connection available.'));
 			return;
 		}
-		var loader = new cubelets.FlashLoader(construction.origin, connection.stream());
+		var loader = new cubelets.FlashLoader(construction.origin(), connection.getStream());
 		loader.on('upload', function(p) {
 			studio.emit('flashProgress', {
 				action: 'upload',
@@ -387,21 +387,6 @@ var Studio = function() {
 		cubelet.currentFirmwareVersion = version;
 		studio.emit('cubeletChanged', cubelet);
 	});
-
-	this.mockConstruction = function() {
-		var Types = cubelets.Types;
-		var Cubelet = cubelets.Cubelet;
-		construction.origin = new Cubelet(32028, Types.BLUETOOTH);
-		construction.near = [
-			new Cubelet(26012, Types.BARGRAPH),
-			new Cubelet(23825, Types.PASSIVE),
-			new Cubelet(24003, Types.BRIGHTNESS),
-			new Cubelet(21685, Types.BATTERY),
-			new Cubelet(20214, Types.DISTANCE),
-			new Cubelet(0, Types.UNKNOWN)
-		];
-		studio.emit('constructionChanged');
-	};
 
 };
 

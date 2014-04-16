@@ -4,8 +4,8 @@ set NW_VERSION=0.8.4
 set NW_PATH=C:\opt\node-webkit\%NW_VERSION%
 set NW=nw
 set GYP=nw-gyp
-set APP_NAME=Cubelets Scratch
-set APP_SLUG=cubelets-scratch
+set APP_NAME=Cubelets Studio
+set APP_SLUG=cubelets-studio
 
 goto zip
 
@@ -21,6 +21,11 @@ call %GYP% configure --target=%NW_VERSION%
 call %GYP% build
 call cd ..\..\..\..
 call cd node_modules\cubelets\node_modules\bluetooth-serial-port
+call %GYP% clean
+call %GYP% configure --target=%NW_VERSION%
+call %GYP% build
+call cd ..\..\..\..
+call cd node_modules\cubelets\node_modules\socket.io-client\node_modules\ws
 call %GYP% clean
 call %GYP% configure --target=%NW_VERSION%
 call %GYP% build
