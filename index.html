@@ -726,7 +726,7 @@ studio.on('deviceDisconnected', function() {
   log.info('Cubelet disconnected.');
 });
 
-studio.on('buildComplete', function(build) {
+studio.on('buildComplete', function() {
   ui.hideBuildProgressIndicator();
   ui.enableBuildButton();
   var cubelet = studio.getCubelet();
@@ -736,13 +736,15 @@ studio.on('buildComplete', function(build) {
   log.info('Build complete.');
 });
 
-studio.on('buildFailed', function(build, result) {
-  ui.hideBuildProgressIndicator();
-  ui.enableBuildButton();
+studio.on('buildWarning', function(result) {
+  log.warn(ui.formatBuildResult(result));
+});
+
+studio.on('buildError', function(result) {
   log.error(ui.formatBuildResult(result));
 });
 
-studio.on('buildError', function(error) {
+studio.on('buildFailed', function(error) {
   ui.hideBuildProgressIndicator();
   ui.enableBuildButton();
   log.error(error);
@@ -1104,8 +1106,10 @@ var ui = {
     ui.showDialog('Select a Cubelet', function(contents) {
       contents.selectAll('*').remove();
       var list = contents.append('ul').classed('dialog-connection-devices', true);
+      var emptyItem = list.append('li').text('Scanning for Bluetooth Cubelets...');
       var scanner = new cubelets.SerialScanner();
       scanner.on('pass', function(connection, name, config) {
+        emptyItem.remove();
         list.append('li')
           .datum({
             connection: connection,
@@ -1664,7 +1668,7 @@ var ui = {
     var line = result.lineNumber;
     var message = result.message;
     return (line > 0) ? 
-      'Syntax error on line ' + line + ': ' + message : message;
+      'Line ' + line + ': ' + message : message;
   },
 
   // Console autoscroll

@@ -15,7 +15,7 @@ var Studio = function() {
 	var build = null;
 
 	var studio = this;
-	var buildService = new cubelets.BuildService();
+	var compileService = new cubelets.CompileService();
 	var infoService = new cubelets.InfoService();
 	var firmwareService = new cubelets.FirmwareService();
 
@@ -195,7 +195,7 @@ var Studio = function() {
 			studio.emit('error', new Error('No cubelet selected to build.'));
 			return;
 		}
-		buildService.requestBuild(program, cubelet);
+		compileService.requestBuild(program, cubelet);
 	};
 
 	this.hasBuild = function() {
@@ -264,21 +264,21 @@ var Studio = function() {
 		loader.load(program, cubelet);
 	};
 
-	buildService.on('complete', function(b) {
-		build = b;
-		studio.emit('buildComplete', b);
+	compileService.on('complete', function(result) {
+		build = result;
+		studio.emit('buildComplete');
 	});
 
-	buildService.on('fail', function(b, result) {
-		studio.emit('buildFailed', b, result);
+	compileService.on('failed', function(error) {
+		studio.emit('buildFailed', error);
 	});
 
-	buildService.on('error', function(error) {
-		studio.emit('buildError', error);
+	compileService.on('error', function(result) {
+		studio.emit('buildError', result);
 	});
 
-	buildService.on('progress', function(b, progress) {
-		studio.emit('buildProgress', b, progress);
+	compileService.on('warning', function(result) {
+		studio.emit('buildWarning', result);
 	});
 
 	this.fetchCubeletInfo = function(cubelets) {
