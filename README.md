@@ -1,7 +1,7 @@
 CUBELETS STUDIO
 ===============
 
-Cubelets Studio is a programming environment for Mac OS X. Connect your Bluetooth Cubelet to your Mac to create new advanced behaviors for your robot constructions!
+Cubelets Studio is a programming environment for [Cubelets](https://modrobotics.com/cubelets) on Mac OS X. Connect your Bluetooth Cubelet to your Mac to create new advanced behaviors for your robot constructions!
 
 Overview
 --------
