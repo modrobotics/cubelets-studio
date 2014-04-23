@@ -1,8 +1,11 @@
 exclude.list
 Makefile
+build.sh
+build.bat
 platform/*
 build/*
 tools/*
+resources/*
 .git/*
 .gitignore
 *.DS_Store*
