@@ -1,13 +1,13 @@
 @echo off
 
-set NW_VERSION=0.8.4
+set NW_VERSION=0.8.6
 set NW_PATH=C:\opt\node-webkit\%NW_VERSION%
 set NW=nw
 set GYP=nw-gyp
 set APP_NAME=Cubelets Studio
 set APP_SLUG=cubelets-studio
 
-goto zip
+REM goto zip
 
 :install_modules
 echo "Installing node modules..."
@@ -17,20 +17,20 @@ call npm install
 echo "Building native node modules for node-webkit..."
 call cd node_modules\cubelets\node_modules\serialport
 call %GYP% clean
-call %GYP% configure --target=%NW_VERSION%
+call %GYP% configure --target=%NW_VERSION% --arch=ia32
 call %GYP% build
 call cd ..\..\..\..
 call cd node_modules\cubelets\node_modules\bluetooth-serial-port
 call %GYP% clean
-call %GYP% configure --target=%NW_VERSION%
+call %GYP% configure --target=%NW_VERSION% --arch=ia32
 call %GYP% build
 call cd ..\..\..\..
 call cd node_modules\cubelets\node_modules\socket.io-client\node_modules\ws
 call %GYP% clean
-call %GYP% configure --target=%NW_VERSION%
+call %GYP% configure --target=%NW_VERSION% --arch=ia32
 call %GYP% build
-call cd ..\..\..\..
-
+call cd ..\..\..\..\..\..
+pause
 :zip
 echo "Zipping up app.nw package..."
 rmdir /s /q build 2> NUL
