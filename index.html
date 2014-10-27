@@ -648,7 +648,9 @@ process.on('uncaughtException', function(e) {
   console.error(e);
 });
 
+
 var cubelets = require('cubelets');
+
 var studio = new (require('./studio'))();
 
 studio.on('load', function() {
@@ -781,6 +783,7 @@ studio.on('firmwareComplete', function(cubelet, version) {
   log.info('Firmware updated on cubelet \'' + cubelet.id + '\' to version \'' + version + '\'.');
 });
 
+
 var log = new (function() {
   var instance = this;
   _(['info', 'debug', 'warn', 'error']).each(function(type) {
@@ -823,11 +826,11 @@ var ui = {
     });
   },
   initializeMenu: function() {
-    var g = require('nw.gui');
+    var g = require('nw.gui');        
     var menu = new g.Menu({ type: 'menubar' });
     var win = g.Window.get();
     win.menu = menu;
-
+    
     var fileMenuItem = new g.MenuItem({ label: 'File' });
     var fileMenu = fileMenuItem.submenu = new g.Menu();
     fileMenu.append(new g.MenuItem({ label: 'New Program', click: function() {
@@ -852,7 +855,15 @@ var ui = {
     fileMenu.append(new g.MenuItem({ label: 'Close All Programs', click: function() {
       ui.closeAll();
     }}));
-    menu.insert(fileMenuItem, 1);
+    
+    if(process.platform == 'darwin')
+    {
+        menu.insert(fileMenuItem, 1);
+    }
+    else
+    {
+        menu.append(fileMenuItem);        
+    }
 
     var debugMenuItem = new g.MenuItem({ label: 'Debug' });
     var debugMenu = debugMenuItem.submenu = new g.Menu();
@@ -876,7 +887,7 @@ var ui = {
       g.Shell.openExternal('https://www.modrobotics.com/blog/?forum=cubelets-programming');
     }}));
     menu.append(helpMenuItem);
-
+    win.menu = menu;
     ui.menu = menu;
   },
   initializeWorkspaceCodeEditor: function() {
@@ -1736,11 +1747,13 @@ var ui = {
   }
 };
 
+
 d3.select('.titlebar-connection-status').on('click', function(e) {
   ui.showConnectionDialog();
 });
 
 ui.initialize();
+
 
 studio.on('error', function(error) {
   console.error('Unhandled Error', error);
