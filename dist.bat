@@ -8,6 +8,6 @@ call %RESHACK% -addoverwrite "%dp0%build\nw.exe","%dp0%build\nw.exe","%dp0%resou
 call rmdir /s /q dist 2> NUL
 call mkdir dist 2> NUL
 call candle.exe -nologo "resources\msi\dist.wxs" -out "dist\tmp.wixobj" -ext WixUIExtension
-call light.exe -nologo "dist\tmp.wixobj" -out "dist\MOSS Flash.msi" -ext WixUIExtension
-call del "dist\MOSS Flash.wixpdb"
+call light.exe -nologo "dist\tmp.wixobj" -out "dist\Cubelets Studio.msi" -ext WixUIExtension
+call del "dist\Cubelets Studio.wixpdb"
 call del "dist\tmp.wixobj"
