@@ -929,10 +929,12 @@ var ui = {
           var program = tab.ref.program;
           var session = tab.ref.session;
           log.info('Building \'' + program.name + '\'... ');
-          studio.saveProgram(program, session);
-          studio.buildProgram(program);
-          ui.disableBuildButton();
-          ui.showBuildProgressIndicator();
+          studio.saveProgram(program, session, function(program)
+          {
+            studio.buildProgram(program);
+            ui.disableBuildButton();
+            ui.showBuildProgressIndicator();
+          });
         }
       });
   },
