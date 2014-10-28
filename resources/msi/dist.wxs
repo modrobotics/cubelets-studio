@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="Cubelets Studio" Language="1033" Version="1.1.0" Manufacturer="Modular Robotics Incorporated" UpgradeCode="bb3b72d9-80aa-4b04-bfed-b7d8fc6580e5">
+
+        <Package Description="Use Cubelets Studio to connect your Bluetooth Cubelet to your PC, and unlock the power to create new advanced behaviors for your robot constructions!" Comments="Cubelets Studio" InstallerVersion="200" Compressed="yes"/>
+
+        <Media Id="1" Cabinet="app.cab" EmbedCab="yes"/>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder" Name="PFiles">
+                <Directory Id="AppRootFolder" Name="Cubelets Studio"/>
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="AppProgramMenuFolder" Name="Cubelets Studio"/>
+            </Directory>
+        </Directory>
+
+        <DirectoryRef Id="AppRootFolder">
+            <Component Id="NW.EXE" Guid="b99d66e1-5a94-4d57-a6dc-e60628ec768b">
+                <File Id="NW.EXE" Source="build\nw.exe" KeyPath="yes" Checksum="yes">
+                    <Shortcut Id="AppShortcut" Name="Cubelets Studio" Directory="AppRootFolder" WorkingDirectory="AppRootFolder" Icon="icon1.ico"/>
+                    <Shortcut Id="AppProgramMenuShortcut" Name="Cubelets Studio" Directory="AppProgramMenuFolder" Description="Start Cubelets Studio..." WorkingDirectory="AppRootFolder" Advertise="yes" Icon="icon1.ico"/>
+                </File>
+            </Component>
+            <Component Id="NW.PAK" Guid="01405b40-fdba-41a9-9c3f-c2f7f18fb83f">
+                <File Id="NW.PAK" Source="build\nw.pak" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="FFMPEGSUMO.DLL" Guid="a73556d6-3dd1-41a5-be9e-68e06ae4f33c">
+                <File Id="FFMPEGSUMO.DLL" Source="build\ffmpegsumo.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="ICUDT.DLL" Guid="b8fbfc64-85a9-4a3d-8278-b7ddab2cc0fe">
+                <File Id="ICUDT.DLL" Source="build\icudt.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="LIBEGL.DLL" Guid="1837eedd-ef9b-4773-8f47-49281a560147">
+                <File Id="LIBEGL.DLL" Source="build\libEGL.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="LIBGLESV2.DLL" Guid="1b2a95c0-c3ea-4d18-abf0-64d17d605481">
+                <File Id="LIBGLESV2.DLL" Source="build\libGLESv2.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="AppProgramMenuFolder">
+            <Component Id="AppProgramMenuComponent" Guid="eec66cee-575e-4344-9f6a-fff28a894edd">
+                <RemoveFolder Id="AppProgramMenuFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <Feature Id="AppMain" Title="Main Feature" Level="1">
+            <ComponentRef Id="NW.EXE"/>
+            <ComponentRef Id="NW.PAK"/>
+            <ComponentRef Id="FFMPEGSUMO.DLL"/>
+            <ComponentRef Id="ICUDT.DLL"/>
+            <ComponentRef Id="LIBEGL.DLL"/>
+            <ComponentRef Id="LIBGLESV2.DLL"/>
+            <ComponentRef Id="AppProgramMenuComponent"/>
+        </Feature>
+
+        <WixVariable Id="WixUIBannerBmp" Value="resources\msi\banner.bmp"/>
+        <WixVariable Id="WixUIDialogBmp" Value="resources\msi\dialog.bmp"/>
+        <Property Id="WIXUI_INSTALLDIR" Value="AppRootFolder"/>
+        <UIRef Id="WixUI_InstallDir"/>
+        <Icon Id="icon1.ico" SourceFile="resources\nw.ico"/>
+
+    </Product>
+</Wix>
