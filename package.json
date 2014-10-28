@@ -8,7 +8,8 @@
     "width": 1200,
     "height": 725,
     "min_width": 800,
-    "min_height": 450
+    "min_height": 450,
+    "icon": "img/icon.png"
   },
   "dependencies": {
     "cubelets": "git+https://github.com/modrobotics/node-cubelets.git#studio",
