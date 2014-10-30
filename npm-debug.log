@@ -1,0 +1,384 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'install' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.33
+4 warn package.json cubelets-studio@ No repository field.
+5 verbose readDependencies using package.json deps
+6 verbose install where, deps [ '/Users/lundby/Desktop/Cubelets Studio/cubelets-studio',
+6 verbose install   [ 'cubelets', 'glob', 'underscore' ] ]
+7 info preinstall cubelets-studio@
+8 verbose readDependencies using package.json deps
+9 verbose cache add [ 'cubelets@git+https://github.com/modrobotics/node-cubelets.git#studio',
+9 verbose cache add   null ]
+10 verbose cache add name=undefined spec="cubelets@git+https://github.com/modrobotics/node-cubelets.git#studio" args=["cubelets@git+https://github.com/modrobotics/node-cubelets.git#studio",null]
+11 verbose parsed url { protocol: null,
+11 verbose parsed url   slashes: null,
+11 verbose parsed url   auth: null,
+11 verbose parsed url   host: null,
+11 verbose parsed url   port: null,
+11 verbose parsed url   hostname: null,
+11 verbose parsed url   hash: '#studio',
+11 verbose parsed url   search: null,
+11 verbose parsed url   query: null,
+11 verbose parsed url   pathname: 'cubelets@git+https://github.com/modrobotics/node-cubelets.git',
+11 verbose parsed url   path: 'cubelets@git+https://github.com/modrobotics/node-cubelets.git',
+11 verbose parsed url   href: 'cubelets@git+https://github.com/modrobotics/node-cubelets.git#studio' }
+12 verbose cache add [ 'glob@3.2.6', null ]
+13 verbose cache add name=undefined spec="glob@3.2.6" args=["glob@3.2.6",null]
+14 verbose parsed url { protocol: null,
+14 verbose parsed url   slashes: null,
+14 verbose parsed url   auth: null,
+14 verbose parsed url   host: null,
+14 verbose parsed url   port: null,
+14 verbose parsed url   hostname: null,
+14 verbose parsed url   hash: null,
+14 verbose parsed url   search: null,
+14 verbose parsed url   query: null,
+14 verbose parsed url   pathname: 'glob@3.2.6',
+14 verbose parsed url   path: 'glob@3.2.6',
+14 verbose parsed url   href: 'glob@3.2.6' }
+15 verbose cache add [ 'underscore@1.5.0', null ]
+16 verbose cache add name=undefined spec="underscore@1.5.0" args=["underscore@1.5.0",null]
+17 verbose parsed url { protocol: null,
+17 verbose parsed url   slashes: null,
+17 verbose parsed url   auth: null,
+17 verbose parsed url   host: null,
+17 verbose parsed url   port: null,
+17 verbose parsed url   hostname: null,
+17 verbose parsed url   hash: null,
+17 verbose parsed url   search: null,
+17 verbose parsed url   query: null,
+17 verbose parsed url   pathname: 'underscore@1.5.0',
+17 verbose parsed url   path: 'underscore@1.5.0',
+17 verbose parsed url   href: 'underscore@1.5.0' }
+18 verbose cache add name="cubelets" spec="git+https://github.com/modrobotics/node-cubelets.git#studio" args=["cubelets","git+https://github.com/modrobotics/node-cubelets.git#studio"]
+19 verbose parsed url { protocol: 'git+https:',
+19 verbose parsed url   slashes: true,
+19 verbose parsed url   auth: null,
+19 verbose parsed url   host: 'github.com',
+19 verbose parsed url   port: null,
+19 verbose parsed url   hostname: 'github.com',
+19 verbose parsed url   hash: '#studio',
+19 verbose parsed url   search: null,
+19 verbose parsed url   query: null,
+19 verbose parsed url   pathname: '/modrobotics/node-cubelets.git',
+19 verbose parsed url   path: '/modrobotics/node-cubelets.git',
+19 verbose parsed url   href: 'git+https://github.com/modrobotics/node-cubelets.git#studio' }
+20 verbose cache add name="glob" spec="3.2.6" args=["glob","3.2.6"]
+21 verbose parsed url { protocol: null,
+21 verbose parsed url   slashes: null,
+21 verbose parsed url   auth: null,
+21 verbose parsed url   host: null,
+21 verbose parsed url   port: null,
+21 verbose parsed url   hostname: null,
+21 verbose parsed url   hash: null,
+21 verbose parsed url   search: null,
+21 verbose parsed url   query: null,
+21 verbose parsed url   pathname: '3.2.6',
+21 verbose parsed url   path: '3.2.6',
+21 verbose parsed url   href: '3.2.6' }
+22 verbose addNamed [ 'glob', '3.2.6' ]
+23 verbose addNamed [ '3.2.6', '3.2.6' ]
+24 verbose cache add name="underscore" spec="1.5.0" args=["underscore","1.5.0"]
+25 verbose parsed url { protocol: null,
+25 verbose parsed url   slashes: null,
+25 verbose parsed url   auth: null,
+25 verbose parsed url   host: null,
+25 verbose parsed url   port: null,
+25 verbose parsed url   hostname: null,
+25 verbose parsed url   hash: null,
+25 verbose parsed url   search: null,
+25 verbose parsed url   query: null,
+25 verbose parsed url   pathname: '1.5.0',
+25 verbose parsed url   path: '1.5.0',
+25 verbose parsed url   href: '1.5.0' }
+26 verbose addNamed [ 'underscore', '1.5.0' ]
+27 verbose addNamed [ '1.5.0', '1.5.0' ]
+28 silly lockFile b7b2077a-om-modrobotics-node-cubelets-git https://github.com/modrobotics/node-cubelets.git
+29 verbose lock https://github.com/modrobotics/node-cubelets.git /Users/lundby/.npm/b7b2077a-om-modrobotics-node-cubelets-git.lock
+30 silly lockFile 7c662a47-glob-3-2-6 glob@3.2.6
+31 verbose lock glob@3.2.6 /Users/lundby/.npm/7c662a47-glob-3-2-6.lock
+32 silly lockFile d00c5b0c-underscore-1-5-0 underscore@1.5.0
+33 verbose lock underscore@1.5.0 /Users/lundby/.npm/d00c5b0c-underscore-1-5-0.lock
+34 verbose addRemoteGit [ 'https://github.com/modrobotics/node-cubelets.git', 'studio' ]
+35 verbose request where is /underscore
+36 verbose request registry https://registry.npmjs.org/
+37 verbose request id 85ae876ba2598fa9
+38 verbose url raw /underscore
+39 verbose url resolving [ 'https://registry.npmjs.org/', './underscore' ]
+40 verbose url resolved https://registry.npmjs.org/underscore
+41 verbose request where is https://registry.npmjs.org/underscore
+42 info trying registry request attempt 1 at 10:25:31
+43 http GET https://registry.npmjs.org/underscore
+44 verbose request where is /glob
+45 verbose request registry https://registry.npmjs.org/
+46 verbose url raw /glob
+47 verbose url resolving [ 'https://registry.npmjs.org/', './glob' ]
+48 verbose url resolved https://registry.npmjs.org/glob
+49 verbose request where is https://registry.npmjs.org/glob
+50 info trying registry request attempt 1 at 10:25:31
+51 verbose etag "YVVOYS7EUF19W7GET05G81FZ"
+52 http GET https://registry.npmjs.org/glob
+53 http 200 https://registry.npmjs.org/underscore
+54 silly registry.get cb [ 200,
+54 silly registry.get   { date: 'Thu, 30 Oct 2014 16:24:35 GMT',
+54 silly registry.get     server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+54 silly registry.get     etag: '"3U3L3XQXK6N2047DFWI14HFWJ"',
+54 silly registry.get     'content-type': 'application/json',
+54 silly registry.get     'cache-control': 'max-age=60',
+54 silly registry.get     'content-length': '33059',
+54 silly registry.get     'accept-ranges': 'bytes',
+54 silly registry.get     via: '1.1 varnish',
+54 silly registry.get     age: '22',
+54 silly registry.get     'x-served-by': 'cache-atl6233-ATL',
+54 silly registry.get     'x-cache': 'HIT',
+54 silly registry.get     'x-cache-hits': '2',
+54 silly registry.get     'x-timer': 'S1414686275.333213,VS0,VE0',
+54 silly registry.get     vary: 'Accept',
+54 silly registry.get     'keep-alive': 'timeout=10, max=50',
+54 silly registry.get     connection: 'Keep-Alive' } ]
+55 silly lockFile 72adf75d--underscore-underscore-1-5-0-tgz https://registry.npmjs.org/underscore/-/underscore-1.5.0.tgz
+56 verbose lock https://registry.npmjs.org/underscore/-/underscore-1.5.0.tgz /Users/lundby/.npm/72adf75d--underscore-underscore-1-5-0-tgz.lock
+57 verbose addRemoteTarball [ 'https://registry.npmjs.org/underscore/-/underscore-1.5.0.tgz',
+57 verbose addRemoteTarball   '90c57994d1de16aab8938142e3c5b43547019362' ]
+58 info retry fetch attempt 1 at 10:25:32
+59 verbose fetch to= /var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/registry.npmjs.org/underscore/-/underscore-1.5.0.tgz
+60 http GET https://registry.npmjs.org/underscore/-/underscore-1.5.0.tgz
+61 http 304 https://registry.npmjs.org/glob
+62 silly registry.get cb [ 304,
+62 silly registry.get   { date: 'Thu, 30 Oct 2014 16:24:35 GMT',
+62 silly registry.get     server: 'Apache',
+62 silly registry.get     via: '1.1 varnish',
+62 silly registry.get     'last-modified': 'Thu, 30 Oct 2014 16:24:35 GMT',
+62 silly registry.get     'cache-control': 'max-age=60',
+62 silly registry.get     etag: '"YVVOYS7EUF19W7GET05G81FZ"',
+62 silly registry.get     age: '0',
+62 silly registry.get     'x-served-by': 'cache-atl6223-ATL',
+62 silly registry.get     'x-cache': 'HIT',
+62 silly registry.get     'x-cache-hits': '1',
+62 silly registry.get     'x-timer': 'S1414686275.347548,VS0,VE314',
+62 silly registry.get     vary: 'Accept',
+62 silly registry.get     'content-length': '0',
+62 silly registry.get     'keep-alive': 'timeout=10, max=50',
+62 silly registry.get     connection: 'Keep-Alive' } ]
+63 verbose etag https://registry.npmjs.org/glob from cache
+64 silly lockFile 9538bfae-ry-npmjs-org-glob-glob-3-2-6-tgz https://registry.npmjs.org/glob/-/glob-3.2.6.tgz
+65 verbose lock https://registry.npmjs.org/glob/-/glob-3.2.6.tgz /Users/lundby/.npm/9538bfae-ry-npmjs-org-glob-glob-3-2-6-tgz.lock
+66 verbose addRemoteTarball [ 'https://registry.npmjs.org/glob/-/glob-3.2.6.tgz',
+66 verbose addRemoteTarball   '28c805b47bc6c19ba3059cbdf079b98ff62442f2' ]
+67 info retry fetch attempt 1 at 10:25:33
+68 verbose fetch to= /var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/registry.npmjs.org/glob/-/glob-3.2.6.tgz
+69 http GET https://registry.npmjs.org/glob/-/glob-3.2.6.tgz
+70 http 200 https://registry.npmjs.org/glob/-/glob-3.2.6.tgz
+71 http 200 https://registry.npmjs.org/underscore/-/underscore-1.5.0.tgz
+72 silly lockFile 9538bfae-ry-npmjs-org-glob-glob-3-2-6-tgz https://registry.npmjs.org/glob/-/glob-3.2.6.tgz
+73 silly lockFile 9538bfae-ry-npmjs-org-glob-glob-3-2-6-tgz https://registry.npmjs.org/glob/-/glob-3.2.6.tgz
+74 silly lockFile 7c662a47-glob-3-2-6 glob@3.2.6
+75 silly lockFile 7c662a47-glob-3-2-6 glob@3.2.6
+76 silly lockFile 72adf75d--underscore-underscore-1-5-0-tgz https://registry.npmjs.org/underscore/-/underscore-1.5.0.tgz
+77 silly lockFile 72adf75d--underscore-underscore-1-5-0-tgz https://registry.npmjs.org/underscore/-/underscore-1.5.0.tgz
+78 silly lockFile d00c5b0c-underscore-1-5-0 underscore@1.5.0
+79 silly lockFile d00c5b0c-underscore-1-5-0 underscore@1.5.0
+80 verbose git clone https://github.com/modrobotics/node-cubelets.git Cloning into bare repository '/Users/lundby/.npm/_git-remotes/https-github-com-modrobotics-node-cubelets-git-b7b2077a'...
+81 verbose git fetch -a origin (https://github.com/modrobotics/node-cubelets.git)
+82 verbose git rev-list -n1 studio feea15bdb50c2a01568681cb21dc6c6c9d161b2d
+83 verbose resolved git url git+https://github.com/modrobotics/node-cubelets.git#feea15bdb50c2a01568681cb21dc6c6c9d161b2d
+84 verbose tar unpack /var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz
+85 silly lockFile 9f73ccde--5987269072793424-tmp-tgz-unpack tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz-unpack
+86 verbose lock tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz-unpack /Users/lundby/.npm/9f73ccde--5987269072793424-tmp-tgz-unpack.lock
+87 silly lockFile 6350ee25-36686-0-5987269072793424-tmp-tgz tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz
+88 verbose lock tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz /Users/lundby/.npm/6350ee25-36686-0-5987269072793424-tmp-tgz.lock
+89 silly gunzTarPerm modes [ '755', '644' ]
+90 silly gunzTarPerm extractEntry
+91 silly gunzTarPerm modified mode [ '', 509, 493 ]
+92 silly gunzTarPerm extractEntry .gitignore
+93 silly gunzTarPerm modified mode [ '.gitignore', 436, 420 ]
+94 silly gunzTarPerm extractEntry README.md
+95 silly gunzTarPerm modified mode [ 'README.md', 436, 420 ]
+96 silly gunzTarPerm extractEntry command.js
+97 silly gunzTarPerm modified mode [ 'command.js', 436, 420 ]
+98 silly gunzTarPerm extractEntry command/
+99 silly gunzTarPerm modified mode [ 'command/', 509, 493 ]
+100 silly gunzTarPerm extractEntry command/blinkLED.js
+101 silly gunzTarPerm modified mode [ 'command/blinkLED.js', 436, 420 ]
+102 silly gunzTarPerm extractEntry command/discoverMapNeighbors.js
+103 silly gunzTarPerm modified mode [ 'command/discoverMapNeighbors.js', 436, 420 ]
+104 silly gunzTarPerm extractEntry command/keepAlive.js
+105 silly gunzTarPerm modified mode [ 'command/keepAlive.js', 436, 420 ]
+106 silly gunzTarPerm extractEntry command/registerBlockValueEvent.js
+107 silly gunzTarPerm modified mode [ 'command/registerBlockValueEvent.js', 436, 420 ]
+108 silly gunzTarPerm extractEntry command/setBlockValue.js
+109 silly gunzTarPerm modified mode [ 'command/setBlockValue.js', 436, 420 ]
+110 silly gunzTarPerm extractEntry command/setDefaultBlockValue.js
+111 silly gunzTarPerm modified mode [ 'command/setDefaultBlockValue.js', 436, 420 ]
+112 silly gunzTarPerm extractEntry command/unregisterAllBlockValueEvents.js
+113 silly gunzTarPerm modified mode [ 'command/unregisterAllBlockValueEvents.js', 436, 420 ]
+114 silly gunzTarPerm extractEntry command/unregisterBlockValueEvent.js
+115 silly gunzTarPerm modified mode [ 'command/unregisterBlockValueEvent.js', 436, 420 ]
+116 silly gunzTarPerm extractEntry config.json
+117 silly gunzTarPerm modified mode [ 'config.json', 436, 420 ]
+118 silly gunzTarPerm extractEntry connection/
+119 silly gunzTarPerm modified mode [ 'connection/', 509, 493 ]
+120 silly gunzTarPerm extractEntry connection/bluetooth.js
+121 silly gunzTarPerm modified mode [ 'connection/bluetooth.js', 436, 420 ]
+122 silly gunzTarPerm extractEntry connection/mock.js
+123 silly gunzTarPerm modified mode [ 'connection/mock.js', 436, 420 ]
+124 silly gunzTarPerm extractEntry connection/serial.js
+125 silly gunzTarPerm modified mode [ 'connection/serial.js', 436, 420 ]
+126 silly gunzTarPerm extractEntry console.js
+127 silly gunzTarPerm modified mode [ 'console.js', 436, 420 ]
+128 silly gunzTarPerm extractEntry construction.js
+129 silly gunzTarPerm modified mode [ 'construction.js', 436, 420 ]
+130 silly gunzTarPerm extractEntry cubelet.js
+131 silly gunzTarPerm modified mode [ 'cubelet.js', 436, 420 ]
+132 silly gunzTarPerm extractEntry data/
+133 silly gunzTarPerm modified mode [ 'data/', 509, 493 ]
+134 silly gunzTarPerm extractEntry data/couple/
+135 silly gunzTarPerm modified mode [ 'data/couple/', 509, 493 ]
+136 silly gunzTarPerm extractEntry data/couple/1.json
+137 silly gunzTarPerm modified mode [ 'data/couple/1.json', 436, 420 ]
+138 silly gunzTarPerm extractEntry data/couple/2.json
+139 silly gunzTarPerm modified mode [ 'data/couple/2.json', 436, 420 ]
+140 silly gunzTarPerm extractEntry data/couple/3.json
+141 silly gunzTarPerm modified mode [ 'data/couple/3.json', 436, 420 ]
+142 silly gunzTarPerm extractEntry data/couple/4.json
+143 silly gunzTarPerm modified mode [ 'data/couple/4.json', 436, 420 ]
+144 silly gunzTarPerm extractEntry data/couple/5.json
+145 silly gunzTarPerm modified mode [ 'data/couple/5.json', 436, 420 ]
+146 silly gunzTarPerm extractEntry data/grid/
+147 silly gunzTarPerm modified mode [ 'data/grid/', 509, 493 ]
+148 silly gunzTarPerm extractEntry data/grid/1.json
+149 silly gunzTarPerm modified mode [ 'data/grid/1.json', 436, 420 ]
+150 silly gunzTarPerm extractEntry data/index.json
+151 silly gunzTarPerm modified mode [ 'data/index.json', 436, 420 ]
+152 silly gunzTarPerm extractEntry data/line/
+153 silly gunzTarPerm modified mode [ 'data/line/', 509, 493 ]
+154 silly gunzTarPerm extractEntry data/line/1.json
+155 silly gunzTarPerm modified mode [ 'data/line/1.json', 436, 420 ]
+156 silly gunzTarPerm extractEntry data/output.json
+157 silly gunzTarPerm modified mode [ 'data/output.json', 436, 420 ]
+158 silly gunzTarPerm extractEntry data/ship/
+159 silly gunzTarPerm modified mode [ 'data/ship/', 509, 493 ]
+160 silly gunzTarPerm extractEntry data/ship/1.json
+161 silly gunzTarPerm modified mode [ 'data/ship/1.json', 436, 420 ]
+162 silly gunzTarPerm extractEntry data/ship/2.json
+163 silly gunzTarPerm modified mode [ 'data/ship/2.json', 436, 420 ]
+164 silly gunzTarPerm extractEntry decoder.js
+165 silly gunzTarPerm modified mode [ 'decoder.js', 436, 420 ]
+166 silly gunzTarPerm extractEntry encoder.js
+167 silly gunzTarPerm modified mode [ 'encoder.js', 436, 420 ]
+168 silly gunzTarPerm extractEntry examples/
+169 silly gunzTarPerm modified mode [ 'examples/', 509, 493 ]
+170 silly gunzTarPerm extractEntry examples/blink.js
+171 silly gunzTarPerm modified mode [ 'examples/blink.js', 436, 420 ]
+172 silly gunzTarPerm extractEntry examples/connect.js
+173 silly gunzTarPerm modified mode [ 'examples/connect.js', 436, 420 ]
+174 silly gunzTarPerm extractEntry examples/discover.js
+175 silly gunzTarPerm modified mode [ 'examples/discover.js', 436, 420 ]
+176 silly gunzTarPerm extractEntry flash.js
+177 silly gunzTarPerm modified mode [ 'flash.js', 436, 420 ]
+178 silly gunzTarPerm extractEntry flash.sh
+179 silly gunzTarPerm modified mode [ 'flash.sh', 509, 493 ]
+180 silly gunzTarPerm extractEntry index.js
+181 silly gunzTarPerm modified mode [ 'index.js', 436, 420 ]
+182 silly gunzTarPerm extractEntry loader.js
+183 silly gunzTarPerm modified mode [ 'loader.js', 436, 420 ]
+184 silly gunzTarPerm extractEntry message.js
+185 silly gunzTarPerm modified mode [ 'message.js', 436, 420 ]
+186 silly gunzTarPerm extractEntry package.json
+187 silly gunzTarPerm modified mode [ 'package.json', 436, 420 ]
+188 silly gunzTarPerm extractEntry parser.js
+189 silly gunzTarPerm modified mode [ 'parser.js', 436, 420 ]
+190 silly gunzTarPerm extractEntry program.js
+191 silly gunzTarPerm modified mode [ 'program.js', 436, 420 ]
+192 silly gunzTarPerm extractEntry response.js
+193 silly gunzTarPerm modified mode [ 'response.js', 436, 420 ]
+194 silly gunzTarPerm extractEntry response/
+195 silly gunzTarPerm modified mode [ 'response/', 509, 493 ]
+196 silly gunzTarPerm extractEntry response/blockValueEvent.js
+197 silly gunzTarPerm modified mode [ 'response/blockValueEvent.js', 436, 420 ]
+198 silly gunzTarPerm extractEntry response/debug.js
+199 silly gunzTarPerm modified mode [ 'response/debug.js', 436, 420 ]
+200 silly gunzTarPerm extractEntry response/discoverMapNeighbors.js
+201 silly gunzTarPerm modified mode [ 'response/discoverMapNeighbors.js', 436, 420 ]
+202 silly gunzTarPerm extractEntry response/flashProgress.js
+203 silly gunzTarPerm modified mode [ 'response/flashProgress.js', 436, 420 ]
+204 silly gunzTarPerm extractEntry scanner/
+205 silly gunzTarPerm modified mode [ 'scanner/', 509, 493 ]
+206 silly gunzTarPerm extractEntry scanner/bluetooth.js
+207 silly gunzTarPerm modified mode [ 'scanner/bluetooth.js', 436, 420 ]
+208 silly gunzTarPerm extractEntry scanner/mock.js
+209 silly gunzTarPerm modified mode [ 'scanner/mock.js', 436, 420 ]
+210 silly gunzTarPerm extractEntry scanner/serial.js
+211 silly gunzTarPerm modified mode [ 'scanner/serial.js', 436, 420 ]
+212 silly gunzTarPerm extractEntry service/
+213 silly gunzTarPerm modified mode [ 'service/', 509, 493 ]
+214 silly gunzTarPerm extractEntry service/build.js
+215 silly gunzTarPerm modified mode [ 'service/build.js', 436, 420 ]
+216 silly gunzTarPerm extractEntry service/compile.js
+217 silly gunzTarPerm modified mode [ 'service/compile.js', 436, 420 ]
+218 silly gunzTarPerm extractEntry service/firmware.js
+219 silly gunzTarPerm modified mode [ 'service/firmware.js', 436, 420 ]
+220 silly gunzTarPerm extractEntry service/info.js
+221 silly gunzTarPerm modified mode [ 'service/info.js', 436, 420 ]
+222 silly gunzTarPerm extractEntry test/
+223 silly gunzTarPerm modified mode [ 'test/', 509, 493 ]
+224 silly gunzTarPerm extractEntry test/bluetooth.js
+225 silly gunzTarPerm modified mode [ 'test/bluetooth.js', 436, 420 ]
+226 silly gunzTarPerm extractEntry test/charm.js
+227 silly gunzTarPerm modified mode [ 'test/charm.js', 436, 420 ]
+228 silly gunzTarPerm extractEntry test/coder.js
+229 silly gunzTarPerm modified mode [ 'test/coder.js', 436, 420 ]
+230 silly gunzTarPerm extractEntry test/data/
+231 silly gunzTarPerm modified mode [ 'test/data/', 509, 493 ]
+232 silly gunzTarPerm extractEntry test/data/bluetooth.bin
+233 silly gunzTarPerm modified mode [ 'test/data/bluetooth.bin', 436, 420 ]
+234 silly gunzTarPerm extractEntry test/data/bluetooth.hex
+235 silly gunzTarPerm modified mode [ 'test/data/bluetooth.hex', 436, 420 ]
+236 silly gunzTarPerm extractEntry test/echo.js
+237 silly gunzTarPerm modified mode [ 'test/echo.js', 436, 420 ]
+238 silly gunzTarPerm extractEntry test/interval.js
+239 silly gunzTarPerm modified mode [ 'test/interval.js', 436, 420 ]
+240 silly gunzTarPerm extractEntry test/keyboard.js
+241 silly gunzTarPerm modified mode [ 'test/keyboard.js', 436, 420 ]
+242 silly gunzTarPerm extractEntry test/meter.js
+243 silly gunzTarPerm modified mode [ 'test/meter.js', 436, 420 ]
+244 silly gunzTarPerm extractEntry test/parser.js
+245 silly gunzTarPerm modified mode [ 'test/parser.js', 436, 420 ]
+246 silly gunzTarPerm extractEntry test/sandbox.js
+247 silly gunzTarPerm modified mode [ 'test/sandbox.js', 436, 420 ]
+248 silly gunzTarPerm extractEntry test/timer.js
+249 silly gunzTarPerm modified mode [ 'test/timer.js', 436, 420 ]
+250 silly gunzTarPerm extractEntry web/
+251 silly gunzTarPerm modified mode [ 'web/', 509, 493 ]
+252 silly gunzTarPerm extractEntry web/index.html
+253 silly gunzTarPerm modified mode [ 'web/index.html', 436, 420 ]
+254 silly gunzTarPerm extractEntry web/js/
+255 silly gunzTarPerm modified mode [ 'web/js/', 509, 493 ]
+256 silly gunzTarPerm extractEntry web/js/d3.v3.min.js
+257 silly gunzTarPerm modified mode [ 'web/js/d3.v3.min.js', 436, 420 ]
+258 silly gunzTarPerm extractEntry web/js/underscore-min.js
+259 silly gunzTarPerm modified mode [ 'web/js/underscore-min.js', 436, 420 ]
+260 silly lockFile 9f73ccde--5987269072793424-tmp-tgz-unpack tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz-unpack
+261 silly lockFile 9f73ccde--5987269072793424-tmp-tgz-unpack tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz-unpack
+262 silly lockFile 6350ee25-36686-0-5987269072793424-tmp-tgz tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz
+263 silly lockFile 6350ee25-36686-0-5987269072793424-tmp-tgz tar:///var/folders/ly/xq35nz0d6951n41bz4jj1yqm0000gp/T/npm-59125-jx99u9XW/1414686336686-0.5987269072793424/tmp.tgz
+264 silly lockFile b7b2077a-om-modrobotics-node-cubelets-git https://github.com/modrobotics/node-cubelets.git
+265 silly lockFile b7b2077a-om-modrobotics-node-cubelets-git https://github.com/modrobotics/node-cubelets.git
+266 error Error: EACCES, mkdir '/Users/lundby/.npm/glob/3.2.6'
+266 error  { [Error: EACCES, mkdir '/Users/lundby/.npm/glob/3.2.6']
+266 error   errno: 3,
+266 error   code: 'EACCES',
+266 error   path: '/Users/lundby/.npm/glob/3.2.6',
+266 error   parent: 'cubelets-studio' }
+267 error Please try running this command again as root/Administrator.
+268 error System Darwin 12.5.0
+269 error command "node" "/usr/local/bin/npm" "install"
+270 error cwd /Users/lundby/Desktop/Cubelets Studio/cubelets-studio
+271 error node -v v0.10.33
+272 error npm -v 1.4.28
+273 error path /Users/lundby/.npm/glob/3.2.6
+274 error code EACCES
+275 error errno 3
+276 error stack Error: EACCES, mkdir '/Users/lundby/.npm/glob/3.2.6'
+277 verbose exit [ 3, true ]
