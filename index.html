@@ -887,7 +887,12 @@ var ui = {
       g.Shell.openExternal('https://www.modrobotics.com/blog/?forum=cubelets-programming');
     }}));
     menu.append(helpMenuItem);
-    win.menu = menu;
+    
+    if(process.platform === 'win32')
+    {
+        win.menu = menu;
+    }
+    
     ui.menu = menu;
   },
   initializeWorkspaceCodeEditor: function() {
