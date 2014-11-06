@@ -766,6 +766,8 @@ studio.on('flashComplete', function() {
 studio.on('flashError', function(error) {
   ui.hideFlashProgressBar();
   ui.enableFlashButton();
+  studio.resetAllCubelets();
+  studio.resetBluetoothCubelet();
   log.error(error);
 });
 

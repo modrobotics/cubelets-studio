@@ -18,6 +18,8 @@ var Studio = function() {
 	var compileService = new cubelets.CompileService();
 	var infoService = new cubelets.InfoService();
 	var firmwareService = new cubelets.FirmwareService();
+	var resetBluetoothCommand = new cubelets.ResetBluetoothCommand();
+	var resetAllCubeletsCommand = new cubelets.ResetAllCubeletsCommand();
 
 	this.load = function() {
 		studio.emit('load');
@@ -343,6 +345,15 @@ var Studio = function() {
 		}
 		this.upgradeCubelet(cubelet.latestFirmwareVersion);
 	};
+	
+	this.resetBluetoothCubelet = function()
+	{
+	    connection.postCommand(resetBluetoothCommand);
+	};
+	this.resetAllCubelets = function()
+    {
+        connection.postCommand(resetAllCubeletsCommand);
+    };
 
 	firmwareService.on('error', function(error) {
 		studio.emit('firmwareError', error);
