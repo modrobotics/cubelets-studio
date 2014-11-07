@@ -4,7 +4,7 @@
 
         <Package Description="Use Cubelets Studio to connect your Bluetooth Cubelet to your PC, and unlock the power to create new advanced behaviors for your robot constructions!" Comments="Cubelets Studio" InstallerVersion="200" Compressed="yes"/>
 
-        <Media Id="1" Cabinet="app.cab" EmbedCab="yes"/>
+        <Media Id="1" Cabinet="app.cab" EmbedCab="yes" CompressionLevel="high"/>
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder" Name="PFiles">
