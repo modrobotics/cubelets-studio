@@ -36,7 +36,7 @@ echo "Zipping up app.nw package..."
 rmdir /s /q build 2> NUL
 call mkdir build 2> NUL
 call node .\tools\set-app-name "%APP_NAME%"
-call 7z a -tzip -r -x@exclude.list build\app.nw *
+call 7z a -tzip -mx0 -r -x@exclude.list build\app.nw *
 call node .\tools\set-app-name "%APP_SLUG%"
 
 :package
