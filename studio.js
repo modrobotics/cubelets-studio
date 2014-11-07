@@ -20,6 +20,10 @@ var Studio = function() {
 	var firmwareService = new cubelets.FirmwareService();
 	var resetBluetoothCommand = new cubelets.ResetBluetoothCommand();
 	var resetAllCubeletsCommand = new cubelets.ResetAllCubeletsCommand();
+	
+	var ua = require('universal-analytics');
+	var visitor = ua('UA-1956519-6');
+	visitor.pageview("/").send();
 
 	this.load = function() {
 		studio.emit('load');
