@@ -648,7 +648,6 @@ process.on('uncaughtException', function(e) {
   console.error(e);
 });
 
-
 var cubelets = require('cubelets');
 
 var studio = new (require('./studio'))();
@@ -1765,6 +1764,15 @@ var ui = {
   }
 };
 
+$(document).keydown(function(e) {
+    if ((e.which == '115' || e.which == '83' ) && (e.ctrlKey || e.metaKey))
+    {
+        e.preventDefault();
+        ui.save();
+        return false;
+    }
+    return true;
+});
 
 d3.select('.titlebar-connection-status').on('click', function(e) {
   ui.showConnectionDialog();
