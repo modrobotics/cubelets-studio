@@ -93,6 +93,18 @@ var Studio = function() {
 			dirty: (file === null)
 		});
 	};
+	
+	this.openDefaultProgram = function(type)
+	{
+	    var programPath = "default_programs/"+type.name+".c";
+	    if (fs.existsSync(programPath)) {
+	       var code = fs.readFileSync(programPath, 'utf8');
+            if (code) {
+                var programName = path.basename(programPath);
+                studio.createNewProgram(programName, code, null);
+            }
+	    }
+	};
 
 	this.openProgram = function(program) {
 		if (!__(programs).contains(program)) {

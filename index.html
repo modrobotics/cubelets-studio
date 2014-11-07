@@ -1623,6 +1623,12 @@ var ui = {
       ui.disableFlashButton();
       studio.restoreCubelet();
     });
+    
+    if(node.type.name != "bluetooth"){
+      addActionButton('View Default Code', function(button) {
+        studio.openDefaultProgram(node.type);
+      });
+    }    
   },
 
   // Connection status
