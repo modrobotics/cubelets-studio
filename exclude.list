@@ -26,3 +26,4 @@ js/ace/kitchen-sink-req.html
 js/ace/LICENSE
 js/ace/README.md
 js/ace/scrollable-page.html
+node_modules/cubelets/build/*
