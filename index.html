@@ -727,7 +727,7 @@ studio.on('deviceDisconnected', function() {
   log.info('Cubelet disconnected.');
 });
 
-studio.on('buildComplete', function() {
+studio.on('buildComplete', function() {    
   ui.hideBuildProgressIndicator();
   ui.enableBuildButton();
   var cubelet = studio.getCubelet();
@@ -739,10 +739,26 @@ studio.on('buildComplete', function() {
 
 studio.on('buildWarning', function(result) {
   log.warn(ui.formatBuildResult(result));
+  annotations = ui.editor.getSession().getAnnotations();
+  annotations.push({ 
+                    row: result.lineNumber-1, 
+                    column: 0, 
+                    text: result.message, 
+                    type: "warning" // also warning and information 
+                });
+  ui.editor.getSession().setAnnotations(annotations);
 });
 
 studio.on('buildError', function(result) {
   log.error(ui.formatBuildResult(result));
+  annotations = ui.editor.getSession().getAnnotations();
+  annotations.push({ 
+                    row: result.lineNumber-1, 
+                    column: 0, 
+                    text: result.message, 
+                    type: "error" // also warning and information 
+                });
+  ui.editor.getSession().setAnnotations(annotations);
 });
 
 studio.on('buildFailed', function(error) {
