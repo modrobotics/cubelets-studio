@@ -291,11 +291,11 @@ var Studio = function() {
 		studio.emit('buildFailed', error);
 	});
 
-	compileService.on('error', function(result) {
+	compileService.on('compileError', function(result) {
 		studio.emit('buildError', result);
 	});
 
-	compileService.on('warning', function(result) {
+	compileService.on('compileWarning', function(result) {
 		studio.emit('buildWarning', result);
 	});
 
