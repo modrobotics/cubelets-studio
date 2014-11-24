@@ -12,3 +12,17 @@ resources/*
 *Thumbs.db*
 *nw-gyp*
 dist/*
+dist.bat
+js/ace/demo/*
+js/ace/kitchen-sink/*
+js/ace/src/*
+js/ace/src-min/*
+js/ace/src-min-noconflict/*
+js/ace/textarea/*
+js/ace/ChangeLog.txt
+js/ace/editor.html
+js/ace/kitchen-sink.html
+js/ace/kitchen-sink-req.html
+js/ace/LICENSE
+js/ace/README.md
+js/ace/scrollable-page.html
