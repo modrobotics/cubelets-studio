@@ -1739,6 +1739,7 @@ var ui = {
       var program = tab.ref.program;
       var session = tab.ref.session;
       ui.editor.getSession().setAnnotations([]);
+      studio.saveProgram(program, session);
     }
   },
   saveAs: function(tab) {
