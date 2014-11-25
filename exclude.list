@@ -27,3 +27,5 @@ js/ace/LICENSE
 js/ace/README.md
 js/ace/scrollable-page.html
 node_modules/cubelets/build/*
+node_modules/cubelets/node_modules/socket.io-client/node_modules/active-x-obfuscator/node_modules/zeparser/benchmark.html
+node_modules/cubelets/node_modules/socket.io-client/node_modules/ws/build/*
