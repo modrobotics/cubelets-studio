@@ -923,7 +923,9 @@ var ui = {
     editor.getSession().setMode('ace/mode/c_cpp');
     editor.setShowPrintMargin(false);
     editor.setFontSize(14);
-    editor.getSession().setUndoManager(new UndoManager());
+    var undo_manager = editor.getSession().getUndoManager();
+    undo_manager.reset();
+    editor.getSession().setUndoManager(undo_manager);
     ui.editor = editor;
   },
   initializeWorkspaceConstructionGraph: function() {
