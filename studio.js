@@ -18,7 +18,7 @@ var Studio = function() {
 	var compileService = new cubelets.CompileService();
 	var infoService = new cubelets.InfoService();
 	var firmwareService = new cubelets.FirmwareService();
-	var resetBluetoothCommand = new cubelets.ResetBluetoothCommand();
+	var resetBluetoothCubeletCommand = new cubelets.ResetBluetoothCubeletCommand();
 	var resetAllCubeletsCommand = new cubelets.ResetAllCubeletsCommand();
 	
 	var ua = require('universal-analytics');
@@ -362,14 +362,13 @@ var Studio = function() {
 		this.upgradeCubelet(cubelet.latestFirmwareVersion);
 	};
 	
-	this.resetBluetoothCubelet = function()
-	{
-	    connection.postCommand(resetBluetoothCommand);
+	this.resetBluetoothCubelet = function() {
+	    connection.postCommand(resetBluetoothCubeletCommand);
 	};
-	this.resetAllCubelets = function()
-    {
-        connection.postCommand(resetAllCubeletsCommand);
-    };
+
+	this.resetAllCubelets = function() {
+	  connection.postCommand(resetAllCubeletsCommand);
+	};
 
 	firmwareService.on('error', function(error) {
 		studio.emit('firmwareError', error);
