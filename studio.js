@@ -362,7 +362,7 @@ var Studio = function() {
 	};
 	
 	this.resetBluetoothCubelet = function() {
-	    connection.postCommand(resetBluetoothCubeletCommand);
+		connection.postCommand(resetBluetoothCubeletCommand);
 	};
 
 	firmwareService.on('error', function(error) {
