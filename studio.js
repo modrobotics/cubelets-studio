@@ -176,7 +176,7 @@ var Studio = function() {
 		connection = c;
 		if (connection) {
 			construction = new cubelets.Construction(connection);
-			connection.on('close', onConnectionClose);
+			connection.once('close', onConnectionClose);
 			connection.on('error', onConnectionError);
 			construction.on('change', onConstructionChange);
 			construction.on('error', onConstructionError);

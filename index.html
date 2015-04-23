@@ -1147,16 +1147,7 @@ var ui = {
       contents.selectAll('*').remove();
       var list = contents.append('ul').classed('dialog-connection-devices', true);
       var emptyItem = list.append('li').text('Scanning for Bluetooth Cubelets...');
-      var scanner;
-      if(process.platform == 'darwin')
-      {
-          scanner = new cubelets.SerialScanner();
-      }
-      else
-      {
-          scanner = new cubelets.BluetoothScanner();
-      }
-       
+      var scanner = new cubelets.BluetoothScanner();
       scanner.on('pass', function(connection, name, config) {
         emptyItem.remove();
         list.append('li')
