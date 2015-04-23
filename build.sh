@@ -29,6 +29,9 @@ $GYP configure --target=$NW_VERSION
 $GYP build
 cd ../../../../../..
 
+#echo "Stopping for development"
+#exit
+
 echo "Zipping up app.nw package..."
 mkdir -p build
 node ./tools/set-app-name "$APP_NAME" # proper formatting in node-webkit

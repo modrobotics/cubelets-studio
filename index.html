@@ -738,30 +738,28 @@ studio.on('buildComplete', function() {
 });
 
 studio.on('buildWarning', function(result) {
-  if(result.fileName.indexOf(studio.getCubelet().type.name)>=0)
-  {
+  if (result.fileName.indexOf(studio.getCubelet().type.name) >= 0) {
     log.warn(ui.formatBuildResult(result));
-    annotations = ui.editor.getSession().getAnnotations();
+    var annotations = ui.editor.getSession().getAnnotations();
     annotations.push({ 
-                      row: result.lineNumber-1, 
-                      column: 0, 
-                      text: result.message, 
-                      type: "warning" // also warning and information 
-                  });
+      row: result.lineNumber - 1, 
+      column: 0, 
+      text: result.message, 
+      type: "warning" // also warning and information 
+    });
     ui.editor.getSession().setAnnotations(annotations);
   }
-
 });
 
 studio.on('buildError', function(result) {
   log.error(ui.formatBuildResult(result));
-  annotations = ui.editor.getSession().getAnnotations();
+  var annotations = ui.editor.getSession().getAnnotations();
   annotations.push({ 
-                    row: result.lineNumber-1, 
-                    column: 0, 
-                    text: result.message, 
-                    type: "error" // also warning and information 
-                });
+    row: result.lineNumber - 1,
+    column: 0,  
+    text: result.message, 
+    type: "error" // also warning and information 
+  });
   ui.editor.getSession().setAnnotations(annotations);
 });
 
@@ -785,7 +783,6 @@ studio.on('flashComplete', function() {
 studio.on('flashError', function(error) {
   ui.hideFlashProgressBar();
   ui.enableFlashButton();
-  studio.resetAllCubelets();
   studio.resetBluetoothCubelet();
   log.error(error);
 });
@@ -804,7 +801,6 @@ studio.on('firmwareComplete', function(cubelet, version) {
   log.info('Firmware updated on cubelet \'' + cubelet.id + '\' to version \'' + version + '\'.');
 });
 
-
 var log = new (function() {
   var instance = this;
   _(['info', 'debug', 'warn', 'error']).each(function(type) {
@@ -814,6 +810,8 @@ var log = new (function() {
         .classed('console-message-' + type, true)
         .text(Array.prototype.join.call(arguments, ' '));
       ui.scrollConsoleToBottom();
+      (type === 'error' ? console.error :
+        console.log).apply(console, arguments);
     }
   });
 });
@@ -958,8 +956,7 @@ var ui = {
           var program = tab.ref.program;
           var session = tab.ref.session;
           log.info('Building \'' + program.name + '\'... ');
-          studio.saveProgram(program, session, function(program)
-          {
+          studio.saveProgram(program, session, function(program) {
             ui.editor.getSession().setAnnotations([]);
             studio.buildProgram(program);
             ui.disableBuildButton();
@@ -1810,7 +1807,6 @@ d3.select('.titlebar-connection-status').on('click', function(e) {
 });
 
 ui.initialize();
-
 
 studio.on('error', function(error) {
   console.error('Unhandled Error', error);
