@@ -4,7 +4,6 @@ NW_VERSION=0.8.4
 NW_PATH=/opt/node-webkit/$NW_VERSION
 NW=$NW_PATH/node-webkit.app/Contents/MacOS/node-webkit
 GYP=nw-gyp
-PREGYP=node-pre-gyp
 
 # App info
 APP_NAME=Cubelets\ Studio
@@ -13,14 +12,10 @@ APP_SLUG=cubelets-studio
 echo "Installing node modules..."
 npm install
 
+echo "Pruning node modules..."
+rm -rf node_modules/cubelets/node_modules/socket.io-client/node_modules/active-x-obfuscator/.*.un~
+
 echo "Building native node modules for node-webkit..."
-cd node_modules/cubelets/node_modules/serialport
-$PREGYP clean
-$PREGYP configure --runtime=node-webkit --target=$NW_VERSION
-$PREGYP build
-# HACK to work around node-pre-gyp problems with old node-webkit.
-mv build/serialport/v1.6.3/Release/node-webkit-v0.8.4-darwin-x64 build/serialport/v1.6.3/Release/node-webkit-v11-darwin-ia32
-cd ../../../..
 cd node_modules/cubelets/node_modules/bluetooth-serial-port
 $GYP clean
 $GYP configure --target=$NW_VERSION

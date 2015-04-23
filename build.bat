@@ -4,7 +4,6 @@ set NW_VERSION=0.8.6
 set NW_PATH=C:\opt\node-webkit\%NW_VERSION%
 set NW=nw
 set GYP=nw-gyp
-set PREGYP=node-pre-gyp
 set APP_NAME=Cubelets Studio
 set APP_SLUG=cubelets-studio
 
@@ -16,11 +15,6 @@ call npm install
 
 :build_modules
 echo "Building native node modules for node-webkit..."
-REM call cd node_modules\cubelets\node_modules\serialport
-REM call %PREGYP% clean
-REM call %PREGYP% configure --runtime=node-webkit --target=%NW_VERSION% --arch=ia32
-REM call %PREGYP% build
-REM call cd ..\..\..\..
 call cd node_modules\cubelets\node_modules\bluetooth-serial-port
 call %GYP% clean
 call %GYP% configure --target=%NW_VERSION% --arch=ia32
