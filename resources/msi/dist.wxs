@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="*" Name="Cubelets Studio" Language="1033" Version="2.1.0" Manufacturer="Modular Robotics Incorporated" UpgradeCode="bb3b72d9-80aa-4b04-bfed-b7d8fc6580e5">
+    <Product Id="*" Name="Cubelets Studio" Language="1033" Version="2.1.1" Manufacturer="Modular Robotics Incorporated" UpgradeCode="bb3b72d9-80aa-4b04-bfed-b7d8fc6580e5">
 
         <Package Description="Use Cubelets Studio to connect your Bluetooth Cubelet to your PC, and unlock the power to create new advanced behaviors for your robot constructions!" Comments="Cubelets Studio" InstallerVersion="200" Compressed="yes"/>
 
